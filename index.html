@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Amo a Mayda 💖</title>
+<style>
+    body {
+        margin: 0;
+        overflow: hidden;
+        background: linear-gradient(to bottom, #ffe6f0, #fff);
+        font-family: Arial, sans-serif;
+    }
+
+    .item {
+        position: absolute;
+        top: -50px;
+        font-size: 24px;
+        animation: caer linear infinite;
+        user-select: none;
+    }
+
+    @keyframes caer {
+        from { transform: translateY(-50px); }
+        to { transform: translateY(110vh); }
+    }
+
+    h1 {
+        position: fixed;
+        top: 40%;
+        width: 100%;
+        text-align: center;
+        font-size: 48px;
+        color: #d63384;
+        z-index: 10;
+        text-shadow: 2px 2px 6px white;
+    }
+</style>
+</head>
+<body>
+
+<h1>💖 Amo a Mayda + 💖</h1>
+
+<script>
+    const flores = ["🌸","🌹","🌺","🌷","🌼","💐"];
+    const regalos = ["🎁"];
+
+    function crearItem(simbolos, cantidad) {
+        for (let i = 0; i < cantidad; i++) {
+            const item = document.createElement("div");
+            item.className = "item";
+            item.textContent = simbolos[Math.floor(Math.random() * simbolos.length)];
+            item.style.left = Math.random() * 100 + "vw";
+            item.style.fontSize = (20 + Math.random() * 20) + "px";
+            item.style.animationDuration = (5 + Math.random() * 5) + "s";
+            item.style.animationDelay = Math.random() * 5 + "s";
+            document.body.appendChild(item);
+        }
+    }
+
+    // 1000 flores 🌸
+    crearItem(flores, 1000);
+
+    // 100 regalos 🎁
+    crearItem(regalos, 100);
+</script>
+
+</body>
+</html>
