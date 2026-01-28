@@ -2,129 +2,98 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Sorpresa para mi Amor</title>
+    <title>Para mi Graduada Favorita ❤️</title>
     <style>
         body {
+            background-color: #fff5f7;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
-            background-color: #ffdde1;
-            font-family: 'Arial', sans-serif;
+            font-family: 'Georgia', serif;
         }
 
-        .envelope-container {
+        .carta-abierta {
+            background-color: white;
+            width: 90%;
+            max-width: 600px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid #ffd1dc;
             position: relative;
-            width: 300px;
-            height: 200px;
-            cursor: pointer;
+            text-align: center;
         }
 
-        /* El sobre base */
-        .envelope {
+        .carta-abierta::before {
+            content: "";
+            position: absolute;
+            top: 10px; left: 10px; right: 10px; bottom: 10px;
+            border: 2px solid #ff8fa3;
+            pointer-events: none;
+        }
+
+        h1 { color: #d81b60; font-style: italic; }
+        
+        .galeria {
+            width: 100%;
+            height: 300px;
+            margin: 20px 0;
             position: relative;
-            width: 300px;
-            height: 200px;
-            background-color: #ff8fa3;
-            z-index: 2;
-            border-radius: 0 0 10px 10px;
+            overflow: hidden;
+            border-radius: 8px;
         }
 
-        /* La tapa del sobre */
-        .flap {
-            position: absolute;
-            top: 0;
-            width: 0;
-            height: 0;
-            border-left: 150px solid transparent;
-            border-right: 150px solid transparent;
-            border-top: 100px solid #ff758c;
-            transform-origin: top;
-            transition: transform 0.5s ease;
-            z-index: 4;
-        }
-
-        /* La carta que sale */
-        .letter {
-            position: absolute;
-            top: 5px;
-            left: 10px;
-            width: 280px;
-            height: 180px;
-            background: white;
-            z-index: 1;
-            transition: transform 0.8s ease;
-            padding: 15px;
-            box-sizing: border-box;
-            text-align: center;
-            border-radius: 5px;
-            overflow-y: auto;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-
-        .letter img {
+        .galeria img {
             width: 100%;
-            border-radius: 5px;
-            margin: 10px 0;
-            display: none; /* Se alternan con JS */
-        }
-
-        /* Animación cuando se abre */
-        .envelope-container.open .flap {
-            transform: rotateX(180deg);
-            z-index: 0;
-        }
-
-        .envelope-container.open .letter {
-            transform: translateY(-150px);
-            height: 380px;
-            z-index: 3;
-        }
-
-        .instruccion {
+            height: 100%;
+            object-fit: cover;
             position: absolute;
-            top: 220px;
-            width: 100%;
-            text-align: center;
-            color: #d81b60;
-            font-weight: bold;
+            left: 0; top: 0;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .galeria img.activa { opacity: 1; }
+
+        p { line-height: 1.6; color: #444; font-size: 1.1em; }
+
+        .corazon-final {
+            color: #ff4d6d;
+            font-size: 30px;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
 
-    <div class="envelope-container" onclick="abrirCarta()">
-        <div class="flap"></div>
-        <div class="envelope"></div>
-        <div class="letter">
-            <h3 style="color: #e91e63; margin-top: 0;">¡Felicidades mi Graduada! 🎓</h3>
-            <p style="font-size: 14px;">¡Aprobaste! Estoy tan feliz por ti. Vamos a seguir juntos por siempre.</p>
-            
-            <img src="foto1.jpg" id="f1" style="display: block;">
-            <img src="foto2.jpg" id="f2">
-            <img src="foto3.jpg" id="f3">
-            <img src="foto4.jpg" id="f4">
-            <img src="foto5.jpg" id="f5">
+    <div class="carta-abierta">
+        <h1>¡Felicidades mi amor por este logro!</h1>
+        
+        <p>Estoy demasiado contento por ti. Sé cuánto te esforzaste y ver que aprobaste me llena de orgullo.</p>
 
-            <p style="font-size: 14px; font-weight: bold;">Eres lo mejor que me ha pasado. ❤️</p>
+        <div class="galeria">
+            <img src="foto1.jpg" class="activa">
+            <img src="foto2.jpg">
+            <img src="foto3.jpg">
+            <img src="foto4.jpg">
+            <img src="foto5.jpg">
         </div>
-        <div class="instruccion">Haz clic aquí para abrir 👆</div>
+
+        <p>Vamos a seguir juntos por siempre, apoyándonos en cada paso. Eres lo mejor que me ha pasado en la vida.</p>
+        
+        <div class="corazon-final">❤️</div>
     </div>
 
     <script>
-        function abrirCarta() {
-            document.querySelector('.envelope-container').classList.toggle('open');
-        }
-
-        // Cambio de fotos automático
-        let fotoActual = 1;
+        let actual = 0;
+        const fotos = document.querySelectorAll('.galeria img');
+        
         setInterval(() => {
-            document.getElementById(f${fotoActual}).style.display = 'none';
-            fotoActual = (fotoActual % 5) + 1;
-            document.getElementById(f${fotoActual}).style.display = 'block';
+            fotos[actual].classList.remove('activa');
+            actual = (actual + 1) % fotos.length;
+            fotos[actual].classList.add('activa');
         }, 3000);
     </script>
-
 </body>
 </html>
