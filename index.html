@@ -2,121 +2,127 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>¡Nuestra Felicidad Continúa! 🎉</title>
+    <title>Para Mayda, con todo mi amor</title>
     <style>
         body {
             margin: 0;
-            padding: 0;
-            background: linear-gradient(to top, #ffe6f2, #ffb3d9); /* Gradiente rosa suave */
+            overflow: hidden;
+            background: #fff0f3;
             font-family: 'Arial', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            overflow: hidden; /* Para que las animaciones de fondo no generen scroll */
-            position: relative;
+            height: 100vh;
         }
 
-        /* Estilos del contenedor principal del mensaje y fotos */
-        .celebration-card {
-            background-color: rgba(255, 255, 255, 0.9); /* Fondo blanco semi-transparente */
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            position: relative;
-            z-index: 10; /* Para que esté por encima de las animaciones */
+        /* El muñequito que lanza corazones */
+        .character {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 80px;
+            z-index: 20;
+            animation: bounce 0.5s infinite alternate;
+        }
+
+        @keyframes bounce {
+            from { transform: translateX(-50%) translateY(0); }
+            to { transform: translateX(-50%) translateY(-20px); }
+        }
+
+        .card {
+            background: white;
             width: 90%;
-            max-width: 700px;
-            animation: fadeInScaleUp 1.5s ease-out forwards;
+            max-width: 450px;
+            padding: 25px;
+            border-radius: 30px;
+            box-shadow: 0 10px 40px rgba(255, 77, 109, 0.2);
+            text-align: center;
+            z-index: 10;
+            border: 4px solid #ff8fa3;
         }
 
-        @keyframes fadeInScaleUp {
+        .names {
+            color: #d81b60;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .main-photo {
+            width: 100%;
+            height: 300px;
+            border-radius: 20px;
+            object-fit: cover;
+            margin: 15px 0;
+            border: 3px solid #ffb3c1;
+            display: none; /* Se activan con JS */
+        }
+
+        .active { display: block; animation: fadeIn 0.8s; }
+
+        @keyframes fadeIn {
             from { opacity: 0; transform: scale(0.9); }
             to { opacity: 1; transform: scale(1); }
         }
 
-        h1 {
-            color: #d81b60; /* Rosa oscuro */
-            font-size: 2.8em;
-            margin-bottom: 20px;
-            animation: textReveal 1s ease-out 1.5s forwards;
-            opacity: 0;
-            transform: translateY(20px);
-        }
-
-        @keyframes textReveal {
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        p {
-            color: #6a0080; /* Morado suave */
-            font-size: 1.2em;
-            line-height: 1.6;
-            margin-bottom: 30px;
-            animation: textReveal 1s ease-out 2s forwards;
-            opacity: 0;
-            transform: translateY(20px);
-        }
-
-        /* Carrusel de fotos */
-        .photo-carousel {
-            width: 100%;
-            height: 380px;
-            position: relative;
-            margin: 0 auto 30px auto;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-            border: 4px solid #ff4d6d; /* Borde rosa vibrante */
-        }
-
-        .photo-carousel img {
+        /* Lluvia de corazones y regalos */
+        .drop {
             position: absolute;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0;
-            transition: opacity 1.5s ease-in-out;
-            border-radius: 10px;
-        }
-
-        .photo-carousel img.active {
-            opacity: 1;
-        }
-
-        /* Animación de elementos flotantes (corazones, regalos, chispas) */
-        .floating-element {
-            position: absolute;
-            pointer-events: none; /* No interactuable con el ratón */
-            animation: floatAndFade 8s linear infinite;
-            opacity: 0;
+            top: -50px;
             z-index: 5;
-            font-size: 2em; /* Tamaño base */
+            animation: fall linear forwards;
         }
 
-        /* Variaciones para los tipos de elementos */
-        .floating-element.heart { color: #ff4d6d; }
-        .floating-element.gift { color: #ffeb3b; font-size: 1.8em; animation-duration: 10s; } /* Un poco más lento */
-        .floating-element.sparkle { color: #ffffff; font-size: 1.5em; text-shadow: 0 0 5px #ffcc00; animation-duration: 7s; } /* Más rápido */
-        .floating-element.balloon { color: #f48fb1; font-size: 2.2em; animation-duration: 11s; } /* Más lento */
-
-        @keyframes floatAndFade {
-            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.8; }
-            100% { transform: translateY(-50vh) rotate(720deg); opacity: 0; }
+        @keyframes fall {
+            to { transform: translateY(110vh) rotate(360deg); }
         }
+
+        h2 { color: #ff4d6d; margin: 10px 0; }
     </style>
 </head>
 <body>
 
-    <div class="celebration-card">
-        <h1>¡Nuestra Felicidad es Contagiosa! 🎉</h1>
-        <p>Mi amor, ver tu alegría me hace el más feliz. Cada momento a tu lado es un regalo, y nuestra historia sigue brillando más fuerte que nunca.</p>
-        
-        <div class="photo-carousel">
-            <img src="foto1.jpg" alt="Momento feliz 1" class="active">
-            <img src="foto2.jpg" alt="Momento feliz 2">
-            <img src="foto3.jpg" alt="Momento feliz 3">
-            <img
+    <div class="character">🕺</div> <div class="card">
+        <div class="names">Abel con amor a Mayda ❤️</div>
+        <h2>¡Felicidades mi Graduada!</h2>
+        <p>¡Aprobaste! Eres lo mejor que me ha pasado. Vamos por siempre juntos.</p>
+
+        <img src="foto1.jpg" class="main-photo active">
+        <img src="foto2.jpg" class="main-photo">
+        <img src="foto3.jpg" class="main-photo">
+        <img src="foto4.jpg" class="main-photo">
+        <img src="foto5.jpg" class="main-photo">
+
+        <p style="font-style: italic; color: #777;">¡Estoy muy orgulloso de ti!</p>
+    </div>
+
+    <script>
+        // Cambiar fotos
+        let current = 0;
+        const photos = document.querySelectorAll('.main-photo');
+        setInterval(() => {
+            photos[current].classList.remove('active');
+            current = (current + 1) % photos.length;
+            photos[current].classList.add('active');
+        }, 3000);
+
+        // Tirar corazones y regalos desde arriba
+        function createDrop() {
+            const items = ['❤️', '🎁', '💖', '✨', '🌸'];
+            const drop = document.createElement('div');
+            drop.className = 'drop';
+            drop.innerHTML = items[Math.floor(Math.random() * items.length)];
+            drop.style.left = Math.random() * 100 + 'vw';
+            drop.style.fontSize = Math.random() * 20 + 20 + 'px';
+            drop.style.duration = Math.random() * 3 + 2 + 's';
+            drop.style.animationDuration = drop.style.duration;
+            document.body.appendChild(drop);
+            setTimeout(() => drop.remove(), 5000);
+        }
+
+        setInterval(createDrop, 300);
+    </script>
+</body>
+</html>
