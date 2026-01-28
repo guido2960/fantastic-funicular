@@ -1,87 +1,190 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Para Mi Graduada Favorita, Mayda</title>
-    <style>
-        body {
-            margin: 0; padding: 0; overflow-x: hidden;
-            font-family: 'Arial', sans-serif; color: #fff;
-            background: linear-gradient(to top right, #ff7e5f, #feb47b);
-            min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to right top, #ffecd2, #fcb69f); /* Gradiente de fondo cálido */
+            color: #4a148c; /* Morado oscuro */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+            overflow: hidden; /* Para que los elementos flotantes no creen scroll */
+            position: relative;
         }
-        .header {
-            text-align: center; padding: 30px; background: rgba(0, 0, 0, 0.5);
-            border-radius: 20px; margin: 20px; box-shadow: 0 0 25px #ffd700;
-            animation: fadeIn 2s ease-in-out;
+
+        /* Animación de entrada para el contenedor principal */
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
         }
-        .graduacion-msg {
-            background: rgba(255, 215, 0, 0.2); border: 2px solid #ffd700;
-            padding: 20px; border-radius: 15px; margin: 20px;
-            animation: pulse 2s infinite;
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.95); /* Fondo blanco semi-transparente */
+            border-radius: 20px;
+            padding: 30px 40px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            max-width: 900px;
+            width: 100%;
+            position: relative;
+            z-index: 10;
+            animation: fadeInScale 1.5s ease-out forwards;
         }
-        h1 { font-size: 2.8rem; color: #ffd700; text-shadow: 2px 2px 4px #000; }
-        h2 { color: #fff; font-size: 2rem; }
-        .gallery { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin: 20px; }
-        .gallery img {
-            width: 250px; height: 350px; object-fit: cover;
-            border: 5px solid #fff; border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            color: #e91e63; /* Rosa vibrante */
+            margin-bottom: 20px;
+            font-size: 3.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            opacity: 0; /* Empieza invisible */
+            animation: fadeIn 1s ease-out 1.5s forwards; /* Aparece después del contenedor */
         }
-        .heart {
-            position: absolute; width: 15px; height: 15px; background: #ff69b4;
-            transform: rotate(-45deg); animation: fall linear infinite; pointer-events: none;
+
+        p {
+            font-size: 1.1em;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            color: #6a0080; /* Morado más suave */
+            opacity: 0; /* Empieza invisible */
+            animation: fadeIn 1s ease-out 2s forwards; /* Aparece después del título */
         }
-        .heart::before, .heart::after {
-            content: ''; position: absolute; width: 15px; height: 15px;
-            background: #ff69b4; border-radius: 50%;
+
+        /* Animación para el párrafo final */
+        .footer-message {
+            font-size: 1.2em;
+            font-style: italic;
+            color: #d81b60; /* Rosa oscuro */
+            margin-top: 30px;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 2.5s forwards;
         }
-        .heart::before { top: -8px; left: 0; }
-        .heart::after { left: 8px; top: 0; }
-        @keyframes fall {
-            0% { transform: translateY(-10vh) rotate(-45deg); opacity: 1; }
-            100% { transform: translateY(100vh) rotate(-45deg); opacity: 0; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+
+        /* Carrusel de imágenes */
+        .carousel {
+            position: relative;
+            width: 100%;
+            height: 300px; /* Altura del carrusel */
+            margin: 30px auto;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            background-color: #f8f8f8;
+            border: 4px solid #f06292; /* Borde rosa claro */
         }
+
+        .carousel img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out; /* Transición más lenta */
+            border-radius: 10px; /* Bordes redondeados para cada imagen */
+        }
+
+        .carousel img.active {
+            opacity: 1;
+        }
+
+        /* Animación de elementos flotantes (corazones y regalos) */
+        .floating-element {
+            position: absolute;
+            font-size: 2em;
+            color: #e91e63;
+            animation: float 10s infinite ease-in-out;
+            pointer-events: none; /* No interactuable con el ratón */
+            z-index: 5;
+        }
+        .floating-element.gift {
+            font-size: 1.8em;
+            color: #ffb74d; /* Naranja para los regalos */
+            animation-duration: 12s;
+            animation-delay: 2s;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            20% { opacity: 0.8; }
+            100% { transform: translateY(-1000px) rotate(360deg); opacity: 0; }
+        }
+
+        /* Variaciones para los elementos flotantes */
+        .floating-element:nth-child(1) { left: 10%; animation-delay: 0s; font-size: 2.2em; }
+        .floating-element:nth-child(2) { left: 25%; animation-delay: 2s; font-size: 1.8em; }
+        .floating-element:nth-child(3) { left: 40%; animation-delay: 4s; font-size: 2.5em; }
+        .floating-element:nth-child(4) { left: 55%; animation-delay: 1s; font-size: 1.9em; }
+        .floating-element:nth-child(5) { left: 70%; animation-delay: 3s; font-size: 2.3em; }
+        .floating-element:nth-child(6) { left: 85%; animation-delay: 5s; font-size: 2em; }
+        .floating-element:nth-child(7) { left: 5%; animation-delay: 6s; font-size: 2.4em; }
+        .floating-element:nth-child(8) { left: 90%; animation-delay: 7s; font-size: 2.1em; }
+        .floating-element:nth-child(9) { left: 15%; animation-delay: 8s; font-size: 1.7em; }
+        .floating-element:nth-child(10) { left: 80%; animation-delay: 9s; font-size: 2.6em; }
+
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>🎓 ¡Felicidades, Graduada! 🎓</h1>
-        <div class="graduacion-msg">
-            <h2>Mayda, hoy el mundo celebra tu éxito</h2>
-            <p>Todo tu esfuerzo y dedicación han dado frutos. ¡Estoy tan orgulloso de ti!</p>
+    <div class="floating-element">❤️</div>
+    <div class="floating-element gift">🎁</div>
+    <div class="floating-element">❤️</div>
+    <div class="floating-element">💖</div>
+    <div class="floating-element gift">🎁</div>
+    <div class="floating-element">❤️</div>
+    <div class="floating-element">💞</div>
+    <div class="floating-element gift">🎁</div>
+    <div class="floating-element">❤️</div>
+    <div class="floating-element">💕</div>
+
+    <div class="container">
+        <h1>¡Felicidades mi amor!</h1>
+        <p>Eres algo muy importante para mí. Cada momento a tu lado es un regalo y valoro cada risa, cada conversación y cada sueño que compartimos.</p>
+        <p>Gracias por ser tú, por tu amor, tu apoyo y por hacer mi vida mucho más hermosa. ¡Te adoro con todo mi corazón!</p>
+
+        <div class="carousel">
+            <img src="foto1.jpg" alt="Momento juntos" class="active">
+            <img src="foto2.jpg" alt="Su sonrisa">
+            <img src="foto3.jpg" alt="Recuerdo especial">
+            <img src="foto4.jpg" alt="Detalle amoroso">
+            <img src="foto5.jpg" alt="Nuestro futuro">
         </div>
-    </div>
 
-    <div class="gallery">
-        <img src="foto1.jpg" alt="Mayda 1">
-        <img src="foto2.jpg" alt="Mayda 2">
-        <img src="foto3.jpg" alt="Mayda 3">
-        <img src="foto4.jpg" alt="Mayda 4">
-    </div>
-
-    <div class="header" style="background: rgba(255, 105, 180, 0.3);">
-        <p>Este es solo el comienzo de todas las cosas maravillosas que vas a lograr. 
-        Sigue brillando con esa luz única que tienes. ✨</p>
-        <p><b>¡Con todo mi amor y admiración, Abel!</b></p>
+        <p class="footer-message">Con todo mi amor y admiración, siempre.</p>
     </div>
 
     <script>
-        function createHeart() {
-            const heart = document.createElement('div');
-            heart.classList.add('heart');
-            heart.style.left = Math.random() * 100 + "vw";
-            heart.style.animationDuration = (Math.random() * 3 + 2) + "s";
-            document.body.appendChild(heart);
-            setTimeout(() => heart.remove(), 5000);
+        const images = document.querySelectorAll('.carousel img');
+        let currentImageIndex = 0;
+
+        function showNextImage() {
+            // Quita la clase 'active' de la imagen actual
+            images[currentImageIndex].classList.remove('active');
+
+            // Calcula el índice de la siguiente imagen
+            currentImageIndex = (currentImageIndex + 1) % images.length;
+
+            // Agrega la clase 'active' a la nueva imagen
+            images[currentImageIndex].classList.add('active');
         }
-        setInterval(createHeart, 300);
+
+        // Cambia la imagen cada 4 segundos (4000 milisegundos)
+        setInterval(showNextImage, 4000);
+
+        // Hace que los elementos flotantes aparezcan desde abajo
+        document.querySelectorAll('.floating-element').forEach(el => {
+            el.style.top = ${Math.random() * 100 + 100}vh; // Empieza debajo de la pantalla
+            el.style.left = ${Math.random() * 90}%; // Posición horizontal aleatoria
+            el.style.animationDelay = ${Math.random() * 10}s; // Retraso aleatorio para la animación
+            el.style.animationDuration = ${Math.random() * 8 + 8}s; // Duración aleatoria para que sea menos repetitivo
+            el.style.fontSize = ${Math.random() * 1.5 + 1.5}em; // Tamaño aleatorio
+        });
+
     </script>
 </body>
 </html>
