@@ -1,216 +1,209 @@
- body {
-            font-family: 'Quicksand', sans-serif;
-            background: linear-gradient(to right top, #ffecd2, #fcb69f); /* Gradiente cálido */
-            color: #4a148c; /* Morado oscuro */
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Una sorpresa para ti, mi amor</title>
+    <style>
+        :root {
+            --color-sobre: #ff8fa3;
+            --color-papel: #ffffff;
+            --color-texto: #4a148c;
+        }
+
+        body {
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
-            min-height: 100vh;
+            align-items: center;
+            height: 100vh;
             margin: 0;
+            background-color: #ffeef2;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+
+        /* Contenedor del sobre */
+        .envelope-wrapper {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .envelope-wrapper:hover {
+            transform: scale(1.05);
+        }
+
+        .envelope {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            background-color: var(--color-sobre);
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        /* Tapa del sobre */
+        .envelope::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            z-index: 2;
+            border-top: 110px solid var(--color-sobre);
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            transform-origin: top;
+            transition: transform 0.4s 0.4s;
+        }
+
+        /* Lados del sobre */
+        .envelope::after {
+            content: "";
+            position: absolute;
+            z-index: 2;
+            width: 0;
+            height: 0;
+            border-top: 100px solid transparent;
+            border-left: 150px solid #ffb3c1;
+            border-right: 150px solid #ffb3c1;
+            border-bottom: 100px solid #ffb3c1;
+            border-radius: 10px;
+        }
+
+        /* La carta (papel) */
+        .letter {
+            position: absolute;
+            bottom: 0;
+            left: 10px;
+            width: 280px;
+            height: 180px;
+            background: var(--color-papel);
             padding: 20px;
             box-sizing: border-box;
+            transition: transform 0.6s, bottom 0.6s;
+            z-index: 1;
+            border-radius: 5px;
+            overflow-y: auto;
             text-align: center;
-            overflow: hidden; /* Para animaciones de fondo */
-            position: relative;
         }
 
-        /* Contenedor principal para el mensaje y las fotos */
-        .container {
-            background-color: rgba(255, 255, 255, 0.95);
-            border-radius: 25px;
-            padding: 30px 40px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-            max-width: 800px;
+        .letter h2 {
+            font-size: 1.2em;
+            color: #e91e63;
+            margin-top: 0;
+        }
+
+        .letter p {
+            font-size: 0.9em;
+            line-height: 1.4;
+            color: var(--color-texto);
+        }
+
+        .letter img {
             width: 100%;
-            position: relative;
-            z-index: 10;
-            animation: fadeInScale 1.5s ease-out forwards;
-            opacity: 0; /* Empieza invisible */
-            transform: scale(0.9);
+            border-radius: 10px;
+            margin: 10px 0;
+            display: none; /* Se activarán con JS */
         }
 
-        @keyframes fadeInScale {
-            to { opacity: 1; transform: scale(1); }
+        /* Estado Abierto */
+        .envelope-wrapper.open .envelope::before {
+            transform: rotateX(180deg);
+            z-index: 0;
         }
 
-        h1 {
-            font-family: 'Pacifico', cursive;
-            color: #e91e63; /* Rosa vibrante */
-            margin-bottom: 20px;
-            font-size: 3.8em;
-            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.15);
-            opacity: 0;
-            animation: fadeIn 1s ease-out 1.8s forwards; /* Aparece después del contenedor */
-        }
-
-        p {
-            font-size: 1.3em;
-            line-height: 1.6;
-            margin-bottom: 25px;
-            color: #6a0080;
-            opacity: 0;
-            animation: fadeIn 1s ease-out 2.3s forwards; /* Aparece después del título */
-        }
-
-        @keyframes fadeIn {
-            to { opacity: 1; }
-        }
-
-        /* Carrusel de imágenes */
-        .carousel {
-            position: relative;
-            width: 100%;
-            height: 400px; /* Altura del carrusel */
-            margin: 30px auto;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-            background-color: #f8f8f8;
-            border: 6px solid #f06292; /* Borde rosa claro */
-            transform: translateY(20px); /* Empieza un poco abajo */
-            opacity: 0;
-            animation: slideInUp 1s ease-out 2.8s forwards; /* Aparece deslizando */
-        }
-
-        @keyframes slideInUp {
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .carousel img {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0;
-            transition: opacity 1.8s ease-in-out; /* Transición más lenta para las fotos */
-            border-radius: 15px;
-        }
-
-        .carousel img.active {
-            opacity: 1;
-        }
-
-        /* Confeti y estrellas flotantes para la celebración */
-        .celebration-element {
-            position: absolute;
-            font-size: 1.5em;
-            animation: celebrate 8s linear infinite;
-            pointer-events: none;
-            z-index: 5;
-            opacity: 0; /* Empiezan invisibles */
-            animation-delay: 3s; /* Empiezan a aparecer después del contenido principal */
-        }
-        .celebration-element.star { color: gold; font-size: 2em; animation-duration: 10s; }
-        .celebration-element.confetti { color: #f9a825; font-size: 1.2em; animation-duration: 7s; }
-
-        @keyframes celebrate {
-            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.8; }
-            100% { transform: translateY(-50vh) rotate(720deg); opacity: 0; }
-        }
-
-        /* Botón de reproducción de música */
-        #musicToggle {
-            background-color: #ff4081; /* Rojo rosado */
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            font-size: 1.5em;
-            cursor: pointer;
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            transition: transform 0.3s ease, background-color 0.3s ease;
-            z-index: 100;
-        }
-        #musicToggle:hover {
-            background-color: #e0004f;
+        .envelope-wrapper.open .letter {
+            bottom: 100px;
+            height: 350px;
             transform: scale(1.1);
+            z-index: 3;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Corazones flotantes */
+        .heart {
+            position: absolute;
+            color: #ff4d6d;
+            font-size: 20px;
+            pointer-events: none;
+            animation: floatUp 4s linear infinite;
+            opacity: 0;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+
+        .instruccion {
+            position: absolute;
+            bottom: 50px;
+            color: #ff4d6d;
+            font-weight: bold;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
         }
     </style>
 </head>
 <body>
 
-    <script>
-        const celebrationSymbols = ['✨', '🎉', '🌟', '🎊']; // Estrellas y confeti
-        for (let i = 0; i < 30; i++) {
-            let el = document.createElement('div');
-            el.className = 'celebration-element';
-            el.innerHTML = celebrationSymbols[Math.floor(Math.random() * celebrationSymbols.length)];
-            el.style.left = Math.random() * 100 + 'vw';
-            el.style.top = ${Math.random() * 20 + 100}vh; /* Empiezan más abajo */
-            el.style.animationDelay = Math.random() * 8 + 's';
-            el.style.animationDuration = ${Math.random() * 6 + 6}s;
-            el.style.fontSize = (Math.random() * 1.5 + 1) + 'em';
-            document.body.appendChild(el);
-        }
-    </script>
+    <div class="envelope-wrapper" id="envelope">
+        <div class="envelope"></div>
+        <div class="letter">
+            <h2>¡Felicidades mi amor! ❤️</h2>
+            <p>¡Lo lograste! Estoy tan orgulloso de ese gran logro que acabas de alcanzar.</p>
+            
+            <img src="foto1.jpg" id="img1" style="display: block;">
+            <img src="foto2.jpg" id="img2">
+            <img src="foto3.jpg" id="img3">
+            <img src="foto4.jpg" id="img4">
+            <img src="foto5.jpg" id="img5">
 
-    <div class="container">
-        <h1>¡Felicidades mi vida! ¡Lo lograste!</h1>
-        <p>¡No puedo estar más orgulloso/a de ti por esta increíble aprobación! Sabía que lo conseguirías con tu esfuerzo y dedicación. Eres lo mejor que me ha pasado en la vida y estoy ansioso/a por celebrar cada uno de tus éxitos.</p>
-        <p>Este es solo el comienzo de cosas maravillosas. ¡Te amo con todo mi corazón!</p>
-
-        <div class="carousel">
-            <img src="foto1.jpg" alt="Momento feliz" class="active">
-            <img src="foto2.jpg" alt="Juntos">
-            <img src="foto3.jpg" alt="Recuerdo especial">
-            <img src="foto4.jpg" alt="Su sonrisa">
-            <img src="foto5.jpg" alt="Mi amor">
+            <p>Este es solo un paso más en tu camino al éxito. Recuerda que vamos a seguir juntos por siempre, apoyándonos en todo.</p>
+            <p><b>¡Te amo con toda mi alma!</b></p>
         </div>
     </div>
 
-    <audio id="backgroundMusic" loop>
-        <source src="URL_DE_TU_MUSICA.mp3" type="audio/mpeg">
-        Tu navegador no soporta el elemento de audio.
-    </audio>
-
-    <button id="musicToggle">▶️</button>
+    <div class="instruccion">Toca el sobre para abrirlo</div>
 
     <script>
-        // Lógica del carrusel de imágenes
-        const images = document.querySelectorAll('.carousel img');
-        let currentImageIndex = 0;
-
-        function showNextImage() {
-            images[currentImageIndex].classList.remove('active');
-            currentImageIndex = (currentImageIndex + 1) % images.length;
-            images[currentImageIndex].classList.add('active');
-        }
-        setInterval(showNextImage, 5000); // Cambia la imagen cada 5 segundos
-
-        // Lógica para la música de fondo
-        const backgroundMusic = document.getElementById('backgroundMusic');
-        const musicToggle = document.getElementById('musicToggle');
-        let isPlaying = false;
-
-        musicToggle.addEventListener('click', () => {
-            if (isPlaying) {
-                backgroundMusic.pause();
-                musicToggle.textContent = '▶️';
-            } else {
-                // Intenta reproducir la música
-                backgroundMusic.play().catch(error => {
-                    console.log("No se pudo reproducir la música automáticamente:", error);
-                    alert("Haz clic en cualquier parte de la página para que la música empiece a sonar. (El navegador bloquea la reproducción automática).");
-                    // Una vez que el usuario interactúe, la reproducción manual será posible
-                });
-                musicToggle.textContent = '⏸️';
+        const envelope = document.getElementById('envelope');
+        
+        // Abrir/Cerrar sobre
+        envelope.addEventListener('click', () => {
+            envelope.classList.toggle('open');
+            if(envelope.classList.contains('open')) {
+                crearCorazones();
             }
-            isPlaying = !isPlaying;
         });
 
-        // Autoplay con manejo de políticas del navegador:
-        // Los navegadores modernos suelen bloquear la reproducción automática de audio.
-        // Por eso he incluido un botón para que el usuario pueda iniciarla.
-        // Si quieres intentar el autoplay, podrías quitar el botón y el evento,
-        // pero la experiencia del usuario puede variar si el navegador lo bloquea.
-        // Una buena práctica es que la música comience solo con la interacción del usuario.
+        // Rotar fotos dentro de la carta
+        let currentPhoto = 1;
+        setInterval(() => {
+            document.getElementById(img${currentPhoto}).style.display = 'none';
+            currentPhoto = (currentPhoto % 5) + 1;
+            document.getElementById(img${currentPhoto}).style.display = 'block';
+        }, 3000);
 
+        // Lógica de corazones flotantes
+        function crearCorazones() {
+            for(let i=0; i<15; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.className = 'heart';
+                    heart.innerHTML = '❤️';
+                    heart.style.left = Math.random() * 100 + 'vw';
+                    heart.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                    document.body.appendChild(heart);
+                    setTimeout(() => heart.remove(), 4000);
+                }, i * 300);
+            }
+        }
     </script>
 </body>
 </html>
