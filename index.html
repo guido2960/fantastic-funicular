@@ -1,190 +1,123 @@
-body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(to right top, #ffecd2, #fcb69f); /* Gradiente de fondo cálido */
-            color: #4a148c; /* Morado oscuro */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>¡Felicidades mi Graduada! 🎓</title>
+    <style>
+        body {
             margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
+            padding: 0;
+            background: #fff0f5; /* Color rosado muy suave */
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
             text-align: center;
-            overflow: hidden; /* Para que los elementos flotantes no creen scroll */
-            position: relative;
         }
 
-        /* Animación de entrada para el contenedor principal */
-        @keyframes fadeInScale {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
+        /* Corazones animados en el fondo */
+        .heart {
+            position: absolute;
+            color: #ff69b4;
+            font-size: 20px;
+            animation: fly 10s linear infinite;
+            opacity: 0;
+            z-index: 1;
         }
 
-        .container {
-            background-color: rgba(255, 255, 255, 0.95); /* Fondo blanco semi-transparente */
+        @keyframes fly {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
             border-radius: 20px;
-            padding: 30px 40px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-            max-width: 900px;
-            width: 100%;
-            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             z-index: 10;
-            animation: fadeInScale 1.5s ease-out forwards;
+            width: 90%;
+            max-width: 500px;
         }
 
         h1 {
-            font-family: 'Dancing Script', cursive;
-            color: #e91e63; /* Rosa vibrante */
-            margin-bottom: 20px;
-            font-size: 3.5em;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-            opacity: 0; /* Empieza invisible */
-            animation: fadeIn 1s ease-out 1.5s forwards; /* Aparece después del contenedor */
+            color: #d81b60;
+            font-size: 2em;
+            margin-bottom: 10px;
         }
 
-        p {
-            font-size: 1.1em;
-            line-height: 1.7;
-            margin-bottom: 20px;
-            color: #6a0080; /* Morado más suave */
-            opacity: 0; /* Empieza invisible */
-            animation: fadeIn 1s ease-out 2s forwards; /* Aparece después del título */
-        }
-
-        /* Animación para el párrafo final */
-        .footer-message {
-            font-size: 1.2em;
-            font-style: italic;
-            color: #d81b60; /* Rosa oscuro */
-            margin-top: 30px;
-            opacity: 0;
-            animation: fadeIn 1s ease-out 2.5s forwards;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* Carrusel de imágenes */
-        .carousel {
-            position: relative;
+        .photo-container {
             width: 100%;
-            height: 300px; /* Altura del carrusel */
-            margin: 30px auto;
+            height: 350px;
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-            background-color: #f8f8f8;
-            border: 4px solid #f06292; /* Borde rosa claro */
+            position: relative;
+            margin-bottom: 15px;
+            border: 5px solid #ffc1e3;
         }
 
-        .carousel img {
-            position: absolute;
+        .photo-container img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            position: absolute;
+            left: 0;
+            top: 0;
             opacity: 0;
-            transition: opacity 1.5s ease-in-out; /* Transición más lenta */
-            border-radius: 10px; /* Bordes redondeados para cada imagen */
+            transition: opacity 1s ease-in-out;
         }
 
-        .carousel img.active {
+        .photo-container img.active {
             opacity: 1;
         }
 
-        /* Animación de elementos flotantes (corazones y regalos) */
-        .floating-element {
-            position: absolute;
-            font-size: 2em;
-            color: #e91e63;
-            animation: float 10s infinite ease-in-out;
-            pointer-events: none; /* No interactuable con el ratón */
-            z-index: 5;
+        p {
+            font-size: 1.2em;
+            color: #555;
+            font-weight: bold;
         }
-        .floating-element.gift {
-            font-size: 1.8em;
-            color: #ffb74d; /* Naranja para los regalos */
-            animation-duration: 12s;
-            animation-delay: 2s;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
-            20% { opacity: 0.8; }
-            100% { transform: translateY(-1000px) rotate(360deg); opacity: 0; }
-        }
-
-        /* Variaciones para los elementos flotantes */
-        .floating-element:nth-child(1) { left: 10%; animation-delay: 0s; font-size: 2.2em; }
-        .floating-element:nth-child(2) { left: 25%; animation-delay: 2s; font-size: 1.8em; }
-        .floating-element:nth-child(3) { left: 40%; animation-delay: 4s; font-size: 2.5em; }
-        .floating-element:nth-child(4) { left: 55%; animation-delay: 1s; font-size: 1.9em; }
-        .floating-element:nth-child(5) { left: 70%; animation-delay: 3s; font-size: 2.3em; }
-        .floating-element:nth-child(6) { left: 85%; animation-delay: 5s; font-size: 2em; }
-        .floating-element:nth-child(7) { left: 5%; animation-delay: 6s; font-size: 2.4em; }
-        .floating-element:nth-child(8) { left: 90%; animation-delay: 7s; font-size: 2.1em; }
-        .floating-element:nth-child(9) { left: 15%; animation-delay: 8s; font-size: 1.7em; }
-        .floating-element:nth-child(10) { left: 80%; animation-delay: 9s; font-size: 2.6em; }
-
     </style>
 </head>
 <body>
-    <div class="floating-element">❤️</div>
-    <div class="floating-element gift">🎁</div>
-    <div class="floating-element">❤️</div>
-    <div class="floating-element">💖</div>
-    <div class="floating-element gift">🎁</div>
-    <div class="floating-element">❤️</div>
-    <div class="floating-element">💞</div>
-    <div class="floating-element gift">🎁</div>
-    <div class="floating-element">❤️</div>
-    <div class="floating-element">💕</div>
 
-    <div class="container">
-        <h1>¡Felicidades mi amor!</h1>
-        <p>Eres algo muy importante para mí. Cada momento a tu lado es un regalo y valoro cada risa, cada conversación y cada sueño que compartimos.</p>
-        <p>Gracias por ser tú, por tu amor, tu apoyo y por hacer mi vida mucho más hermosa. ¡Te adoro con todo mi corazón!</p>
+    <script>
+        for (let i = 0; i < 20; i++) {
+            let heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.innerHTML = '❤️';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDelay = Math.random() * 10 + 's';
+            heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
+            document.body.appendChild(heart);
+        }
+    </script>
 
-        <div class="carousel">
-            <img src="foto1.jpg" alt="Momento juntos" class="active">
-            <img src="foto2.jpg" alt="Su sonrisa">
-            <img src="foto3.jpg" alt="Recuerdo especial">
-            <img src="foto4.jpg" alt="Detalle amoroso">
-            <img src="foto5.jpg" alt="Nuestro futuro">
+    <div class="card">
+        <h1>¡Feliz mi graduada! 🎓</h1>
+        
+        <div class="photo-container">
+            <img src="foto1.jpg" class="active">
+            <img src="foto2.jpg">
+            <img src="foto3.jpg">
+            <img src="foto4.jpg">
+            <img src="foto5.jpg">
         </div>
 
-        <p class="footer-message">Con todo mi amor y admiración, siempre.</p>
+        <p>Eres lo mejor que me ha pasado en la vida. ❤️</p>
     </div>
 
     <script>
-        const images = document.querySelectorAll('.carousel img');
-        let currentImageIndex = 0;
-
-        function showNextImage() {
-            // Quita la clase 'active' de la imagen actual
-            images[currentImageIndex].classList.remove('active');
-
-            // Calcula el índice de la siguiente imagen
-            currentImageIndex = (currentImageIndex + 1) % images.length;
-
-            // Agrega la clase 'active' a la nueva imagen
-            images[currentImageIndex].classList.add('active');
-        }
-
-        // Cambia la imagen cada 4 segundos (4000 milisegundos)
-        setInterval(showNextImage, 4000);
-
-        // Hace que los elementos flotantes aparezcan desde abajo
-        document.querySelectorAll('.floating-element').forEach(el => {
-            el.style.top = ${Math.random() * 100 + 100}vh; // Empieza debajo de la pantalla
-            el.style.left = ${Math.random() * 90}%; // Posición horizontal aleatoria
-            el.style.animationDelay = ${Math.random() * 10}s; // Retraso aleatorio para la animación
-            el.style.animationDuration = ${Math.random() * 8 + 8}s; // Duración aleatoria para que sea menos repetitivo
-            el.style.fontSize = ${Math.random() * 1.5 + 1.5}em; // Tamaño aleatorio
-        });
-
+        let index = 0;
+        const images = document.querySelectorAll('.photo-container img');
+        
+        setInterval(() => {
+            images[index].classList.remove('active');
+            index = (index + 1) % images.length;
+            images[index].classList.add('active');
+        }, 3000); // Cambia cada 3 segundos
     </script>
+
 </body>
 </html>
