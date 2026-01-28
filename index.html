@@ -2,208 +2,129 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Una sorpresa para ti, mi amor</title>
+    <title>Sorpresa para mi Amor</title>
     <style>
-        :root {
-            --color-sobre: #ff8fa3;
-            --color-papel: #ffffff;
-            --color-texto: #4a148c;
-        }
-
         body {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #ffeef2;
+            background-color: #ffdde1;
             font-family: 'Arial', sans-serif;
-            overflow: hidden;
         }
 
-        /* Contenedor del sobre */
-        .envelope-wrapper {
+        .envelope-container {
             position: relative;
+            width: 300px;
+            height: 200px;
             cursor: pointer;
-            transition: transform 0.3s;
         }
 
-        .envelope-wrapper:hover {
-            transform: scale(1.05);
-        }
-
+        /* El sobre base */
         .envelope {
             position: relative;
             width: 300px;
             height: 200px;
-            background-color: var(--color-sobre);
-            border-bottom-left-radius: 10px;
-            border-bottom-right-radius: 10px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            background-color: #ff8fa3;
+            z-index: 2;
+            border-radius: 0 0 10px 10px;
         }
 
-        /* Tapa del sobre */
-        .envelope::before {
-            content: "";
+        /* La tapa del sobre */
+        .flap {
             position: absolute;
             top: 0;
-            z-index: 2;
-            border-top: 110px solid var(--color-sobre);
-            border-left: 150px solid transparent;
-            border-right: 150px solid transparent;
-            transform-origin: top;
-            transition: transform 0.4s 0.4s;
-        }
-
-        /* Lados del sobre */
-        .envelope::after {
-            content: "";
-            position: absolute;
-            z-index: 2;
             width: 0;
             height: 0;
-            border-top: 100px solid transparent;
-            border-left: 150px solid #ffb3c1;
-            border-right: 150px solid #ffb3c1;
-            border-bottom: 100px solid #ffb3c1;
-            border-radius: 10px;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 100px solid #ff758c;
+            transform-origin: top;
+            transition: transform 0.5s ease;
+            z-index: 4;
         }
 
-        /* La carta (papel) */
+        /* La carta que sale */
         .letter {
             position: absolute;
-            bottom: 0;
+            top: 5px;
             left: 10px;
             width: 280px;
             height: 180px;
-            background: var(--color-papel);
-            padding: 20px;
-            box-sizing: border-box;
-            transition: transform 0.6s, bottom 0.6s;
+            background: white;
             z-index: 1;
+            transition: transform 0.8s ease;
+            padding: 15px;
+            box-sizing: border-box;
+            text-align: center;
             border-radius: 5px;
             overflow-y: auto;
-            text-align: center;
-        }
-
-        .letter h2 {
-            font-size: 1.2em;
-            color: #e91e63;
-            margin-top: 0;
-        }
-
-        .letter p {
-            font-size: 0.9em;
-            line-height: 1.4;
-            color: var(--color-texto);
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
         .letter img {
             width: 100%;
-            border-radius: 10px;
+            border-radius: 5px;
             margin: 10px 0;
-            display: none; /* Se activarán con JS */
+            display: none; /* Se alternan con JS */
         }
 
-        /* Estado Abierto */
-        .envelope-wrapper.open .envelope::before {
+        /* Animación cuando se abre */
+        .envelope-container.open .flap {
             transform: rotateX(180deg);
             z-index: 0;
         }
 
-        .envelope-wrapper.open .letter {
-            bottom: 100px;
-            height: 350px;
-            transform: scale(1.1);
+        .envelope-container.open .letter {
+            transform: translateY(-150px);
+            height: 380px;
             z-index: 3;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        /* Corazones flotantes */
-        .heart {
-            position: absolute;
-            color: #ff4d6d;
-            font-size: 20px;
-            pointer-events: none;
-            animation: floatUp 4s linear infinite;
-            opacity: 0;
-        }
-
-        @keyframes floatUp {
-            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
         }
 
         .instruccion {
             position: absolute;
-            bottom: 50px;
-            color: #ff4d6d;
+            top: 220px;
+            width: 100%;
+            text-align: center;
+            color: #d81b60;
             font-weight: bold;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 0.5; }
-            50% { opacity: 1; }
-            100% { opacity: 0.5; }
         }
     </style>
 </head>
 <body>
 
-    <div class="envelope-wrapper" id="envelope">
+    <div class="envelope-container" onclick="abrirCarta()">
+        <div class="flap"></div>
         <div class="envelope"></div>
         <div class="letter">
-            <h2>¡Felicidades mi amor! ❤️</h2>
-            <p>¡Lo lograste! Estoy tan orgulloso de ese gran logro que acabas de alcanzar.</p>
+            <h3 style="color: #e91e63; margin-top: 0;">¡Felicidades mi Graduada! 🎓</h3>
+            <p style="font-size: 14px;">¡Aprobaste! Estoy tan feliz por ti. Vamos a seguir juntos por siempre.</p>
             
-            <img src="foto1.jpg" id="img1" style="display: block;">
-            <img src="foto2.jpg" id="img2">
-            <img src="foto3.jpg" id="img3">
-            <img src="foto4.jpg" id="img4">
-            <img src="foto5.jpg" id="img5">
+            <img src="foto1.jpg" id="f1" style="display: block;">
+            <img src="foto2.jpg" id="f2">
+            <img src="foto3.jpg" id="f3">
+            <img src="foto4.jpg" id="f4">
+            <img src="foto5.jpg" id="f5">
 
-            <p>Este es solo un paso más en tu camino al éxito. Recuerda que vamos a seguir juntos por siempre, apoyándonos en todo.</p>
-            <p><b>¡Te amo con toda mi alma!</b></p>
+            <p style="font-size: 14px; font-weight: bold;">Eres lo mejor que me ha pasado. ❤️</p>
         </div>
+        <div class="instruccion">Haz clic aquí para abrir 👆</div>
     </div>
 
-    <div class="instruccion">Toca el sobre para abrirlo</div>
-
     <script>
-        const envelope = document.getElementById('envelope');
-        
-        // Abrir/Cerrar sobre
-        envelope.addEventListener('click', () => {
-            envelope.classList.toggle('open');
-            if(envelope.classList.contains('open')) {
-                crearCorazones();
-            }
-        });
-
-        // Rotar fotos dentro de la carta
-        let currentPhoto = 1;
-        setInterval(() => {
-            document.getElementById(img${currentPhoto}).style.display = 'none';
-            currentPhoto = (currentPhoto % 5) + 1;
-            document.getElementById(img${currentPhoto}).style.display = 'block';
-        }, 3000);
-
-        // Lógica de corazones flotantes
-        function crearCorazones() {
-            for(let i=0; i<15; i++) {
-                setTimeout(() => {
-                    const heart = document.createElement('div');
-                    heart.className = 'heart';
-                    heart.innerHTML = '❤️';
-                    heart.style.left = Math.random() * 100 + 'vw';
-                    heart.style.animationDuration = (Math.random() * 3 + 2) + 's';
-                    document.body.appendChild(heart);
-                    setTimeout(() => heart.remove(), 4000);
-                }, i * 300);
-            }
+        function abrirCarta() {
+            document.querySelector('.envelope-container').classList.toggle('open');
         }
+
+        // Cambio de fotos automático
+        let fotoActual = 1;
+        setInterval(() => {
+            document.getElementById(f${fotoActual}).style.display = 'none';
+            fotoActual = (fotoActual % 5) + 1;
+            document.getElementById(f${fotoActual}).style.display = 'block';
+        }, 3000);
     </script>
+
 </body>
 </html>
