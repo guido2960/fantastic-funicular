@@ -3,32 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Para Mayda, Mi Universo</title>
+    <title>Para Mi Graduada Favorita, Mayda</title>
     <style>
-        body { background-color: #1a1a1a; color: #ffd700; text-align: center; font-family: 'Arial', sans-serif; overflow-x: hidden; }
-        .container { padding: 50px; }
-        h1 { font-size: 3rem; text-shadow: 2px 2px #ff4500; }
-        .flores { font-size: 100px; margin: 20px; animation: bounce 2s infinite; }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
-        .galeria img { width: 80%; max-width: 300px; margin: 10px; border: 5px solid #fff; border-radius: 15px; box-shadow: 0 0 20px #ffd700; }
-        p { font-size: 1.5rem; font-style: italic; }
+        body {
+            margin: 0; padding: 0; overflow-x: hidden;
+            font-family: 'Arial', sans-serif; color: #fff;
+            background: linear-gradient(to top right, #ff7e5f, #feb47b);
+            min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+        }
+        .header {
+            text-align: center; padding: 30px; background: rgba(0, 0, 0, 0.5);
+            border-radius: 20px; margin: 20px; box-shadow: 0 0 25px #ffd700;
+            animation: fadeIn 2s ease-in-out;
+        }
+        .graduacion-msg {
+            background: rgba(255, 215, 0, 0.2); border: 2px solid #ffd700;
+            padding: 20px; border-radius: 15px; margin: 20px;
+            animation: pulse 2s infinite;
+        }
+        h1 { font-size: 2.8rem; color: #ffd700; text-shadow: 2px 2px 4px #000; }
+        h2 { color: #fff; font-size: 2rem; }
+        .gallery { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin: 20px; }
+        .gallery img {
+            width: 250px; height: 350px; object-fit: cover;
+            border: 5px solid #fff; border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .heart {
+            position: absolute; width: 15px; height: 15px; background: #ff69b4;
+            transform: rotate(-45deg); animation: fall linear infinite; pointer-events: none;
+        }
+        .heart::before, .heart::after {
+            content: ''; position: absolute; width: 15px; height: 15px;
+            background: #ff69b4; border-radius: 50%;
+        }
+        .heart::before { top: -8px; left: 0; }
+        .heart::after { left: 8px; top: 0; }
+        @keyframes fall {
+            0% { transform: translateY(-10vh) rotate(-45deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(-45deg); opacity: 0; }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Mayda, Mi Amor Eterno ❤️</h1>
-        <div class="flores">🌻🌻🌻</div>
-        <p>Eres el sol que ilumina mis días.</p>
-        
-        <div class="galeria">
-            <img src="foto1.jpg" alt="Amor 1">
-            <img src="foto2.jpg" alt="Amor 2">
-            <img src="foto3.jpg" alt="Amor 3">
-            <img src="foto4.jpg" alt="Amor 4">
+    <div class="header">
+        <h1>🎓 ¡Felicidades, Graduada! 🎓</h1>
+        <div class="graduacion-msg">
+            <h2>Mayda, hoy el mundo celebra tu éxito</h2>
+            <p>Todo tu esfuerzo y dedicación han dado frutos. ¡Estoy tan orgulloso de ti!</p>
         </div>
-        
-        <p>Gracias por ser parte de mi universo.</p>
-        <div class="flores">🌻🌻🌻</div>
     </div>
+
+    <div class="gallery">
+        <img src="foto1.jpg" alt="Mayda 1">
+        <img src="foto2.jpg" alt="Mayda 2">
+        <img src="foto3.jpg" alt="Mayda 3">
+        <img src="foto4.jpg" alt="Mayda 4">
+    </div>
+
+    <div class="header" style="background: rgba(255, 105, 180, 0.3);">
+        <p>Este es solo el comienzo de todas las cosas maravillosas que vas a lograr. 
+        Sigue brillando con esa luz única que tienes. ✨</p>
+        <p><b>¡Con todo mi amor y admiración, Abel!</b></p>
+    </div>
+
+    <script>
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.style.left = Math.random() * 100 + "vw";
+            heart.style.animationDuration = (Math.random() * 3 + 2) + "s";
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 5000);
+        }
+        setInterval(createHeart, 300);
+    </script>
 </body>
 </html>
