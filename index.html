@@ -1,52 +1,30 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<title>Lluvia de Flores con Fotos</title>
-
-<style>
-    body {
-        margin: 0;
-        overflow: hidden;
-        background: linear-gradient(to bottom, #ffe0f0, #fff);
-        height: 100vh;
-    }
-
-    .foto {
-        position: absolute;
-        top: -100px;
-        width: 80px;
-        animation: caer linear infinite;
-        opacity: 0.9;
-    }
-
-    @keyframes caer {
-        from {
-            transform: translateY(0) rotate(0deg);
-        }
-        to {
-            transform: translateY(110vh) rotate(360deg);
-        }
-    }
-</style>
-</head>
-
-<body>
+<html>
+<body style="margin:0; overflow:hidden; background:#ffe6f2">
 
 <script>
-    const fotos = [
-        "flor1.jpg",
-        "flor2.jpg",
-        "flor3.jpg",
-        "flor4.jpg",
-        "flor5.jpg"
-    ];
+const fotos = ["flor1.png","flor2.png","flor3.png","flor4.png","flor5.png"];
 
-    function crearFoto() {
-        const img = document.createElement("img");
-        img.src = fotos[Math.floor(Math.random() * fotos.length)];
-        img.className = "foto";
+setInterval(() => {
+  const img = document.createElement("img");
+  img.src = fotos[Math.floor(Math.random()*fotos.length)];
+  img.style.position = "absolute";
+  img.style.left = Math.random()*window.innerWidth+"px";
+  img.style.top = "0px";
+  img.style.width = "60px";
+  document.body.appendChild(img);
 
-        img.style.left = Math.random() * window.innerWidth + "px";
-        img.style.width = (50 + Math.random() * 60) + "px";
-        img.style.animationDuration = (4 + Math.random() * 4) + "s";
+  let y = 0;
+  const i = setInterval(() => {
+    y += 4;
+    img.style.top = y+"px";
+    if (y > window.innerHeight) {
+      clearInterval(i);
+      img.remove();
+    }
+  }, 30);
+}, 400);
+</script>
+
+</body>
+</html>
