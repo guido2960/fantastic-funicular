@@ -1,128 +1,39 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Para Mayda, con todo mi amor</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background: #fff0f3;
-            font-family: 'Arial', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+<meta charset="UTF-8">
+<title>Lluvia de Flores 🌸</title>
+
+<style>
+    body {
+        margin: 0;
+        overflow: hidden;
+        background: linear-gradient(to bottom, #ffdee9, #b5fffc);
+        height: 100vh;
+    }
+
+    .flor {
+        position: absolute;
+        top: -50px;
+        font-size: 24px;
+        animation: caer linear infinite;
+    }
+
+    @keyframes caer {
+        0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 1;
         }
-
-        /* El muñequito que lanza corazones */
-        .character {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 80px;
-            z-index: 20;
-            animation: bounce 0.5s infinite alternate;
+        100% {
+            transform: translateY(110vh) rotate(360deg);
+            opacity: 0;
         }
-
-        @keyframes bounce {
-            from { transform: translateX(-50%) translateY(0); }
-            to { transform: translateX(-50%) translateY(-20px); }
-        }
-
-        .card {
-            background: white;
-            width: 90%;
-            max-width: 450px;
-            padding: 25px;
-            border-radius: 30px;
-            box-shadow: 0 10px 40px rgba(255, 77, 109, 0.2);
-            text-align: center;
-            z-index: 10;
-            border: 4px solid #ff8fa3;
-        }
-
-        .names {
-            color: #d81b60;
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .main-photo {
-            width: 100%;
-            height: 300px;
-            border-radius: 20px;
-            object-fit: cover;
-            margin: 15px 0;
-            border: 3px solid #ffb3c1;
-            display: none; /* Se activan con JS */
-        }
-
-        .active { display: block; animation: fadeIn 0.8s; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        /* Lluvia de corazones y regalos */
-        .drop {
-            position: absolute;
-            top: -50px;
-            z-index: 5;
-            animation: fall linear forwards;
-        }
-
-        @keyframes fall {
-            to { transform: translateY(110vh) rotate(360deg); }
-        }
-
-        h2 { color: #ff4d6d; margin: 10px 0; }
-    </style>
+    }
+</style>
 </head>
+
 <body>
 
-    <div class="character">🕺</div> <div class="card">
-        <div class="names">Abel con amor a Mayda ❤️</div>
-        <h2>¡Felicidades mi Graduada!</h2>
-        <p>¡Aprobaste! Eres lo mejor que me ha pasado. Vamos por siempre juntos.</p>
+<script>
+    const
 
-        <img src="foto1.jpg" class="main-photo active">
-        <img src="foto2.jpg" class="main-photo">
-        <img src="foto3.jpg" class="main-photo">
-        <img src="foto4.jpg" class="main-photo">
-        <img src="foto5.jpg" class="main-photo">
-
-        <p style="font-style: italic; color: #777;">¡Estoy muy orgulloso de ti!</p>
-    </div>
-
-    <script>
-        // Cambiar fotos
-        let current = 0;
-        const photos = document.querySelectorAll('.main-photo');
-        setInterval(() => {
-            photos[current].classList.remove('active');
-            current = (current + 1) % photos.length;
-            photos[current].classList.add('active');
-        }, 3000);
-
-        // Tirar corazones y regalos desde arriba
-        function createDrop() {
-            const items = ['❤️', '🎁', '💖', '✨', '🌸'];
-            const drop = document.createElement('div');
-            drop.className = 'drop';
-            drop.innerHTML = items[Math.floor(Math.random() * items.length)];
-            drop.style.left = Math.random() * 100 + 'vw';
-            drop.style.fontSize = Math.random() * 20 + 20 + 'px';
-            drop.style.duration = Math.random() * 3 + 2 + 's';
-            drop.style.animationDuration = drop.style.duration;
-            document.body.appendChild(drop);
-            setTimeout(() => drop.remove(), 5000);
-        }
-
-        setInterval(createDrop, 300);
-    </script>
-</body>
-</html>
