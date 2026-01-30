@@ -1,30 +1,85 @@
 <!DOCTYPE html>
-<html>
-<body style="margin:0; overflow:hidden; background:#ffe6f2">
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lluvia de Flores para Mayda</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #fff5f8; /* Un color rosado muy suave de fondo */
+            overflow: hidden; /* Evita que aparezcan barras de scroll */
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+        }
 
-<script>
-const fotos = ["flor1.png","flor2.png","flor3.png","flor4.png","flor5.png"];
+        h1 {
+            color: #d81b60;
+            text-align: center;
+            z-index: 1;
+            pointer-events: none; /* Para que no interfiera con las flores */
+        }
 
-setInterval(() => {
-  const img = document.createElement("img");
-  img.src = fotos[Math.floor(Math.random()*fotos.length)];
-  img.style.position = "absolute";
-  img.style.left = Math.random()*window.innerWidth+"px";
-  img.style.top = "0px";
-  img.style.width = "60px";
-  document.body.appendChild(img);
+        /* Estilo de cada flor */
+        .flower {
+            position: absolute;
+            top: -50px;
+            user-select: none;
+            pointer-events: none;
+            z-index: 0;
+            animation: fall linear forwards;
+        }
 
-  let y = 0;
-  const i = setInterval(() => {
-    y += 4;
-    img.style.top = y+"px";
-    if (y > window.innerHeight) {
-      clearInterval(i);
-      img.remove();
-    }
-  }, 30);
-}, 400);
-</script>
+        /* Animación de caída */
+        @keyframes fall {
+            to {
+                transform: translateY(110vh) rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
 
+    <h1>Para mi hermosa Mayda 🌸</h1>
+
+    <script>
+        const flowerEmojis = ['🌸', '🌺', '🌼', '🌷', '🌹'];
+        
+        function createFlower() {
+            const flower = document.createElement('div');
+            flower.classList.add('flower');
+            
+            // Elegir un emoji de flor al azar
+            flower.innerText = flowerEmojis[Math.floor(Math.random() * flowerEmojis.length)];
+            
+            // Posición horizontal aleatoria
+            flower.style.left = Math.random() * 100 + "vw";
+            
+            // Tamaño aleatorio
+            const size = Math.random() * 20 + 20 + "px";
+            flower.style.fontSize = size;
+            
+            // Duración de caída aleatoria (entre 3 y 6 segundos)
+            const duration = Math.random() * 3 + 3;
+            flower.style.animationDuration = duration + "s";
+            
+            // Opacidad aleatoria para dar profundidad
+            flower.style.opacity = Math.random();
+
+            document.body.appendChild(flower);
+
+            // Eliminar la flor después de que termine la animación para no saturar la PC
+            setTimeout(() => {
+                flower.remove();
+            }, duration * 1000);
+        }
+
+        // Crear una flor cada 300 milisegundos
+        setInterval(createFlower, 300);
+    </script>
 </body>
 </html>
