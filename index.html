@@ -2,31 +2,30 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Lluvia de Flores 🌸</title>
+<title>Lluvia de Flores con Fotos</title>
 
 <style>
     body {
         margin: 0;
         overflow: hidden;
-        background: linear-gradient(to bottom, #ffdee9, #b5fffc);
+        background: linear-gradient(to bottom, #ffe0f0, #fff);
         height: 100vh;
     }
 
-    .flor {
+    .foto {
         position: absolute;
-        top: -50px;
-        font-size: 24px;
+        top: -100px;
+        width: 80px;
         animation: caer linear infinite;
+        opacity: 0.9;
     }
 
     @keyframes caer {
-        0% {
+        from {
             transform: translateY(0) rotate(0deg);
-            opacity: 1;
         }
-        100% {
+        to {
             transform: translateY(110vh) rotate(360deg);
-            opacity: 0;
         }
     }
 </style>
@@ -35,5 +34,19 @@
 <body>
 
 <script>
-    const
+    const fotos = [
+        "flor1.jpg",
+        "flor2.jpg",
+        "flor3.jpg",
+        "flor4.jpg",
+        "flor5.jpg"
+    ];
 
+    function crearFoto() {
+        const img = document.createElement("img");
+        img.src = fotos[Math.floor(Math.random() * fotos.length)];
+        img.className = "foto";
+
+        img.style.left = Math.random() * window.innerWidth + "px";
+        img.style.width = (50 + Math.random() * 60) + "px";
+        img.style.animationDuration = (4 + Math.random() * 4) + "s";
