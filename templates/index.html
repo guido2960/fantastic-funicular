@@ -157,6 +157,24 @@
             // Eliminar la flor después de que termine su animación para no sobrecargar el navegador
             setTimeout(() => f.remove(), parseFloat(f.style.animationDuration) * 1000);
         }, 300); // Una nueva flor cada 300 milisegundos
-    </script>
+    <script>
+    // ESTO ES LO QUE FALTA PARA QUE EL BOTÓN FUNCIONE
+    function verificarConPython() {
+        const claveIngresada = document.getElementById('passEntrada').value;
+        
+        // Usamos la clave "1234" que tienes en tu archivo link.py
+        if (claveIngresada === "2411") { 
+            // Esto quita la pantalla de bloqueo y muestra la sorpresa
+            document.getElementById('bloqueo').style.display = 'none';
+            document.getElementById('contenido-real').style.display = 'block';
+        } else {
+            alert("Clave incorrecta. Inténtalo de nuevo.");
+        }
+    }
+
+    // Aquí abajo sigue tu código de las flores...
+    let indice = 0;
+    // ... resto del código
+</script>
 </body>
 </html>
