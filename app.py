@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 
-app = Flask(_name_)
+app = Flask(__name__)
 
 # AQUÍ ELIGES EL CÓDIGO (Pon algo que ella sepa, como su fecha)
 # Por ejemplo: "030226" o una palabra especial
