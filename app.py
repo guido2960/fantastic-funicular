@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 
-app = Flask(_name_)
+app = Flask(__name__)
 
 CODIGO_SECRETO = "amor123"
 
@@ -16,5 +16,5 @@ def verificar():
     else:
         return "Código incorrecto, intenta de nuevo.", 403
 
-if _name_ == '_main_':
+if __name__ == '__main__':
     app.run(debug=True)
