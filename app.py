@@ -21,5 +21,5 @@ def verificar():
         # Si falla, le da un aviso tierno
         return "Ese no es el código, mi vida. Intenta con nuestra fecha especial. ❤️", 403
 
-if _name_ == '_main_':
+if __name__ == '__main__':
     app.run(debug=True)
