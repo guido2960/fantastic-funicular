@@ -2,22 +2,26 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Código de Seguridad</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrada Secreta</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #f0f0f0; padding-top: 50px; }
+        .login-container { background: white; padding: 20px; border-radius: 10px; display: inline-block; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        input { padding: 10px; margin: 10px; border-radius: 5px; border: 1px solid #ccc; }
+        button { padding: 10px 20px; background-color: #ff4b2b; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
 </head>
-<body style="background-color: #1a1a1a; color: white; text-align: center; font-family: sans-serif; padding-top: 50px;">
-    <h2>🔐 Sistema de Seguridad Personal</h2>
-    <p>Ingresa el código para acceder a tus planes</p>
-    
-    <form method="POST">
-        <input type="password" name="password" placeholder="Clave de 4 dígitos" 
-               style="padding: 10px; border-radius: 5px; border: none;" required>
-        <button type="submit" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">
-            Entrar
-        </button>
-    </form>
-
-    {% if mensaje %}
-        <p style="color: #ff5555; margin-top: 20px;">{{ mensaje }}</p>
-    {% endif %}
+<body>
+    <div class="login-container">
+        <h2>Hola Mayda ❤️</h2>
+        <p>Ingresa el código secreto para ver tu sorpresa:</p>
+        
+        <form action="/verificar" method="POST">
+            <input type="password" name="codigo" placeholder="Escribe aquí..." required>
+            <br>
+            <button type="submit">Entrar</button>
+        </form>
+        
+    </div>
 </body>
 </html>
