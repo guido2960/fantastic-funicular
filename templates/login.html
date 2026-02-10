@@ -1,27 +1,15 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Entrada Secreta</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; background-color: #f0f0f0; padding-top: 50px; }
-        .login-container { background: white; padding: 20px; border-radius: 10px; display: inline-block; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        input { padding: 10px; margin: 10px; border-radius: 5px; border: 1px solid #ccc; }
-        button { padding: 10px 20px; background-color: #ff4b2b; color: white; border: none; border-radius: 5px; cursor: pointer; }
-    </style>
-</head>
-<body>
-    <div class="login-container">
-        <h2>Hola Mayda ❤️</h2>
-        <p>Ingresa el código secreto para ver tu sorpresa:</p>
-        
-        <form action="/verificar" method="POST">
-            <input type="password" name="codigo" placeholder="Escribe aquí..." required>
-            <br>
-            <button type="submit">Entrar</button>
-        </form>
-        
-    </div>
-</body>
-</html>
+<div id="bloqueo" style="text-align: center; padding: 50px;">
+    <h2 style="color: #d81b60;">🔐 Acceso Privado</h2>
+    
+    <form action="/verificar" method="POST">
+        <input type="password" name="codigo" placeholder="Código de Puerta" required 
+               style="padding: 10px; border-radius: 10px; border: 1px solid #ff69b4; margin-bottom: 10px;">
+        <br>
+        <input type="password" name="codigo_amuleto" placeholder="Clave del Amuleto" required 
+               style="padding: 10px; border-radius: 10px; border: 1px solid #ff69b4;">
+        <br>
+        <button type="submit" style="margin-top: 20px; background: #d81b60; color: white; border: none; padding: 10px 20px; border-radius: 20px;">
+            Entrar
+        </button>
+    </form>
+</div>
