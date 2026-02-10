@@ -2,7 +2,7 @@ import os
 import sqlite3
 from flask import Flask, render_template, request, redirect, url_for
 
-app = Flask(_name_)
+app = Flask(__name__)
 
 # --- CONFIGURACIÓN DE SEGURIDAD ---
 # Usa siempre minúsculas para evitar errores al escribir en el celular
@@ -78,7 +78,7 @@ def subir():
             
     return redirect(url_for('login'))
 
-if _name_ == '_main_':
+if __name__ == '__main__':
     inicializar_db()
     # Configuración para que el servidor encuentre el puerto automáticamente
     port = int(os.environ.get("PORT", 5000))
