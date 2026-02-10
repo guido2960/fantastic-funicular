@@ -3,128 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Para mi Prometida ❤️</title>
+    <title>Nuestra Bóveda de Recuerdos ❤️</title>
     <style>
-        body { 
-            margin: 0; 
-            background: #fff5f8; 
-            font-family: 'Arial', sans-serif; 
-            overflow: hidden; 
-            height: 100vh; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            position: relative; 
-        }
+        /* Mantenemos tu estilo original de flores y tarjeta */
+        body { margin: 0; background: #fff5f8; font-family: 'Arial', sans-serif; overflow: hidden; height: 100vh; display: flex; justify-content: center; align-items: center; position: relative; }
+        #tarjeta { text-align: center; z-index: 10; background: rgba(255, 255, 255, 0.9); padding: 25px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 85%; max-width: 400px; }
+        h1 { color: #d81b60; font-size: 1.2rem; margin: 0; min-height: 60px; display: flex; align-items: center; justify-content: center; line-height: 1.4; }
+        .foto-marco { width: 100%; height: 250px; border-radius: 15px; margin-top: 15px; border: 3px solid #fce4ec; overflow: hidden; background: #eee; }
+        img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.5s ease-in-out; }
+        button { background: #d81b60; color: white; border: none; padding: 12px 25px; border-radius: 25px; margin-top: 15px; cursor: pointer; font-weight: bold; }
         
-        #tarjeta {
-            text-align: center;
-            z-index: 10; 
-            background: rgba(255, 255, 255, 0.9); 
-            padding: 25px;
-            border-radius: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            width: 85%;
-            max-width: 400px;
-        }
-
-        h1 { 
-            color: #d81b60; 
-            font-size: 1.4rem; 
-            margin: 0; 
-            min-height: 80px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            line-height: 1.4; 
-        }
+        /* Estilo para el formulario de subida (Nuevo) */
+        .seccion-subida { margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ffb2d1; }
+        .input-archivo { font-size: 0.8rem; margin-bottom: 10px; width: 100%; }
         
-        .foto-marco { 
-            width: 100%; 
-            height: 250px; 
-            border-radius: 15px; 
-            margin-top: 15px; 
-            border: 3px solid #fce4ec; 
-            overflow: hidden;
-            background: #eee; 
-        }
-
-        img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-            transition: opacity 0.5s ease-in-out; 
-        }
-
-        button { 
-            background: #d81b60; 
-            color: white; 
-            border: none; 
-            padding: 12px 25px; 
-            border-radius: 25px; 
-            margin-top: 20px; 
-            cursor: pointer; 
-            font-weight: bold;
-            box-shadow: 0 4px 10px rgba(216, 27, 96, 0.3); 
-        }
-
-        .flor { 
-            position: absolute; 
-            top: -50px; 
-            user-select: none; 
-            pointer-events: none; 
-            z-index: 1; 
-            animation: caer linear forwards; 
-        }
-
-        @keyframes caer { 
-            0% { transform: translateY(-10vh) rotate(0deg); opacity: 0.8; }
-            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
-        }
+        .flor { position: absolute; top: -50px; user-select: none; pointer-events: none; z-index: 1; animation: caer linear forwards; }
+        @keyframes caer { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 0.8; } 100% { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
     </style>
 </head>
 <body>
-    <div id="bloqueo" style="text-align: center; z-index: 100; position: fixed; top:0; left:0; background: #fff5f8; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-        <h2 style="color: #d81b60;">🔐 Acceso Privado</h2>
-        <input type="password" id="passEntrada" placeholder="Clave de nuestro amuleto" style="padding: 10px; border-radius: 10px; border: 1px solid #ff69b4;">
-        <button onclick="verificarConPython()" style="margin-top: 10px;">Entrar</button>
-    </div>
 
-    <div id="contenido-real" style="display: none; width: 100%; height: 100%; justify-content: center; align-items: center;">
-        <div id="tarjeta">
-            <h1 id="texto">¡Hola, mi hermosa prometida! 💍</h1>
-            <div class="foto-marco">
-                <img id="miFoto" src="foto1.jpg" alt="Nuestra Foto"> 
-            </div>
-            <button onclick="cambiar()">Toca aquí, amor 🌸</button>
+    <div id="tarjeta">
+        <h1 id="texto">¡Hola, mi hermosa prometida! 💍</h1>
+        
+        <div class="foto-marco">
+            <img id="miFoto" src="{{ url_for('static', filename='uploads/fotos/' + fotos[0][0]) if fotos else 'default.jpg' }}" alt="Recuerdo"> 
+        </div>
+
+        <button onclick="cambiar()">Ver otro recuerdo 🌸</button>
+
+        <div class="seccion-subida">
+            <p style="font-size: 0.7rem; color: #d81b60; font-weight: bold;">Añadir nuevo momento:</p>
+            <form action="/subir" method="POST" enctype="multipart/form-data">
+                <input type="file" name="foto_usuario" accept="image/*" class="input-archivo" required>
+                <input type="text" name="mensaje_usuario" placeholder="Dedicatoria..." style="width: 80%; padding: 5px; border-radius: 10px; border: 1px solid #fce4ec; margin-bottom: 10px;">
+                <button type="submit" style="background: #ff69b4; padding: 8px 15px; font-size: 0.8rem;">Guardar en la Bóveda</button>
+            </form>
         </div>
     </div>
 
     <script>
-        // ESTA ES LA FUNCIÓN QUE TE FALTABA
-        function verificarConPython() {
-            const claveIngresada = document.getElementById('passEntrada').value;
-            // Verificamos si la clave es 2411
-            if (claveIngresada === "2411") { 
-                document.getElementById('bloqueo').style.display = 'none'; // Quita el bloqueo
-                document.getElementById('contenido-real').style.display = 'flex'; // Muestra la sorpresa
-            } else {
-                alert("Clave incorrecta. Inténtalo de nuevo, mi vida.");
-            }
-        }
-
-        // Lógica para cambiar fotos y mensajes
-        let indice = 0;
+        // CONEXIÓN CON LA BASE DE DATOS: 
+        // Flask llena esta lista con las fotos reales de tu carpeta
         const contenido = [
-            { txt: "¡Feliz feliz viernes, mi vida! Que tengas un día hermoso. ✨", img: "foto1.jpg" },
-            { txt: "Quiero que sepas que siempre, siempre estoy contigo. ❤️", img: "foto2.jpg" },
-            { txt: "Siempre te voy a cuidar y a proteger, eres mi prioridad. 💍", img: "foto3.jpg" },
-            { txt: "Eres lo mejor que me ha pasado y siempre te elegiré a ti. 🌹", img: "foto1.jpg" }
+            {% for foto in fotos %}
+            { 
+                txt: "{{ foto[1] }}", 
+                img: "{{ url_for('static', filename='uploads/fotos/' + foto[0]) }}" 
+            },
+            {% endfor %}
         ];
 
+        let indice = 0;
         function cambiar() {
+            if (contenido.length === 0) return;
             indice++;
             if (indice >= contenido.length) indice = 0;
+            
             const textoElem = document.getElementById('texto');
             const fotoElem = document.getElementById('miFoto');
             
@@ -136,7 +71,7 @@
             }, 300); 
         }
 
-        // Lluvia de flores
+        // Tu lluvia de flores original
         const florEmojis = ['🌸', '🌺', '🌼', '🌷', '🌹', '💖', '✨']; 
         setInterval(() => {
             const f = document.createElement('div');
