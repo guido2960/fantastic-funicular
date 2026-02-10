@@ -5,15 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nuestra Bóveda de Recuerdos ❤️</title>
     <style>
-        /* Mantenemos tu estilo original de flores y tarjeta */
         body { margin: 0; background: #fff5f8; font-family: 'Arial', sans-serif; overflow: hidden; height: 100vh; display: flex; justify-content: center; align-items: center; position: relative; }
-        #tarjeta { text-align: center; z-index: 10; background: rgba(255, 255, 255, 0.9); padding: 25px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 85%; max-width: 400px; }
+        #tarjeta { text-align: center; z-index: 10; background: rgba(255, 255, 255, 0.9); padding: 25px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 85%; max-width: 400px; max-height: 90vh; overflow-y: auto; }
         h1 { color: #d81b60; font-size: 1.2rem; margin: 0; min-height: 60px; display: flex; align-items: center; justify-content: center; line-height: 1.4; }
-        .foto-marco { width: 100%; height: 250px; border-radius: 15px; margin-top: 15px; border: 3px solid #fce4ec; overflow: hidden; background: #eee; }
+        .foto-marco { width: 100%; height: 250px; border-radius: 15px; margin-top: 15px; border: 3px solid #fce4ec; overflow: hidden; background: #eee; position: relative; }
         img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.5s ease-in-out; }
-        button { background: #d81b60; color: white; border: none; padding: 12px 25px; border-radius: 25px; margin-top: 15px; cursor: pointer; font-weight: bold; }
         
-        /* Estilo para el formulario de subida (Nuevo) */
+        /* Botón de eliminar sobre la foto */
+        .btn-eliminar { position: absolute; top: 10px; right: 10px; background: rgba(216, 27, 96, 0.8); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 14px; font-weight: bold; }
+
+        button { background: #d81b60; color: white; border: none; padding: 12px 25px; border-radius: 25px; margin-top: 15px; cursor: pointer; font-weight: bold; }
         .seccion-subida { margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ffb2d1; }
         .input-archivo { font-size: 0.8rem; margin-bottom: 10px; width: 100%; }
         
@@ -24,10 +25,14 @@
 <body>
 
     <div id="tarjeta">
-        <h1 id="texto">¡Hola, mi hermosa prometida! 💍</h1>
+        <h1 id="texto">¡recuerdos Mayda y Abel! 🫂❤️‍🩹</h1>
         
         <div class="foto-marco">
-            <img id="miFoto" src="{{ url_for('static', filename='uploads/fotos/' + fotos[0][0]) if fotos else 'default.jpg' }}" alt="Recuerdo"> 
+            <img id="miFoto" src="{{ url_for('static', filename='uploads/fotos/' + fotos[0][0]) if fotos else 'default.jpg' }}" alt="Recuerdo">
+            
+            <form id="formEliminar" action="" method="POST">
+                <button type="submit" class="btn-eliminar" title="Eliminar este recuerdo">✕</button>
+            </form>
         </div>
 
         <button onclick="cambiar()">Ver otro recuerdo 🌸</button>
@@ -43,20 +48,30 @@
     </div>
 
     <script>
-        // CONEXIÓN CON LA BASE DE DATOS: 
-        // Flask llena esta lista con las fotos reales de tu carpeta
         const contenido = [
             {% for foto in fotos %}
             { 
                 txt: "{{ foto[1] }}", 
-                img: "{{ url_for('static', filename='uploads/fotos/' + foto[0]) }}" 
+                img: "{{ url_for('static', filename='uploads/fotos/' + foto[0]) }}",
+                id: "{{ foto[2] }}" 
             },
             {% endfor %}
         ];
 
         let indice = 0;
+
+        function actualizarFormulario() {
+            if (contenido.length > 0) {
+                const form = document.getElementById('formEliminar');
+                form.action = "/eliminar/" + contenido[indice].id;
+            }
+        }
+
+        // Inicializamos el primer botón
+        actualizarFormulario();
+
         function cambiar() {
-            if (contenido.length === 0) return;
+            if (contenido.length <= 1) return;
             indice++;
             if (indice >= contenido.length) indice = 0;
             
@@ -67,11 +82,11 @@
             setTimeout(() => {
                 textoElem.innerText = contenido[indice].txt;
                 fotoElem.src = contenido[indice].img;
+                actualizarFormulario(); // Actualiza el ID para borrar la foto correcta
                 fotoElem.style.opacity = 1; 
             }, 300); 
         }
 
-        // Tu lluvia de flores original
         const florEmojis = ['🌸', '🌺', '🌼', '🌷', '🌹', '💖', '✨']; 
         setInterval(() => {
             const f = document.createElement('div');
