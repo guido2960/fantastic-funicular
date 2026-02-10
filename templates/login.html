@@ -1,15 +1,24 @@
-<div id="bloqueo" style="text-align: center; padding: 50px;">
-    <h2 style="color: #d81b60;">🔐 Acceso Privado</h2>
-    
-    <form action="/verificar" method="POST">
-        <input type="password" name="codigo" placeholder="Código de Puerta" required 
-               style="padding: 10px; border-radius: 10px; border: 1px solid #ff69b4; margin-bottom: 10px;">
-        <br>
-        <input type="password" name="codigo_amuleto" placeholder="Clave del Amuleto" required 
-               style="padding: 10px; border-radius: 10px; border: 1px solid #ff69b4;">
-        <br>
-        <button type="submit" style="margin-top: 20px; background: #d81b60; color: white; border: none; padding: 10px 20px; border-radius: 20px;">
-            Entrar
-        </button>
-    </form>
-</div>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bóveda de Mayda</title>
+    <style>
+        body { background: #fff0f5; text-align: center; font-family: sans-serif; padding-top: 50px; }
+        .caja { background: white; padding: 20px; border-radius: 15px; display: inline-block; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 80%; max-width: 350px; }
+        h1 { color: #d63384; font-size: 1.4rem; }
+        input { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ffc0cb; border-radius: 5px; }
+        button { background: #d63384; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; width: 95%; }
+    </style>
+</head>
+<body>
+    <div class="caja">
+        <h1>{{ saludo }}</h1>
+        <form action="/verificar" method="POST">
+            <input type="password" name="codigo" placeholder="Código de acceso" required>
+            <input type="password" name="codigo_amuleto" placeholder="Código del amuleto" required>
+            <button type="submit">Entrar</button>
+        </form>
+    </div>
+</body>
+</html>
