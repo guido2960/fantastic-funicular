@@ -4,19 +4,20 @@ from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
 
-# CONFIGURACIÓN DE SEGURIDAD
+# CONFIGURACIÓN DE SEGURIDAD PARA MAYDA ❤️
 CODIGO_PUERTA = "amor123"
-CODIGO_AMULETO = "2411"
+CODIGO_AMULETO = "2411" # Tu amuleto [cite: 2026-01-27]
 
-# CONFIGURACIÓN DE RUTAS PARA RENDER
-BASE_DIR = os.path.abspath(os.path.dirname(_file_))
+# CORRECCIÓN PARA RENDER: Usamos os.getcwd() en lugar de _file_
+BASE_DIR = os.getcwd() 
 DB_PATH = os.path.join(BASE_DIR, 'base_datos_pro.db')
-UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static/uploads/fotos')
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads', 'fotos')
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Asegurar que la carpeta de fotos exista
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+# Asegurar que las carpetas existan
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 def inicializar_db():
     with sqlite3.connect(DB_PATH) as con:
@@ -41,9 +42,10 @@ def verificar():
             cursor = con.cursor()
             cursor.execute('SELECT archivo, mensaje FROM galeria ORDER BY id DESC')
             fotos = cursor.fetchall()
-        return render_template('index.html', fotos=fotos)
+        # Aquí pasamos el nombre de tu prometida
+        return render_template('index.html', fotos=fotos, nombre="Mayda")
     else:
-        return "🔐 Acceso denegado. Revisa tus códigos.", 403
+        return "🔐 Acceso denegado. Inténtalo de nuevo, amor.", 403
 
 @app.route('/subir', methods=['POST'])
 def subir():
@@ -52,8 +54,7 @@ def subir():
     
     if archivo and archivo.filename != '':
         nombre_archivo = archivo.filename
-        ruta_guardado = os.path.join(app.config['UPLOAD_FOLDER'], nombre_archivo)
-        archivo.save(ruta_guardado)
+        archivo.save(os.path.join(app.config['UPLOAD_FOLDER'], nombre_archivo))
         
         with sqlite3.connect(DB_PATH) as con:
             con.execute('INSERT INTO galeria (archivo, mensaje) VALUES (?, ?)', 
