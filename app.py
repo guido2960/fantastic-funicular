@@ -2,7 +2,7 @@ import os
 import sqlite3
 from flask import Flask, render_template, request, redirect, url_for
 
-app = Flask(_name_)
+app = Flask(__name__)
 
 # CONFIGURACIÓN DE SEGURIDAD
 CODIGO_PUERTA = "amor123"
@@ -61,7 +61,7 @@ def subir():
             
     return redirect(url_for('login'))
 
-if _name_ == '_main_':
+if __name__ == '__main__':
     inicializar_db()
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
