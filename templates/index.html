@@ -11,7 +11,6 @@
         .foto-marco { width: 100%; height: 250px; border-radius: 15px; margin-top: 15px; border: 3px solid #fce4ec; overflow: hidden; background: #eee; position: relative; }
         img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.5s ease-in-out; }
         
-        /* Botón de eliminar sobre la foto */
         .btn-eliminar { position: absolute; top: 10px; right: 10px; background: rgba(216, 27, 96, 0.8); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 14px; font-weight: bold; }
 
         button { background: #d81b60; color: white; border: none; padding: 12px 25px; border-radius: 25px; margin-top: 15px; cursor: pointer; font-weight: bold; }
@@ -25,10 +24,10 @@
 <body>
 
     <div id="tarjeta">
-        <h1 id="texto">¡recuerdos Mayda y Abel! 🫂❤️‍🩹</h1>
+        <h1 id="texto">{{ fotos[0][1] if fotos else '¡Bitácora de Nuestro Amor! 🫂❤️‍🩹' }}</h1>
         
         <div class="foto-marco">
-            <img id="miFoto" src="{{ url_for('static', filename='uploads/fotos/' + fotos[0][0]) if fotos else 'default.jpg' }}" alt="Recuerdo">
+            <img id="miFoto" src="{{ fotos[0][0] if fotos else 'default.jpg' }}" alt="Recuerdo">
             
             <form id="formEliminar" action="" method="POST">
                 <button type="submit" class="btn-eliminar" title="Eliminar este recuerdo">✕</button>
@@ -48,11 +47,12 @@
     </div>
 
     <script>
+        // Cargamos los datos de la base de datos (URL de imagen, Mensaje, ID)
         const contenido = [
             {% for foto in fotos %}
             { 
                 txt: "{{ foto[1] }}", 
-                img: "{{ url_for('static', filename='uploads/fotos/' + foto[0]) }}",
+                img: "{{ foto[0] }}", 
                 id: "{{ foto[2] }}" 
             },
             {% endfor %}
@@ -60,33 +60,35 @@
 
         let indice = 0;
 
-        function actualizarFormulario() {
+        function actualizarVista() {
             if (contenido.length > 0) {
                 const form = document.getElementById('formEliminar');
+                const textoElem = document.getElementById('texto');
+                const fotoElem = document.getElementById('miFoto');
+                
                 form.action = "/eliminar/" + contenido[indice].id;
+                textoElem.innerText = contenido[indice].txt || "¡Recuerdos Mayda y Abel!";
+                fotoElem.src = contenido[indice].img;
             }
         }
 
-        // Inicializamos el primer botón
-        actualizarFormulario();
+        // Inicializamos la primera carga
+        actualizarVista();
 
         function cambiar() {
             if (contenido.length <= 1) return;
-            indice++;
-            if (indice >= contenido.length) indice = 0;
+            indice = (indice + 1) % contenido.length;
             
-            const textoElem = document.getElementById('texto');
             const fotoElem = document.getElementById('miFoto');
-            
             fotoElem.style.opacity = 0; 
+            
             setTimeout(() => {
-                textoElem.innerText = contenido[indice].txt;
-                fotoElem.src = contenido[indice].img;
-                actualizarFormulario(); // Actualiza el ID para borrar la foto correcta
+                actualizarVista();
                 fotoElem.style.opacity = 1; 
             }, 300); 
         }
 
+        // Efecto de flores cayendo (Se mantiene igual)
         const florEmojis = ['🌸', '🌺', '🌼', '🌷', '🌹', '💖', '✨']; 
         setInterval(() => {
             const f = document.createElement('div');
