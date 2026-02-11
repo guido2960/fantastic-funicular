@@ -4,7 +4,7 @@ import cloudinary
 import cloudinary.uploader
 from flask import Flask, render_template, request, redirect, url_for
 
-app = Flask(_name_)
+app = Flask(__name__)
 
 # --- CONFIGURACIÓN DE CLOUDINARY ---
 # Usa los datos que encontraste en tu Dashboard
@@ -34,7 +34,7 @@ def inicializar_db():
 
 @app.route('/')
 def login():
-    saludo_personalizado = "Hola amorcito Mayda 🫂❤️‍🩹"
+    saludo_personalizado = "Hola Mayda❤️‍🩹"
     return render_template('login.html', saludo=saludo_personalizado)
 
 @app.route('/verificar', methods=['POST'])
@@ -77,7 +77,7 @@ def eliminar(foto_id):
         con.commit()
     return redirect(url_for('login'))
 
-if _name_ == '_main_':
+if __name__ == '__main__':
     inicializar_db()
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
