@@ -4,7 +4,7 @@ import cloudinary
 import cloudinary.uploader
 from flask import Flask, render_template, request, redirect, url_for
 
-app = Flask(_name_)
+app = Flask(__name__)
 
 # --- 1. CONEXIÓN CON LA NUBE (CLOUDINARY) ---
 # Aquí es donde el cerebro se conecta con la bóveda eterna
@@ -80,7 +80,7 @@ def eliminar(foto_id):
     return redirect(url_for('login'))
 
 # --- 4. ARRANQUE DEL SERVIDOR ---
-if _name_ == '_main_':
+if __name__ == '__main__':
     inicializar_db()
     # Render asignará el puerto automáticamente
     puerto = int(os.environ.get("PORT", 5000))
