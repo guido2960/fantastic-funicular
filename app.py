@@ -1,32 +1,33 @@
 import os
 import sqlite3
 import cloudinary
-import cloudinary.uploader
+import cloudinary.uploader  # Solo añadimos esta herramienta
 from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
 
-# --- CONFIGURACIÓN DE CLOUDINARY ---
-# Usa los datos que encontraste en tu Dashboard
+# --- CONFIGURACIÓN CLOUDINARY (Tu almacén seguro) ---
 cloudinary.config( 
   cloud_name = "dvmz2v0zvr", 
   api_key = "297853115656242", 
-  api_secret = "TU_API_SECRET_REAL" # <--- PEGA AQUÍ EL QUE VISTE CON EL OJO
+  api_secret = "TU_API_SECRET_AQUÍ" # Coloca el que viste con el ojo
 )
 
-# CONFIGURACIÓN DE SEGURIDAD
+# CONFIGURACIÓN DE SEGURIDAD (Se mantiene igual)
 CODIGO_PUERTA = "amor123"
 CODIGO_AMULETO = "241125"
 
-# RUTA DE BASE DE DATOS
+# RUTAS DE ARCHIVOS
 BASE_DIR = os.getcwd()
 DB_PATH = os.path.join(BASE_DIR, 'base_datos_pro.db')
+
+# Ya no necesitamos UPLOAD_FOLDER porque la nube es nuestra carpeta
 
 def inicializar_db():
     with sqlite3.connect(DB_PATH) as con:
         con.execute('''CREATE TABLE IF NOT EXISTS galeria (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            archivo TEXT NOT NULL,  -- Aquí ahora guardaremos la URL de la nube
+            archivo TEXT NOT NULL,
             mensaje TEXT,
             fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )''')
@@ -34,7 +35,7 @@ def inicializar_db():
 
 @app.route('/')
 def login():
-    saludo_personalizado = "Hola Mayda❤️‍🩹"
+    saludo_personalizado = "Hola Mayda ❤️‍🩹"
     return render_template('login.html', saludo=saludo_personalizado)
 
 @app.route('/verificar', methods=['POST'])
@@ -56,23 +57,20 @@ def verificar():
 def subir():
     archivo = request.files.get('foto_usuario')
     mensaje = request.form.get('mensaje_usuario')
-    
     if archivo and archivo.filename != '':
-        # PASO CLAVE: Subir a Cloudinary en lugar de guardar localmente
+        # INCLUSIÓN SUAVE: En lugar de guardar en el disco de Render, 
+        # lo mandamos a Cloudinary y guardamos ese link.
         resultado = cloudinary.uploader.upload(archivo)
-        url_nube = resultado['url'] # Esta URL es eterna
+        url_foto = resultado['url'] 
         
         with sqlite3.connect(DB_PATH) as con:
-            con.execute('INSERT INTO galeria (archivo, mensaje) VALUES (?, ?)', (url_nube, mensaje))
+            con.execute('INSERT INTO galeria (archivo, mensaje) VALUES (?, ?)', (url_foto, mensaje))
             con.commit()
-    # Cambié el redirect a 'login' por una respuesta simple o podrías redirigir según tu flujo
-    return "✅ Recuerdo guardado para siempre. Regresa y refresca la página."
+    return redirect(url_for('login'))
 
 @app.route('/eliminar/<int:foto_id>', methods=['POST'])
 def eliminar(foto_id):
     with sqlite3.connect(DB_PATH) as con:
-        # En la nube no es estrictamente necesario borrar el archivo físico 
-        # de inmediato, pero eliminamos el registro de tu base de datos.
         con.execute('DELETE FROM galeria WHERE id = ?', (foto_id,))
         con.commit()
     return redirect(url_for('login'))
