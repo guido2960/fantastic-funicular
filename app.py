@@ -36,7 +36,7 @@ def inicializar_db():
 @app.route('/')
 def login():
     """Pantalla de entrada para Mayda"""
-    return render_template('login.html', saludo="Hola amorcito Mayda 🫂❤️‍🩹")
+    return render_template('login.html', saludo="Hola Mayda ❤️‍🩹")
 
 @app.route('/verificar', methods=['POST'])
 def verificar():
