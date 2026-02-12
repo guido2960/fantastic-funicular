@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
 
-# --- 1. CONFIGURACIÓN DE NUBE (CLOUDINARY) ---
+# --- 1. CONFIGURACIÓN CLOUDINARY ---
 cloudinary.config( 
   cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME'), 
   api_key = os.environ.get('CLOUDINARY_API_KEY'), 
@@ -14,11 +14,10 @@ cloudinary.config(
   secure = True
 )
 
-# --- 2. SEGURIDAD Y BASE DE DATOS ---
+# --- 2. SEGURIDAD ---
 CODIGO_PUERTA = "amor123"
 CODIGO_AMULETO = "241125"
-# Usamos una ruta que Render suele respetar un poco más
-DB_PATH = "base_datos_pro.db"
+DB_PATH = os.path.join(os.getcwd(), 'base_datos_pro.db')
 
 def inicializar_db():
     with sqlite3.connect(DB_PATH) as con:
@@ -31,7 +30,6 @@ def inicializar_db():
         con.commit()
 
 # --- 3. RUTAS ---
-
 @app.route('/')
 def login():
     return render_template('login.html', saludo="Hola Mayda ❤️‍🩹")
@@ -45,7 +43,6 @@ def verificar():
         inicializar_db()
         with sqlite3.connect(DB_PATH) as con:
             cursor = con.cursor()
-            # Traemos ARCHIVO e ID, pero sobre todo el MENSAJE
             cursor.execute('SELECT archivo, mensaje, id FROM galeria ORDER BY id DESC')
             fotos_db = cursor.fetchall()
         return render_template('index.html', fotos=fotos_db, nombre="Mayda")
@@ -54,16 +51,13 @@ def verificar():
 @app.route('/subir', methods=['POST'])
 def subir():
     archivo = request.files.get('foto_usuario')
-    mensaje = request.form.get('mensaje_usuario') # <--- Captura el comentario
-    
+    mensaje = request.form.get('mensaje_usuario') 
     if archivo and archivo.filename != '':
         res = cloudinary.uploader.upload(archivo)
         url_nube = res['secure_url'] 
-        
         with sqlite3.connect(DB_PATH) as con:
             con.execute('INSERT INTO galeria (archivo, mensaje) VALUES (?, ?)', (url_nube, mensaje))
             con.commit()
-            
     return redirect(url_for('login')) 
 
 @app.route('/eliminar/<int:foto_id>', methods=['POST'])
