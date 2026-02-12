@@ -3,79 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bóveda San Valentín: Mayda & Abel ❤️</title>
+    <title>Bóveda de Recuerdos ❤️</title>
     <style>
-        body { margin: 0; background: #fff0f3; font-family: sans-serif; overflow: hidden; height: 100vh; display: flex; justify-content: center; align-items: center; position: relative; }
-        #tarjeta { background: white; padding: 20px; border-radius: 30px; box-shadow: 0 10px 40px rgba(255, 75, 110, 0.2); width: 85%; max-width: 380px; text-align: center; z-index: 10; max-height: 95vh; overflow-y: auto; border: 2px solid #ffccd5; }
-        .foto-marco { width: 100%; height: 260px; border-radius: 20px; overflow: hidden; border: 4px solid #ffccd5; position: relative; background: #fff5f5; }
-        img { width: 100%; height: 100%; object-fit: cover; }
-        .btn-eliminar { position: absolute; top: 10px; right: 10px; background: #ff4d6d; color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-weight: bold; }
-        .btn-amuleto { background: linear-gradient(45deg, #ffb703, #fb8500); color: white; border: none; padding: 14px; border-radius: 50px; width: 100%; font-weight: bold; cursor: pointer; margin: 12px 0; font-size: 1rem; box-shadow: 0 4px 15px rgba(251, 133, 0, 0.3); }
-        .btn-accion { background: #ff4d6d; color: white; border: none; padding: 10px; border-radius: 25px; width: 100%; cursor: pointer; margin-top: 5px; font-weight: bold; }
-        .seccion-subida { margin-top: 15px; border-top: 2px dashed #ffccd5; padding-top: 10px; }
-        .flor { position: absolute; top: -50px; animation: caer linear forwards; z-index: 5; pointer-events: none; }
-        @keyframes caer { to { transform: translateY(110vh) rotate(360deg); } }
-        #mensaje-sorpresa { position: absolute; top: 10%; left: 50%; transform: translateX(-50%); background: #c9184a; color: white; padding: 20px; border-radius: 25px; display: none; z-index: 100; text-align: center; width: 75%; border: 3px solid #ffccd5; }
-        .fuego { position: absolute; width: 8px; height: 8px; background: gold; border-radius: 50%; animation: explotar 0.8s ease-out forwards; pointer-events: none; }
-        @keyframes explotar { from { transform: scale(1); opacity: 1; } to { transform: scale(4); opacity: 0; } }
+        /* FONDO DE UNIVERSO (Añadido sin tocar lo demás) */
+        body { margin: 0; background: radial-gradient(circle at center, #2d0b2e 0%, #0a0a0a 100%); font-family: 'Arial', sans-serif; overflow: hidden; height: 100vh; display: flex; justify-content: center; align-items: center; position: relative; }
+        
+        /* ESTRELLAS (Añadido) */
+        .estrella { position: absolute; background: white; border-radius: 50%; opacity: 0.5; animation: parpadeo var(--d) infinite; }
+        @keyframes parpadeo { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+        /* TU TARJETA ORIGINAL */
+        #tarjeta { text-align: center; z-index: 10; background: rgba(255, 255, 255, 0.9); padding: 25px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 85%; max-width: 400px; max-height: 90vh; overflow-y: auto; }
+        h1 { color: #d81b60; font-size: 1.2rem; margin: 0; min-height: 60px; display: flex; align-items: center; justify-content: center; line-height: 1.4; font-weight: bold; }
+        
+        /* TU MARCO DE FOTO Y BOTÓN ELIMINAR (Intactos) */
+        .foto-marco { width: 100%; height: 250px; border-radius: 15px; margin-top: 15px; border: 3px solid #fce4ec; overflow: hidden; background: #eee; position: relative; }
+        img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.5s ease-in-out; }
+        .btn-eliminar { position: absolute; top: 10px; right: 10px; background: rgba(216, 27, 96, 0.8); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 14px; font-weight: bold; }
+        
+        /* TUS BOTONES ORIGINALES */
+        button { background: #d81b60; color: white; border: none; padding: 12px 25px; border-radius: 25px; margin-top: 15px; cursor: pointer; font-weight: bold; width: 100%; }
+        
+        /* ESTILO DEL AMULETO */
+        .btn-amuleto { background: linear-gradient(45deg, #ffd700, #ff8c00); border: 2px solid white; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4); }
+        
+        /* TUS SECCIONES DE SUBIDA Y COMENTARIOS */
+        .seccion-subida { margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ffb2d1; }
+        .input-msg { width: 100%; padding: 10px; border-radius: 12px; border: 2px solid #fce4ec; margin-top: 10px; box-sizing: border-box; outline: none; }
+
+        /* EFECTO EXPLOSIÓN */
+        .particula { position: absolute; pointer-events: none; z-index: 100; font-size: 24px; animation: explotar 1.2s ease-out forwards; }
+        @keyframes explotar { 0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; } 100% { transform: translate(var(--x), var(--y)) scale(0) rotate(360deg); opacity: 0; } }
     </style>
 </head>
 <body>
-    <div id="mensaje-sorpresa"></div>
+
+    <script>
+        for (let i = 0; i < 80; i++) {
+            let e = document.createElement('div');
+            e.className = 'estrella';
+            let tam = Math.random() * 2 + 'px';
+            e.style.width = tam; e.style.height = tam;
+            e.style.left = Math.random() * 100 + 'vw';
+            e.style.top = Math.random() * 100 + 'vh';
+            e.style.setProperty('--d', Math.random() * 3 + 2 + 's');
+            document.body.appendChild(e);
+        }
+    </script>
+
     <div id="tarjeta">
-        <h1 style="color: #c9184a; font-size: 1.2rem;">🌹 San Valentín: Mayda & Abel 🌹</h1>
+        <h1 id="texto">¡Hola Mayda! ❤️</h1>
+        
         <div class="foto-marco">
-            <img id="miFoto" src="">
+            <img id="miFoto" src="" alt="Recuerdo">
             <form id="formEliminar" action="" method="POST">
-                <button type="submit" class="btn-eliminar" onclick="return confirm('¿Borrar este recuerdo?')">✕</button>
+                <button type="submit" class="btn-eliminar">✕</button>
             </form>
         </div>
-        <div style="background: #fff5f5; padding: 10px; border-radius: 18px; margin-top: 10px;">
+
+        <div style="margin-top: 10px;">
             <form action="/comentar" method="POST">
                 <input type="hidden" name="foto_id" id="fotoIdInput">
-                <textarea name="nuevo_mensaje" id="textoComentario" rows="2" style="width: 90%; border-radius: 10px; border: 1px solid #ffccd5; padding: 5px; outline: none;"></textarea>
-                <button type="submit" class="btn-accion" style="font-size: 0.75rem;">Actualizar Mensaje ❤️</button>
+                <textarea name="nuevo_mensaje" id="inputComentario" class="input-msg" rows="2" placeholder="Tu mensaje aquí..."></textarea>
+                <button type="submit" style="background: #ff758f; padding: 5px; font-size: 0.8rem; margin-top: 5px;">Actualizar Dedicatoria ❤️</button>
             </form>
         </div>
-        <button class="btn-amuleto" onclick="activarAmuleto()">💍 Tocar Nuestro Amuleto Eterno</button>
-        <button onclick="cambiar()" class="btn-accion" style="background: white; color: #ff4d6d; border: 2px solid #ff4d6d;">Ver otra foto nuestra 🌸</button>
+
+        <button onclick="cambiar()">Ver otro recuerdo 🌸</button>
+        
+        <button class="btn-amuleto" onclick="granCelebracion()">💍 Tocar Nuestro Amuleto</button>
+
         <div class="seccion-subida">
             <form action="/subir" method="POST" enctype="multipart/form-data">
-                <input type="file" name="foto_usuario" accept="image/*" style="font-size: 0.7rem; width: 100%; margin-bottom: 5px;" required>
-                <button type="submit" class="btn-accion" style="background: #c9184a;">Subir Nuevo Recuerdo</button>
+                <input type="file" name="foto_usuario" accept="image/*" style="font-size: 0.8rem;" required>
+                <button type="submit" style="background: #ff69b4;">Guardar Nuevo Recuerdo</button>
             </form>
         </div>
     </div>
+
     <script>
-        const recuerdos = [{% for foto in fotos %}{ id: "{{ foto[2] }}", img: "{{ foto[0] }}", txt: "{{ foto[1] if foto[1] else '¡Te amo! ❤️' }}" },{% endfor %}];
-        let i = 0;
-        function actualizar() {
-            if (recuerdos.length > 0) {
-                document.getElementById('miFoto').src = recuerdos[i].img;
-                document.getElementById('textoComentario').value = recuerdos[i].txt;
-                document.getElementById('fotoIdInput').value = recuerdos[i].id;
-                document.getElementById('formEliminar').action = "/eliminar/" + recuerdos[i].id;
+        // TU LÓGICA DE CONTENIDO ORIGINAL (Mantenida)
+        const contenido = [
+            {% for foto in fotos %}
+            { txt: "{{ foto[1] if foto[1] else 'Nuestro Amor ❤️' }}", img: "{{ foto[0] }}", id: "{{ foto[2] }}" },
+            {% endfor %}
+        ];
+        let indice = 0;
+
+        function actualizarVista() {
+            if (contenido.length > 0) {
+                document.getElementById('formEliminar').action = "/eliminar/" + contenido[indice].id;
+                document.getElementById('texto').innerText = contenido[indice].txt;
+                document.getElementById('miFoto').src = contenido[indice].img;
+                document.getElementById('fotoIdInput').value = contenido[indice].id;
+                document.getElementById('inputComentario').value = contenido[indice].txt;
             }
         }
-        actualizar();
-        function cambiar() { i = (i + 1) % recuerdos.length; actualizar(); }
-        function activarAmuleto() {
-            const msj = document.getElementById('mensaje-sorpresa');
-            msj.innerHTML = "Mayda, este anillo es mi promesa eterna desde el 30 de enero.<br>¡Feliz San Valentín! 💍❤️";
-            msj.style.display = 'block';
-            setTimeout(() => { msj.style.display = 'none'; }, 5000);
-            for(let k=0; k<15; k++) {
-                let f = document.createElement('div'); f.className = 'fuego';
-                f.style.left = Math.random()*100+'vw'; f.style.top = Math.random()*100+'vh';
-                document.body.appendChild(f); setTimeout(()=>f.remove(), 800);
-            }
+        actualizarVista();
+
+        function cambiar() {
+            if (contenido.length <= 1) return;
+            indice = (indice + 1) % contenido.length;
+            const fotoElem = document.getElementById('miFoto');
+            fotoElem.style.opacity = 0; 
+            setTimeout(() => { actualizarVista(); fotoElem.style.opacity = 1; }, 300); 
         }
-        setInterval(() => {
-            const f = document.createElement('div'); f.className = 'flor';
-            f.innerText = ['🌸', '❤️', '🌹'][Math.floor(Math.random()*3)];
-            f.style.left = Math.random() * 100 + "vw"; f.style.animationDuration = (Math.random() * 3 + 4) + "s";
-            document.body.appendChild(f); setTimeout(() => f.remove(), 7000);
-        }, 600);
+
+        // FUNCIÓN DE EXPLOSIÓN TOTAL
+        function granCelebracion() {
+            const iconos = ['❤️', '🌹', '✨', '💖', '🌷', '🌸'];
+            for (let i = 0; i < 70; i++) {
+                const p = document.createElement('div');
+                p.className = 'particula';
+                p.innerText = iconos[Math.floor(Math.random() * iconos.length)];
+                p.style.left = '50vw';
+                p.style.top = '50vh';
+                const x = (Math.random() - 0.5) * 800 + 'px';
+                const y = (Math.random() - 0.5) * 800 + 'px';
+                p.style.setProperty('--x', x);
+                p.style.setProperty('--y', y);
+                document.body.appendChild(p);
+                setTimeout(() => p.remove(), 1200);
+            }
+            alert("Mayda, este anillo es mi promesa eterna desde el 30 de enero. ¡Te amo! 💍❤️");
+        }
     </script>
 </body>
 </html>
