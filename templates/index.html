@@ -40,18 +40,21 @@
             <p style="font-size: 0.7rem; color: #d81b60; font-weight: bold;">Añadir nuevo momento:</p>
             <form action="/subir" method="POST" enctype="multipart/form-data">
                 <input type="file" name="foto_usuario" accept="image/*" class="input-archivo" required>
-                <input type="text" name="mensaje_usuario" placeholder="Dedicatoria..." style="width: 80%; padding: 5px; border-radius: 10px; border: 1px solid #fce4ec; margin-bottom: 10px;">
+                
+                <input type="text" name="mensaje_usuario" placeholder="Escribe una dedicatoria..." 
+                       style="width: 80%; padding: 8px; border-radius: 10px; border: 1px solid #fce4ec; margin-bottom: 10px; outline: none;">
+                
                 <button type="submit" style="background: #ff69b4; padding: 8px 15px; font-size: 0.8rem;">Guardar en la Bóveda</button>
             </form>
         </div>
     </div>
 
     <script>
-        // Cargamos los datos de la base de datos (URL de imagen, Mensaje, ID)
+        // Los datos llegan desde Flask (URL, Mensaje, ID)
         const contenido = [
             {% for foto in fotos %}
             { 
-                txt: "{{ foto[1] }}", 
+                txt: "{{ foto[1] if foto[1] else 'Recuerdo sin mensaje ❤️' }}", 
                 img: "{{ foto[0] }}", 
                 id: "{{ foto[2] }}" 
             },
@@ -67,12 +70,11 @@
                 const fotoElem = document.getElementById('miFoto');
                 
                 form.action = "/eliminar/" + contenido[indice].id;
-                textoElem.innerText = contenido[indice].txt || "¡Recuerdos Mayda y Abel!";
+                textoElem.innerText = contenido[indice].txt;
                 fotoElem.src = contenido[indice].img;
             }
         }
 
-        // Inicializamos la primera carga
         actualizarVista();
 
         function cambiar() {
@@ -88,7 +90,7 @@
             }, 300); 
         }
 
-        // Efecto de flores cayendo (Se mantiene igual)
+        // Efecto de flores cayendo
         const florEmojis = ['🌸', '🌺', '🌼', '🌷', '🌹', '💖', '✨']; 
         setInterval(() => {
             const f = document.createElement('div');
