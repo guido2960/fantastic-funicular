@@ -6,17 +6,32 @@
     <title>Nuestra Bóveda de Recuerdos ❤️</title>
     <style>
         body { margin: 0; background: #fff5f8; font-family: 'Arial', sans-serif; overflow: hidden; height: 100vh; display: flex; justify-content: center; align-items: center; position: relative; }
-        #tarjeta { text-align: center; z-index: 10; background: rgba(255, 255, 255, 0.9); padding: 25px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 85%; max-width: 400px; max-height: 90vh; overflow-y: auto; }
-        h1 { color: #d81b60; font-size: 1.2rem; margin: 0; min-height: 60px; display: flex; align-items: center; justify-content: center; line-height: 1.4; }
-        .foto-marco { width: 100%; height: 250px; border-radius: 15px; margin-top: 15px; border: 3px solid #fce4ec; overflow: hidden; background: #eee; position: relative; }
+        #tarjeta { text-align: center; z-index: 10; background: rgba(255, 255, 255, 0.95); padding: 25px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 85%; max-width: 400px; max-height: 90vh; overflow-y: auto; }
+        
+        /* El mensaje que acompaña la foto */
+        h1 { color: #d81b60; font-size: 1.1rem; margin-bottom: 10px; min-height: 50px; display: flex; align-items: center; justify-content: center; line-height: 1.4; font-weight: bold; }
+        
+        .foto-marco { width: 100%; height: 260px; border-radius: 15px; border: 3px solid #fce4ec; overflow: hidden; background: #eee; position: relative; }
         img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.5s ease-in-out; }
         
-        .btn-eliminar { position: absolute; top: 10px; right: 10px; background: rgba(216, 27, 96, 0.8); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 14px; font-weight: bold; }
+        .btn-eliminar { position: absolute; top: 10px; right: 10px; background: rgba(216, 27, 96, 0.8); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; }
 
-        button { background: #d81b60; color: white; border: none; padding: 12px 25px; border-radius: 25px; margin-top: 15px; cursor: pointer; font-weight: bold; }
-        .seccion-subida { margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ffb2d1; }
-        .input-archivo { font-size: 0.8rem; margin-bottom: 10px; width: 100%; }
+        button { background: #d81b60; color: white; border: none; padding: 12px; border-radius: 25px; margin-top: 10px; cursor: pointer; font-weight: bold; width: 100%; }
         
+        .seccion-subida { margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ffb2d1; text-align: left; }
+        
+        /* Estilo para que el comentario sea fácil de anotar */
+        .caja-comentario { 
+            width: 100%; 
+            padding: 10px; 
+            margin-top: 8px; 
+            border: 2px solid #fce4ec; 
+            border-radius: 10px; 
+            box-sizing: border-box; 
+            font-family: inherit;
+            resize: none;
+        }
+
         .flor { position: absolute; top: -50px; user-select: none; pointer-events: none; z-index: 1; animation: caer linear forwards; }
         @keyframes caer { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 0.8; } 100% { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
     </style>
@@ -24,37 +39,35 @@
 <body>
 
     <div id="tarjeta">
-        <h1 id="texto">{{ fotos[0][1] if fotos else '¡Bitácora de Nuestro Amor! 🫂❤️‍🩹' }}</h1>
+        <h1 id="texto">¡Hola Mayda! ❤️</h1>
         
         <div class="foto-marco">
-            <img id="miFoto" src="{{ fotos[0][0] if fotos else 'default.jpg' }}" alt="Recuerdo">
-            
+            <img id="miFoto" src="" alt="Recuerdo">
             <form id="formEliminar" action="" method="POST">
-                <button type="submit" class="btn-eliminar" title="Eliminar este recuerdo">✕</button>
+                <button type="submit" class="btn-eliminar">✕</button>
             </form>
         </div>
 
-        <button onclick="cambiar()">Ver otro recuerdo 🌸</button>
+        <button onclick="cambiar()">Ver otro momento 🌸</button>
 
         <div class="seccion-subida">
-            <p style="font-size: 0.7rem; color: #d81b60; font-weight: bold;">Añadir nuevo momento:</p>
             <form action="/subir" method="POST" enctype="multipart/form-data">
-                <input type="file" name="foto_usuario" accept="image/*" class="input-archivo" required>
+                <label style="font-size: 0.75rem; color: #d81b60; font-weight: bold;">1. Elige la foto:</label>
+                <input type="file" name="foto_usuario" accept="image/*" style="font-size: 0.7rem; margin: 5px 0 10px 0;" required>
                 
-                <input type="text" name="mensaje_usuario" placeholder="Escribe una dedicatoria..." 
-                       style="width: 80%; padding: 8px; border-radius: 10px; border: 1px solid #fce4ec; margin-bottom: 10px; outline: none;">
+                <label style="font-size: 0.75rem; color: #d81b60; font-weight: bold;">2. Escribe tu mensaje:</label>
+                <textarea name="mensaje_usuario" class="caja-comentario" placeholder="¿Qué significa esta foto para nosotros?..." rows="2"></textarea>
                 
-                <button type="submit" style="background: #ff69b4; padding: 8px 15px; font-size: 0.8rem;">Guardar en la Bóveda</button>
+                <button type="submit" style="background: #ff69b4;">Guardar en nuestra Bóveda</button>
             </form>
         </div>
     </div>
 
     <script>
-        // Los datos llegan desde Flask (URL, Mensaje, ID)
         const contenido = [
             {% for foto in fotos %}
             { 
-                txt: "{{ foto[1] if foto[1] else 'Recuerdo sin mensaje ❤️' }}", 
+                txt: "{{ foto[1] if foto[1] else 'Nuestro amor eterno ❤️' }}", 
                 img: "{{ foto[0] }}", 
                 id: "{{ foto[2] }}" 
             },
@@ -65,13 +78,9 @@
 
         function actualizarVista() {
             if (contenido.length > 0) {
-                const form = document.getElementById('formEliminar');
-                const textoElem = document.getElementById('texto');
-                const fotoElem = document.getElementById('miFoto');
-                
-                form.action = "/eliminar/" + contenido[indice].id;
-                textoElem.innerText = contenido[indice].txt;
-                fotoElem.src = contenido[indice].img;
+                document.getElementById('formEliminar').action = "/eliminar/" + contenido[indice].id;
+                document.getElementById('texto').innerText = contenido[indice].txt; 
+                document.getElementById('miFoto').src = contenido[indice].img;
             }
         }
 
@@ -80,28 +89,24 @@
         function cambiar() {
             if (contenido.length <= 1) return;
             indice = (indice + 1) % contenido.length;
-            
             const fotoElem = document.getElementById('miFoto');
             fotoElem.style.opacity = 0; 
-            
             setTimeout(() => {
                 actualizarVista();
                 fotoElem.style.opacity = 1; 
             }, 300); 
         }
 
-        // Efecto de flores cayendo
-        const florEmojis = ['🌸', '🌺', '🌼', '🌷', '🌹', '💖', '✨']; 
+        const florEmojis = ['🌸', '💖', '✨', '🌹']; 
         setInterval(() => {
             const f = document.createElement('div');
             f.className = 'flor';
             f.innerText = florEmojis[Math.floor(Math.random() * florEmojis.length)];
             f.style.left = Math.random() * 100 + "vw"; 
-            f.style.fontSize = Math.random() * 20 + 15 + "px"; 
-            f.style.animationDuration = Math.random() * 4 + 5 + "s"; 
+            f.style.animationDuration = Math.random() * 3 + 4 + "s"; 
             document.body.appendChild(f);
             setTimeout(() => f.remove(), 7000);
-        }, 300);
+        }, 400);
     </script>
 </body>
 </html>
