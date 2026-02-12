@@ -3,128 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Para Mayda con Amor ❤️</title>
+    <title>Nuestra Bóveda: Mayda & Abel ❤️</title>
     <style>
-        /* FONDO ROSA PARA QUE TODO SE NOTE (Sin pantalla negra) */
+        /* FONDO ROSA ROMÁNTICO */
         body { 
-            margin: 0; 
-            background: linear-gradient(180deg, #ffeaef 0%, #ffc2d1 100%); 
-            font-family: 'Arial', sans-serif;
-            overflow: hidden; 
-            height: 100vh; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center;
+            margin: 0; background: #ffe5ec; font-family: 'Segoe UI', Arial, sans-serif;
+            overflow-x: hidden; display: flex; flex-direction: column; align-items: center;
+            min-height: 100vh; padding: 20px;
         }
 
         /* LLUVIA DE ROSAS Y CORAZONES */
-        .caida-romantica {
-            position: absolute;
-            top: -50px;
-            user-select: none;
-            pointer-events: none;
-            z-index: 1;
-            animation: bajar linear forwards;
+        .caida {
+            position: absolute; top: -50px; user-select: none; pointer-events: none;
+            z-index: 1; animation: bajar linear forwards;
         }
-        @keyframes bajar {
-            to { transform: translateY(110vh) rotate(360deg); }
-        }
+        @keyframes bajar { to { transform: translateY(110vh) rotate(360deg); } }
 
-        /* TU TARJETA PRINCIPAL */
-        #tarjeta { 
-            text-align: center; 
-            z-index: 10; 
-            background: rgba(255, 255, 255, 0.95); 
-            padding: 25px; 
-            border-radius: 35px; 
-            box-shadow: 0 15px 35px rgba(255, 77, 109, 0.2); 
-            width: 85%; 
-            max-width: 380px;
-            border: 2px solid #ff4d6d;
+        /* TARJETAS */
+        .tarjeta { 
+            z-index: 10; background: white; padding: 25px; border-radius: 35px; 
+            box-shadow: 0 10px 40px rgba(255, 77, 109, 0.3); width: 90%; max-width: 400px;
+            border: 2px solid #ff4d6d; text-align: center; margin-bottom: 25px;
         }
 
         .foto-marco { 
-            width: 100%; height: 260px; border-radius: 20px; 
-            overflow: hidden; background: white; position: relative;
-            border: 3px solid #ffc2d1;
+            width: 100%; height: 320px; border-radius: 25px; overflow: hidden; 
+            background: #fff0f3; border: 3px solid #ffc2d1; margin-bottom: 15px;
         }
         img { width: 100%; height: 100%; object-fit: cover; }
 
-        button { 
-            background: #ff4d6d; color: white; border: none; 
-            padding: 12px; border-radius: 20px; margin-top: 15px; 
-            cursor: pointer; font-weight: bold; width: 100%;
+        /* BOTONES */
+        button, .label-subir { 
+            background: #ff4d6d; color: white; border: none; padding: 14px; 
+            border-radius: 25px; cursor: pointer; font-weight: bold; 
+            width: 100%; margin-top: 10px; display: inline-block; font-size: 1rem;
         }
 
-        /* AMULETO DORADO QUE BOTA CHISPAS ✨ */
+        /* AMULETO DORADO 26/01 */
         .btn-amuleto { 
-            background: linear-gradient(45deg, #ffd700, #ff9f00); 
-            box-shadow: 0 5px 15px rgba(255, 204, 51, 0.6);
-            border: 2px solid white;
+            background: linear-gradient(45deg, #ffd700, #ffa500); 
+            border: 2px solid white; box-shadow: 0 5px 20px rgba(255, 204, 51, 0.6);
         }
 
-        .chispa-festiva {
-            position: absolute;
-            pointer-events: none;
-            z-index: 100;
-            font-size: 22px;
-            animation: estallar 1s ease-out forwards;
+        /* CHISPAS MÁGICAS */
+        .chispa {
+            position: absolute; pointer-events: none; z-index: 100; font-size: 25px;
+            animation: explotar 1.2s ease-out forwards;
         }
-        @keyframes estallar {
+        @keyframes explotar {
             0% { transform: scale(0); opacity: 1; }
-            100% { transform: translate(var(--x), var(--y)) scale(1.2); opacity: 0; }
+            100% { transform: translate(var(--x), var(--y)) scale(1.5); opacity: 0; }
         }
+
+        textarea { 
+            width: 90%; border-radius: 15px; border: 1px solid #ffb3c1; 
+            padding: 12px; margin-top: 10px; font-family: inherit; resize: none;
+        }
+
+        .btn-eliminar { background: #ffb3c1 !important; color: #c9184a !important; font-size: 0.8rem !important; }
     </style>
 </head>
 <body>
 
-    <div id="tarjeta">
-        <h1 style="color: #ff4d6d; font-size: 1.4rem;">❤️ Feliz San Valentín ❤️</h1>
+    <div class="tarjeta">
+        <h2 style="color: #ff4d6d; margin-top: 0;">🌹 Nuestro Universo 🌹</h2>
         
-        <div class="foto-marco">
-            <img id="miFoto" src="https://via.placeholder.com/300" alt="Nuestro Recuerdo">
-        </div>
+        {% if fotos %}
+            {% for foto in fotos %}
+            <div style="margin-bottom: 40px; border-bottom: 2px solid #ffe5ec; padding-bottom: 25px;">
+                <div class="foto-marco">
+                    <img src="{{ foto[0] }}" alt="Nuestro Recuerdo">
+                </div>
+                
+                <p style="color: #c9184a; font-size: 1.1rem; background: #fff0f3; padding: 10px; border-radius: 15px;">
+                    <b>Dedicatoria:</b> <br> {{ foto[1] }}
+                </p>
 
-        <button onclick="cambiar()">Ver otro recuerdo 🌸</button>
-        <button class="btn-amuleto" onclick="celebrar()">💍 Nuestro Amuleto (26/01)</button>
+                <form action="/comentar" method="POST">
+                    <input type="hidden" name="foto_id" value="{{ foto[2] }}">
+                    <textarea name="nuevo_mensaje" placeholder="Actualizar este mensaje de amor..."></textarea>
+                    <button type="submit">Guardar Nueva Dedicatoria 💌</button>
+                </form>
+
+                <form action="/eliminar/{{ foto[2] }}" method="POST" onsubmit="return confirm('Abel, ¿estás seguro de borrar este recuerdo?');" style="margin-top: 10px;">
+                    <button type="submit" class="btn-eliminar">Eliminar esta foto 🗑️</button>
+                </form>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p style="color: #ff758f;">La bóveda está esperando vuestro primer recuerdo, Abel.</p>
+        {% endif %}
+
+        <button class="btn-amuleto" onclick="hechizoAmuleto()">💍 Nuestro Amuleto (26/01)</button>
+    </div>
+
+    <div class="tarjeta">
+        <h3 style="color: #ff4d6d; margin-top: 0;">Añadir Foto Nueva 📸</h3>
+        <form action="/subir" method="POST" enctype="multipart/form-data">
+            <input type="file" name="foto_usuario" id="file" hidden accept="image/*">
+            <label for="file" class="label-subir">Elegir Foto del Dispositivo</label>
+            <textarea name="mensaje_usuario" placeholder="Escribe la dedicatoria inicial..."></textarea>
+            <button type="submit" style="background: #4caf50;">Subir a la Bóveda ✨</button>
+        </form>
     </div>
 
     <script>
-        // 1. GENERADOR DE LLUVIA (Rosas y Corazones)
-        const amor = ['🌹', '❤️', '💖', '🌸', '✨'];
-        function crearLluvia() {
+        // Lluvia de rosas y corazones constante
+        const iconos = ['🌹', '❤️', '🌸', '💖', '✨'];
+        setInterval(() => {
             const e = document.createElement('div');
-            e.className = 'caida-romantica';
-            e.innerText = amor[Math.floor(Math.random() * amor.length)];
+            e.className = 'caida';
+            e.innerText = iconos[Math.floor(Math.random() * iconos.length)];
             e.style.left = Math.random() * 100 + "vw";
             e.style.fontSize = Math.random() * 20 + 20 + "px";
             e.style.animationDuration = Math.random() * 3 + 3 + "s";
             document.body.appendChild(e);
-            setTimeout(() => e.remove(), 6000);
-        }
-        setInterval(crearLluvia, 400);
+            setTimeout(() => e.remove(), 5000);
+        }, 400);
 
-        // 2. EXPLOSIÓN DE CHISPAS AL TOCAR EL AMULETO
-        function celebrar() {
-            for (let i = 0; i < 50; i++) {
+        // Hechizo del Amuleto con chispas
+        function hechizoAmuleto() {
+            for (let i = 0; i < 60; i++) {
                 const c = document.createElement('div');
-                c.className = 'chispa-festiva';
+                c.className = 'chispa';
                 c.innerText = '✨';
-                c.style.left = '50vw';
-                c.style.top = '50vh';
-                const x = (Math.random() - 0.5) * 600 + 'px';
-                const y = (Math.random() - 0.5) * 600 + 'px';
-                c.style.setProperty('--x', x);
-                c.style.setProperty('--y', y);
+                c.style.left = '50vw'; c.style.top = '50vh';
+                const x = (Math.random() - 0.5) * 800 + 'px';
+                const y = (Math.random() - 0.5) * 800 + 'px';
+                c.style.setProperty('--x', x); c.style.setProperty('--y', y);
                 document.body.appendChild(c);
-                setTimeout(() => c.remove(), 1000);
+                setTimeout(() => c.remove(), 1200);
             }
             alert("¡Feliz San Valentín, Mayda! 🌹 Nuestra promesa eterna del 26 de enero. ¡Te amo! 💍");
-        }
-
-        function cambiar() {
-            // Tu función original de fotos
-            console.log("Cambiando imagen...");
         }
     </script>
 </body>
