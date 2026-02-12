@@ -16,14 +16,13 @@ cloudinary.config(
 )
 
 # --- 2. CONFIGURACIÓN DE SEGURIDAD ---
+# Los códigos que protegen tu compromiso con Mayda
 CODIGO_PUERTA = "amor123"
 CODIGO_AMULETO = "241125"
-
-# IMPORTANTE: En Render, la DB debe estar en /opt/render/project/src/ o usar una DB externa.
-# Por ahora, usemos una ruta local persistente si es posible:
 DB_PATH = os.path.join(os.getcwd(), 'base_datos_pro.db')
 
 def inicializar_db():
+    """Crea la base de datos si no existe"""
     with sqlite3.connect(DB_PATH) as con:
         con.execute('''CREATE TABLE IF NOT EXISTS galeria (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,10 +36,12 @@ def inicializar_db():
 
 @app.route('/')
 def login():
+    """Pantalla de entrada para Mayda"""
     return render_template('login.html', saludo="Hola Mayda ❤️‍🩹")
 
 @app.route('/verificar', methods=['POST'])
 def verificar():
+    """Verifica el acceso con tus códigos especiales"""
     entrada_uno = request.form.get('codigo', '').strip()
     entrada_dos = request.form.get('codigo_amuleto', '').strip()
 
@@ -48,32 +49,32 @@ def verificar():
         inicializar_db()
         with sqlite3.connect(DB_PATH) as con:
             cursor = con.cursor()
+            # Traemos las fotos de la base de datos
             cursor.execute('SELECT archivo, mensaje, id FROM galeria ORDER BY id DESC')
             fotos_db = cursor.fetchall()
-        # Asegúrate de que index.html reciba 'fotos'
         return render_template('index.html', fotos=fotos_db, nombre="Mayda")
     return "🔐 Código incorrecto, amor. Inténtalo de nuevo.", 403
 
 @app.route('/subir', methods=['POST'])
 def subir():
+    """Sube la foto a la nube y guarda el link en la base de datos"""
     archivo = request.files.get('foto_usuario')
     mensaje = request.form.get('mensaje_usuario')
     
     if archivo and archivo.filename != '':
-        # Cambiamos res['url'] por res['secure_url'] para que use HTTPS siempre
+        # Integración suave: Subida directa a Cloudinary
         res = cloudinary.uploader.upload(archivo)
-        url_nube = res['secure_url'] 
+        url_nube = res['secure_url'] # El link eterno y seguro
         
         with sqlite3.connect(DB_PATH) as con:
             con.execute('INSERT INTO galeria (archivo, mensaje) VALUES (?, ?)', (url_nube, mensaje))
             con.commit()
             
-    # Pequeño tip: después de subir, redirigir a una ruta que recargue la galería 
-    # o podrías tener problemas al ver la foto nueva de inmediato.
-    return redirect(url_for('login')) 
+    return redirect(url_for('login'))
 
 @app.route('/eliminar/<int:foto_id>', methods=['POST'])
 def eliminar(foto_id):
+    """Borra el recuerdo de la lista"""
     with sqlite3.connect(DB_PATH) as con:
         con.execute('DELETE FROM galeria WHERE id = ?', (foto_id,))
         con.commit()
@@ -82,5 +83,6 @@ def eliminar(foto_id):
 # --- 4. ARRANQUE DEL SERVIDOR ---
 if __name__ == '__main__':
     inicializar_db()
+    # Render asignará el puerto automáticamente
     puerto = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=puerto)
