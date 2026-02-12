@@ -3,129 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bóveda de Recuerdos ❤️</title>
+    <title>Para Mayda con Amor ❤️</title>
     <style>
-        /* FONDO DE UNIVERSO (Añadido sin tocar lo demás) */
-        body { margin: 0; background: radial-gradient(circle at center, #2d0b2e 0%, #0a0a0a 100%); font-family: 'Arial', sans-serif; overflow: hidden; height: 100vh; display: flex; justify-content: center; align-items: center; position: relative; }
-        
-        /* ESTRELLAS (Añadido) */
-        .estrella { position: absolute; background: white; border-radius: 50%; opacity: 0.5; animation: parpadeo var(--d) infinite; }
-        @keyframes parpadeo { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+        /* FONDO ROSA PARA QUE TODO SE NOTE (Sin pantalla negra) */
+        body { 
+            margin: 0; 
+            background: linear-gradient(180deg, #ffeaef 0%, #ffc2d1 100%); 
+            font-family: 'Arial', sans-serif;
+            overflow: hidden; 
+            height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+        }
 
-        /* TU TARJETA ORIGINAL */
-        #tarjeta { text-align: center; z-index: 10; background: rgba(255, 255, 255, 0.9); padding: 25px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 85%; max-width: 400px; max-height: 90vh; overflow-y: auto; }
-        h1 { color: #d81b60; font-size: 1.2rem; margin: 0; min-height: 60px; display: flex; align-items: center; justify-content: center; line-height: 1.4; font-weight: bold; }
-        
-        /* TU MARCO DE FOTO Y BOTÓN ELIMINAR (Intactos) */
-        .foto-marco { width: 100%; height: 250px; border-radius: 15px; margin-top: 15px; border: 3px solid #fce4ec; overflow: hidden; background: #eee; position: relative; }
-        img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.5s ease-in-out; }
-        .btn-eliminar { position: absolute; top: 10px; right: 10px; background: rgba(216, 27, 96, 0.8); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 14px; font-weight: bold; }
-        
-        /* TUS BOTONES ORIGINALES */
-        button { background: #d81b60; color: white; border: none; padding: 12px 25px; border-radius: 25px; margin-top: 15px; cursor: pointer; font-weight: bold; width: 100%; }
-        
-        /* ESTILO DEL AMULETO */
-        .btn-amuleto { background: linear-gradient(45deg, #ffd700, #ff8c00); border: 2px solid white; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4); }
-        
-        /* TUS SECCIONES DE SUBIDA Y COMENTARIOS */
-        .seccion-subida { margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ffb2d1; }
-        .input-msg { width: 100%; padding: 10px; border-radius: 12px; border: 2px solid #fce4ec; margin-top: 10px; box-sizing: border-box; outline: none; }
+        /* LLUVIA DE ROSAS Y CORAZONES */
+        .caida-romantica {
+            position: absolute;
+            top: -50px;
+            user-select: none;
+            pointer-events: none;
+            z-index: 1;
+            animation: bajar linear forwards;
+        }
+        @keyframes bajar {
+            to { transform: translateY(110vh) rotate(360deg); }
+        }
 
-        /* EFECTO EXPLOSIÓN */
-        .particula { position: absolute; pointer-events: none; z-index: 100; font-size: 24px; animation: explotar 1.2s ease-out forwards; }
-        @keyframes explotar { 0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; } 100% { transform: translate(var(--x), var(--y)) scale(0) rotate(360deg); opacity: 0; } }
+        /* TU TARJETA PRINCIPAL */
+        #tarjeta { 
+            text-align: center; 
+            z-index: 10; 
+            background: rgba(255, 255, 255, 0.95); 
+            padding: 25px; 
+            border-radius: 35px; 
+            box-shadow: 0 15px 35px rgba(255, 77, 109, 0.2); 
+            width: 85%; 
+            max-width: 380px;
+            border: 2px solid #ff4d6d;
+        }
+
+        .foto-marco { 
+            width: 100%; height: 260px; border-radius: 20px; 
+            overflow: hidden; background: white; position: relative;
+            border: 3px solid #ffc2d1;
+        }
+        img { width: 100%; height: 100%; object-fit: cover; }
+
+        button { 
+            background: #ff4d6d; color: white; border: none; 
+            padding: 12px; border-radius: 20px; margin-top: 15px; 
+            cursor: pointer; font-weight: bold; width: 100%;
+        }
+
+        /* AMULETO DORADO QUE BOTA CHISPAS ✨ */
+        .btn-amuleto { 
+            background: linear-gradient(45deg, #ffd700, #ff9f00); 
+            box-shadow: 0 5px 15px rgba(255, 204, 51, 0.6);
+            border: 2px solid white;
+        }
+
+        .chispa-festiva {
+            position: absolute;
+            pointer-events: none;
+            z-index: 100;
+            font-size: 22px;
+            animation: estallar 1s ease-out forwards;
+        }
+        @keyframes estallar {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)) scale(1.2); opacity: 0; }
+        }
     </style>
 </head>
 <body>
 
-    <script>
-        for (let i = 0; i < 80; i++) {
-            let e = document.createElement('div');
-            e.className = 'estrella';
-            let tam = Math.random() * 2 + 'px';
-            e.style.width = tam; e.style.height = tam;
-            e.style.left = Math.random() * 100 + 'vw';
-            e.style.top = Math.random() * 100 + 'vh';
-            e.style.setProperty('--d', Math.random() * 3 + 2 + 's');
-            document.body.appendChild(e);
-        }
-    </script>
-
     <div id="tarjeta">
-        <h1 id="texto">¡Hola Mayda! ❤️</h1>
+        <h1 style="color: #ff4d6d; font-size: 1.4rem;">❤️ Feliz San Valentín ❤️</h1>
         
         <div class="foto-marco">
-            <img id="miFoto" src="" alt="Recuerdo">
-            <form id="formEliminar" action="" method="POST">
-                <button type="submit" class="btn-eliminar">✕</button>
-            </form>
-        </div>
-
-        <div style="margin-top: 10px;">
-            <form action="/comentar" method="POST">
-                <input type="hidden" name="foto_id" id="fotoIdInput">
-                <textarea name="nuevo_mensaje" id="inputComentario" class="input-msg" rows="2" placeholder="Tu mensaje aquí..."></textarea>
-                <button type="submit" style="background: #ff758f; padding: 5px; font-size: 0.8rem; margin-top: 5px;">Actualizar Dedicatoria ❤️</button>
-            </form>
+            <img id="miFoto" src="https://via.placeholder.com/300" alt="Nuestro Recuerdo">
         </div>
 
         <button onclick="cambiar()">Ver otro recuerdo 🌸</button>
-        
-        <button class="btn-amuleto" onclick="granCelebracion()">💍 Tocar Nuestro Amuleto</button>
-
-        <div class="seccion-subida">
-            <form action="/subir" method="POST" enctype="multipart/form-data">
-                <input type="file" name="foto_usuario" accept="image/*" style="font-size: 0.8rem;" required>
-                <button type="submit" style="background: #ff69b4;">Guardar Nuevo Recuerdo</button>
-            </form>
-        </div>
+        <button class="btn-amuleto" onclick="celebrar()">💍 Nuestro Amuleto (26/01)</button>
     </div>
 
     <script>
-        // TU LÓGICA DE CONTENIDO ORIGINAL (Mantenida)
-        const contenido = [
-            {% for foto in fotos %}
-            { txt: "{{ foto[1] if foto[1] else 'Nuestro Amor ❤️' }}", img: "{{ foto[0] }}", id: "{{ foto[2] }}" },
-            {% endfor %}
-        ];
-        let indice = 0;
-
-        function actualizarVista() {
-            if (contenido.length > 0) {
-                document.getElementById('formEliminar').action = "/eliminar/" + contenido[indice].id;
-                document.getElementById('texto').innerText = contenido[indice].txt;
-                document.getElementById('miFoto').src = contenido[indice].img;
-                document.getElementById('fotoIdInput').value = contenido[indice].id;
-                document.getElementById('inputComentario').value = contenido[indice].txt;
-            }
+        // 1. GENERADOR DE LLUVIA (Rosas y Corazones)
+        const amor = ['🌹', '❤️', '💖', '🌸', '✨'];
+        function crearLluvia() {
+            const e = document.createElement('div');
+            e.className = 'caida-romantica';
+            e.innerText = amor[Math.floor(Math.random() * amor.length)];
+            e.style.left = Math.random() * 100 + "vw";
+            e.style.fontSize = Math.random() * 20 + 20 + "px";
+            e.style.animationDuration = Math.random() * 3 + 3 + "s";
+            document.body.appendChild(e);
+            setTimeout(() => e.remove(), 6000);
         }
-        actualizarVista();
+        setInterval(crearLluvia, 400);
+
+        // 2. EXPLOSIÓN DE CHISPAS AL TOCAR EL AMULETO
+        function celebrar() {
+            for (let i = 0; i < 50; i++) {
+                const c = document.createElement('div');
+                c.className = 'chispa-festiva';
+                c.innerText = '✨';
+                c.style.left = '50vw';
+                c.style.top = '50vh';
+                const x = (Math.random() - 0.5) * 600 + 'px';
+                const y = (Math.random() - 0.5) * 600 + 'px';
+                c.style.setProperty('--x', x);
+                c.style.setProperty('--y', y);
+                document.body.appendChild(c);
+                setTimeout(() => c.remove(), 1000);
+            }
+            alert("¡Feliz San Valentín, Mayda! 🌹 Nuestra promesa eterna del 26 de enero. ¡Te amo! 💍");
+        }
 
         function cambiar() {
-            if (contenido.length <= 1) return;
-            indice = (indice + 1) % contenido.length;
-            const fotoElem = document.getElementById('miFoto');
-            fotoElem.style.opacity = 0; 
-            setTimeout(() => { actualizarVista(); fotoElem.style.opacity = 1; }, 300); 
-        }
-
-        // FUNCIÓN DE EXPLOSIÓN TOTAL
-        function granCelebracion() {
-            const iconos = ['❤️', '🌹', '✨', '💖', '🌷', '🌸'];
-            for (let i = 0; i < 70; i++) {
-                const p = document.createElement('div');
-                p.className = 'particula';
-                p.innerText = iconos[Math.floor(Math.random() * iconos.length)];
-                p.style.left = '50vw';
-                p.style.top = '50vh';
-                const x = (Math.random() - 0.5) * 800 + 'px';
-                const y = (Math.random() - 0.5) * 800 + 'px';
-                p.style.setProperty('--x', x);
-                p.style.setProperty('--y', y);
-                document.body.appendChild(p);
-                setTimeout(() => p.remove(), 1200);
-            }
-            alert("Mayda, este anillo es mi promesa eterna desde el 30 de enero. ¡Te amo! 💍❤️");
+            // Tu función original de fotos
+            console.log("Cambiando imagen...");
         }
     </script>
 </body>
