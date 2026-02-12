@@ -13,6 +13,7 @@ cloudinary.config(
   api_secret = os.environ.get('CLOUDINARY_API_SECRET'),
   secure = True
 )
+
 DB_PATH = os.path.join(os.getcwd(), 'base_datos_pro.db')
 
 def inicializar_db():
@@ -31,13 +32,17 @@ def login():
 
 @app.route('/verificar', methods=['POST'])
 def verificar():
-    # Códigos: amor123 y 241125
-    inicializar_db()
-    with sqlite3.connect(DB_PATH) as con:
-        cursor = con.cursor()
-        cursor.execute('SELECT archivo, mensaje, id FROM galeria ORDER BY id DESC')
-        fotos_db = cursor.fetchall()
-    return render_template('index.html', fotos=fotos_db, nombre="Mayda")
+    entrada_uno = request.form.get('codigo', '').strip()
+    entrada_dos = request.form.get('codigo_amuleto', '').strip()
+    # Tus códigos: amor123 y 241125
+    if entrada_uno == "amor123" and entrada_dos == "241125":
+        inicializar_db()
+        with sqlite3.connect(DB_PATH) as con:
+            cursor = con.cursor()
+            cursor.execute('SELECT archivo, mensaje, id FROM galeria ORDER BY id DESC')
+            fotos_db = cursor.fetchall()
+        return render_template('index.html', fotos=fotos_db, nombre="Mayda")
+    return "🔐 Código incorrecto", 403
 
 @app.route('/subir', methods=['POST'])
 def subir():
@@ -45,8 +50,15 @@ def subir():
     if archivo:
         res = cloudinary.uploader.upload(archivo)
         with sqlite3.connect(DB_PATH) as con:
-            con.execute('INSERT INTO galeria (archivo, mensaje) VALUES (?, ?)', (res['secure_url'], "Escribe aquí nuestra historia..."))
+            con.execute('INSERT INTO galeria (archivo, mensaje) VALUES (?, ?)', (res['secure_url'], "Nuestra historia..."))
             con.commit()
+    return redirect(url_for('login'))
+
+@app.route('/eliminar/<int:foto_id>', methods=['POST'])
+def eliminar(foto_id):
+    with sqlite3.connect(DB_PATH) as con:
+        con.execute('DELETE FROM galeria WHERE id = ?', (foto_id,))
+        con.commit()
     return redirect(url_for('login'))
 
 @app.route('/comentar', methods=['POST'])
