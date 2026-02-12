@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
 
-# --- CONFIGURACIÓN CLOUDINARY ---
+# --- 1. CONFIGURACIÓN CLOUDINARY (Tu configuración intacta) ---
 cloudinary.config( 
   cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME'), 
   api_key = os.environ.get('CLOUDINARY_API_KEY'), 
@@ -14,6 +14,9 @@ cloudinary.config(
   secure = True
 )
 
+# --- 2. SEGURIDAD (Tus códigos intactos) ---
+CODIGO_PUERTA = "amor123"
+CODIGO_AMULETO = "241125"
 DB_PATH = os.path.join(os.getcwd(), 'base_datos_pro.db')
 
 def inicializar_db():
@@ -26,29 +29,48 @@ def inicializar_db():
         )''')
         con.commit()
 
+# --- 3. RUTAS ---
+
 @app.route('/')
 def login():
     return render_template('login.html', saludo="Hola Mayda ❤️‍🩹")
 
 @app.route('/verificar', methods=['POST'])
 def verificar():
-    # Códigos: amor123 y 241125
-    inicializar_db()
-    with sqlite3.connect(DB_PATH) as con:
-        cursor = con.cursor()
-        cursor.execute('SELECT archivo, mensaje, id FROM galeria ORDER BY id DESC')
-        fotos_db = cursor.fetchall()
-    return render_template('index.html', fotos=fotos_db, nombre="Mayda")
+    entrada_uno = request.form.get('codigo', '').strip()
+    entrada_dos = request.form.get('codigo_amuleto', '').strip()
+
+    if entrada_uno == CODIGO_PUERTA and entrada_dos == CODIGO_AMULETO:
+        inicializar_db()
+        with sqlite3.connect(DB_PATH) as con:
+            cursor = con.cursor()
+            cursor.execute('SELECT archivo, mensaje, id FROM galeria ORDER BY id DESC')
+            fotos_db = cursor.fetchall()
+        return render_template('index.html', fotos=fotos_db, nombre="Mayda")
+    return "🔐 Código incorrecto, amor. Inténtalo de nuevo.", 403
 
 @app.route('/subir', methods=['POST'])
 def subir():
     archivo = request.files.get('foto_usuario')
-    if archivo:
+    mensaje = request.form.get('mensaje_usuario', '') 
+    if archivo and archivo.filename != '':
         res = cloudinary.uploader.upload(archivo)
+        url_nube = res['secure_url'] 
         with sqlite3.connect(DB_PATH) as con:
-            con.execute('INSERT INTO galeria (archivo, mensaje) VALUES (?, ?)', (res['secure_url'], "¡Feliz San Valentín! ❤️"))
+            con.execute('INSERT INTO galeria (archivo, mensaje) VALUES (?, ?)', (url_nube, mensaje))
             con.commit()
+    return redirect(url_for('login')) 
+
+# --- ESTA ES LA ÚNICA FUNCIÓN NUEVA QUE INCLUIMOS ---
+@app.route('/comentar', methods=['POST'])
+def comentar():
+    foto_id = request.form.get('foto_id')
+    nuevo_msj = request.form.get('nuevo_mensaje')
+    with sqlite3.connect(DB_PATH) as con:
+        con.execute('UPDATE galeria SET mensaje = ? WHERE id = ?', (nuevo_msj, foto_id))
+        con.commit()
     return redirect(url_for('login'))
+# --------------------------------------------------
 
 @app.route('/eliminar/<int:foto_id>', methods=['POST'])
 def eliminar(foto_id):
@@ -57,15 +79,7 @@ def eliminar(foto_id):
         con.commit()
     return redirect(url_for('login'))
 
-@app.route('/comentar', methods=['POST'])
-def comentar():
-    foto_id = request.form.get('foto_id')
-    nuevo_mensaje = request.form.get('nuevo_mensaje')
-    with sqlite3.connect(DB_PATH) as con:
-        con.execute('UPDATE galeria SET mensaje = ? WHERE id = ?', (nuevo_mensaje, foto_id))
-        con.commit()
-    return redirect(url_for('login'))
-
 if __name__ == '__main__':
     inicializar_db()
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+    puerto = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=puerto)
