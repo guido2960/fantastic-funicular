@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
 
-# --- 1. CONEXIÓN CON LA NUBE (CLOUDINARY) ---
+# --- 1. CONFIGURACIÓN DE NUBE (CLOUDINARY) ---
 cloudinary.config( 
   cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME'), 
   api_key = os.environ.get('CLOUDINARY_API_KEY'), 
@@ -14,10 +14,11 @@ cloudinary.config(
   secure = True
 )
 
-# --- 2. CONFIGURACIÓN DE SEGURIDAD ---
+# --- 2. SEGURIDAD Y BASE DE DATOS ---
 CODIGO_PUERTA = "amor123"
 CODIGO_AMULETO = "241125"
-DB_PATH = os.path.join(os.getcwd(), 'base_datos_pro.db')
+# Usamos una ruta que Render suele respetar un poco más
+DB_PATH = "base_datos_pro.db"
 
 def inicializar_db():
     with sqlite3.connect(DB_PATH) as con:
@@ -29,7 +30,7 @@ def inicializar_db():
         )''')
         con.commit()
 
-# --- 3. RUTAS DE LA APLICACIÓN ---
+# --- 3. RUTAS ---
 
 @app.route('/')
 def login():
@@ -44,6 +45,7 @@ def verificar():
         inicializar_db()
         with sqlite3.connect(DB_PATH) as con:
             cursor = con.cursor()
+            # Traemos ARCHIVO e ID, pero sobre todo el MENSAJE
             cursor.execute('SELECT archivo, mensaje, id FROM galeria ORDER BY id DESC')
             fotos_db = cursor.fetchall()
         return render_template('index.html', fotos=fotos_db, nombre="Mayda")
