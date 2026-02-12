@@ -7,21 +7,23 @@ from flask import Flask, render_template, request, redirect, url_for
 app = Flask(__name__)
 
 # --- 1. CONEXIÓN CON LA NUBE (CLOUDINARY) ---
-# Aquí es donde el cerebro se conecta con la bóveda eterna
+# Ahora usamos os.environ.get para leer lo que configuraste en el panel de Render
 cloudinary.config( 
-  cloud_name = "dvmz2v0zvr", 
-  api_key = "297853115656242", 
-  api_secret = "PEGA_AQUI_TU_CODIGO_QN_SIN_ESPACIOS" 
+  cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME'), 
+  api_key = os.environ.get('CLOUDINARY_API_KEY'), 
+  api_secret = os.environ.get('CLOUDINARY_API_SECRET'),
+  secure = True
 )
 
 # --- 2. CONFIGURACIÓN DE SEGURIDAD ---
-# Los códigos que protegen tu compromiso con Mayda
 CODIGO_PUERTA = "amor123"
 CODIGO_AMULETO = "241125"
+
+# IMPORTANTE: En Render, la DB debe estar en /opt/render/project/src/ o usar una DB externa.
+# Por ahora, usemos una ruta local persistente si es posible:
 DB_PATH = os.path.join(os.getcwd(), 'base_datos_pro.db')
 
 def inicializar_db():
-    """Crea la base de datos si no existe"""
     with sqlite3.connect(DB_PATH) as con:
         con.execute('''CREATE TABLE IF NOT EXISTS galeria (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -35,12 +37,10 @@ def inicializar_db():
 
 @app.route('/')
 def login():
-    """Pantalla de entrada para Mayda"""
     return render_template('login.html', saludo="Hola Mayda ❤️‍🩹")
 
 @app.route('/verificar', methods=['POST'])
 def verificar():
-    """Verifica el acceso con tus códigos especiales"""
     entrada_uno = request.form.get('codigo', '').strip()
     entrada_dos = request.form.get('codigo_amuleto', '').strip()
 
@@ -48,32 +48,32 @@ def verificar():
         inicializar_db()
         with sqlite3.connect(DB_PATH) as con:
             cursor = con.cursor()
-            # Traemos las fotos de la base de datos
             cursor.execute('SELECT archivo, mensaje, id FROM galeria ORDER BY id DESC')
             fotos_db = cursor.fetchall()
+        # Asegúrate de que index.html reciba 'fotos'
         return render_template('index.html', fotos=fotos_db, nombre="Mayda")
     return "🔐 Código incorrecto, amor. Inténtalo de nuevo.", 403
 
 @app.route('/subir', methods=['POST'])
 def subir():
-    """Sube la foto a la nube y guarda el link en la base de datos"""
     archivo = request.files.get('foto_usuario')
     mensaje = request.form.get('mensaje_usuario')
     
     if archivo and archivo.filename != '':
-        # Integración suave: Subida directa a Cloudinary
+        # Cambiamos res['url'] por res['secure_url'] para que use HTTPS siempre
         res = cloudinary.uploader.upload(archivo)
-        url_nube = res['url'] # El link eterno
+        url_nube = res['secure_url'] 
         
         with sqlite3.connect(DB_PATH) as con:
             con.execute('INSERT INTO galeria (archivo, mensaje) VALUES (?, ?)', (url_nube, mensaje))
             con.commit()
             
-    return redirect(url_for('login'))
+    # Pequeño tip: después de subir, redirigir a una ruta que recargue la galería 
+    # o podrías tener problemas al ver la foto nueva de inmediato.
+    return redirect(url_for('login')) 
 
 @app.route('/eliminar/<int:foto_id>', methods=['POST'])
 def eliminar(foto_id):
-    """Borra el recuerdo de la lista"""
     with sqlite3.connect(DB_PATH) as con:
         con.execute('DELETE FROM galeria WHERE id = ?', (foto_id,))
         con.commit()
@@ -82,6 +82,5 @@ def eliminar(foto_id):
 # --- 4. ARRANQUE DEL SERVIDOR ---
 if __name__ == '__main__':
     inicializar_db()
-    # Render asignará el puerto automáticamente
     puerto = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=puerto)
