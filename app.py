@@ -4,9 +4,9 @@ import cloudinary
 import cloudinary.uploader
 from flask import Flask, render_template, request, redirect, url_for
 
-app = Flask(__name__)
+app = Flask(_name_)
 
-# --- CONFIGURACIÓN ---
+# --- CONFIGURACIÓN CLOUDINARY ---
 cloudinary.config( 
   cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME'), 
   api_key = os.environ.get('CLOUDINARY_API_KEY'), 
@@ -25,14 +25,13 @@ def inicializar_db():
         )''')
         con.commit()
 
-# --- RUTAS ---
 @app.route('/')
 def login():
     return render_template('login.html', saludo="Hola Mayda ❤️‍🩹")
 
 @app.route('/verificar', methods=['POST'])
 def verificar():
-    # Usa tus códigos: amor123 y 241125
+    # Códigos: amor123 y 241125
     inicializar_db()
     with sqlite3.connect(DB_PATH) as con:
         cursor = con.cursor()
@@ -46,11 +45,10 @@ def subir():
     if archivo:
         res = cloudinary.uploader.upload(archivo)
         with sqlite3.connect(DB_PATH) as con:
-            con.execute('INSERT INTO galeria (archivo, mensaje) VALUES (?, ?)', (res['secure_url'], "Escribe algo lindo..."))
+            con.execute('INSERT INTO galeria (archivo, mensaje) VALUES (?, ?)', (res['secure_url'], "Escribe aquí nuestra historia..."))
             con.commit()
     return redirect(url_for('login'))
 
-# NUEVA RUTA PARA INTERACTUAR EN CADA FOTO
 @app.route('/comentar', methods=['POST'])
 def comentar():
     foto_id = request.form.get('foto_id')
@@ -60,6 +58,6 @@ def comentar():
         con.commit()
     return redirect(url_for('login'))
 
-if __name__ == '__main__':
+if _name_ == '_main_':
     inicializar_db()
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
