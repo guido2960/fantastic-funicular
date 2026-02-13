@@ -9,6 +9,8 @@
         h1 { color: #d63384; font-size: 1.4rem; }
         input { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ffc0cb; border-radius: 5px; }
         button { background: #d63384; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; width: 95%; }
+        /* Estilo para el botón de música */
+        .btn-musica { background: none; border: none; color: #d63384; margin-top: 15px; cursor: pointer; font-size: 0.8rem; text-decoration: underline; width: 100%; }
     </style>
 </head>
 <body>
@@ -16,11 +18,16 @@
         <h1>{{ saludo }}</h1>
         <form action="/verificar" method="POST">
             <input type="text" name="correo" placeholder="Tu correo de amor" required>
-            
             <input type="password" name="clave" placeholder="Introduce el amuleto" required>
-            
             <button type="submit">Entrar</button>
         </form>
+
+        <audio id="musicaBoveda" loop>
+            <source src="TU_ENLACE_DE_DRIVE_AQUI" type="audio/mpeg">
+        </audio>
+        <button class="btn-musica" onclick="document.getElementById('musicaBoveda').play()">
+            🎵 Activar nuestra música
+        </button>
     </div>
 </body>
 </html>
