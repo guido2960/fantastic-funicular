@@ -15,8 +15,8 @@ cloudinary.config(
 )
 
 # --- 2. SEGURIDAD DE NUESTRA HISTORIA ---
-USUARIO_ACCESO = "maydaycooking@amor.com" 
-CLAVE_ACCESO = "260126" # Tu fecha de compromiso (El Amuleto)
+USUARIO_ACCESO = "maydaycookingamor@gmail.com" 
+CLAVE_ACCESO = "cariño241125" # Tu fecha de compromiso (El Amuleto)
 
 def get_db_connection():
     # Conexión a la base de datos "recuerdos" que te aprobaron
@@ -41,7 +41,7 @@ def inicializar_db():
 
 @app.route('/')
 def login():
-    return render_template('login.html', saludo="¡Feliz San Valentín, mi Mayda! ❤️ Ingresa nuestra cuenta y clave para entrar a la Bóveda Privada. ¡Te amo! 🥰")
+    return render_template('login.html', saludo="¡Feliz San Valentín,Mi Mayda!he construido este refugio digital para que solo nosotros seamos testigos de nuestra historia. ¡te amo!🥰")
 
 @app.route('/verificar', methods=['POST'])
 def verificar():
