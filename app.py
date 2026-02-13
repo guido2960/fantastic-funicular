@@ -4,7 +4,7 @@ import cloudinary
 import cloudinary.uploader
 from flask import Flask, render_template, request, redirect, url_for
 
-app = Flask(__name__)
+app = Flask(_name_)
 
 # --- 1. CONFIGURACIÓN DE LA NUBE (Blindada) ---
 cloudinary.config( 
@@ -14,75 +14,62 @@ cloudinary.config(
   secure = True
 )
 
-# --- 2. SEGURIDAD DE LA BÓVEDA ---
-CODIGO_PUERTA = "amor123"
-CODIGO_AMULETO = "241125"
-DB_PATH = os.path.join(os.getcwd(), 'base_datos_pro.db')
+# --- 2. SEGURIDAD DE NUESTRA HISTORIA ---
+# Cambiamos lo feo por "Acceso" y "Legado"
+USUARIO_ACCESO = "maydaycooking@amor.com" 
+CLAVE_LEGADO = "260126" # Tu fecha de compromiso (El Amuleto)
+DB_PATH = os.path.join(os.getcwd(), 'boveda_eterna.db') # Nombre más bonito
 
-def inicializar_db():
-    """Crea el cofre de recuerdos si no existe"""
+def inicializar_boveda():
+    """Crea el cofre de recuerdos con nombre positivo"""
     with sqlite3.connect(DB_PATH) as con:
-        con.execute('''CREATE TABLE IF NOT EXISTS galeria (
+        con.execute('''CREATE TABLE IF NOT EXISTS recuerdos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             archivo TEXT NOT NULL,
-            mensaje TEXT,
-            fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            detalle TEXT,
+            momento TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )''')
         con.commit()
 
 # --- 3. RUTAS DE ACCESO ---
 
 @app.route('/')
-def login():
-    return render_template('login.html', saludo="Feliz San Valentín mi Mayda  Ya ponle los códigos pues amor, para que entres de una vez a nuestra Bóveda Te amo 🥰❤️‍🩹")
+def portal():
+    # Saludo con tu esencia Abel
+    mensaje_bienvenida = "¡Feliz San Valentín, mi Mayda! ❤️ Pon la cuenta y la clave pues amor, para que entres a nuestra Bóveda. ¡Te amo! 🥰"
+    return render_template('login.html', saludo=mensaje_bienvenida)
 
-@app.route('/verificar', methods=['POST'])
-def verificar():
-    entrada_uno = request.form.get('codigo', '').strip()
-    entrada_dos = request.form.get('codigo_amuleto', '').strip()
+@app.route('/entrar', methods=['POST'])
+def verificar_acceso():
+    # Todo con nombres claros y profesionales
+    correo = request.form.get('correo', '').strip()
+    clave = request.form.get('clave', '').strip()
 
-    if entrada_uno == CODIGO_PUERTA and entrada_dos == CODIGO_AMULETO:
-        inicializar_db()
+    if correo == USUARIO_ACCESO and clave == CLAVE_LEGADO:
+        inicializar_boveda()
         with sqlite3.connect(DB_PATH) as con:
             cursor = con.cursor()
-            cursor.execute('SELECT archivo, mensaje, id FROM galeria ORDER BY id DESC')
-            fotos_db = cursor.fetchall()
-        return render_template('index.html', fotos=fotos_db, nombre="Mayda")
-    return "🔐 Código incorrecto, amor. Inténtalo de nuevo.", 403
+            cursor.execute('SELECT archivo, detalle, id FROM recuerdos ORDER BY id DESC')
+            recuerdos_db = cursor.fetchall()
+        return render_template('index.html', recuerdos=recuerdos_db, nombre="Mayda")
+    
+    return "🔐 Acceso denegado. ¡Revisa bien los datos, mi amor mayda!", 403
 
-@app.route('/subir', methods=['POST'])
-def subir():
-    """Envía el recuerdo a la nube y lo guarda en la base de datos"""
+# --- 4. GESTIÓN DE RECUERDOS ---
+
+@app.route('/guardar', methods=['POST'])
+def guardar_recuerdo():
     archivo = request.files.get('foto_usuario')
-    mensaje = request.form.get('mensaje_usuario', '') 
+    detalle = request.form.get('detalle_usuario', '') 
     if archivo and archivo.filename != '':
-        # La magia de la nube ocurre aquí
         res = cloudinary.uploader.upload(archivo)
         url_nube = res['secure_url'] 
         with sqlite3.connect(DB_PATH) as con:
-            con.execute('INSERT INTO galeria (archivo, mensaje) VALUES (?, ?)', (url_nube, mensaje))
+            con.execute('INSERT INTO recuerdos (archivo, detalle) VALUES (?, ?)', (url_nube, detalle))
             con.commit()
-    return redirect(url_for('login')) 
+    return redirect(url_for('portal')) 
 
-@app.route('/comentar', methods=['POST'])
-def comentar():
-    """Actualiza la dedicatoria de un recuerdo"""
-    foto_id = request.form.get('foto_id')
-    nuevo_msj = request.form.get('nuevo_mensaje')
-    with sqlite3.connect(DB_PATH) as con:
-        con.execute('UPDATE galeria SET mensaje = ? WHERE id = ?', (nuevo_msj, foto_id))
-        con.commit()
-    return redirect(url_for('login'))
-
-@app.route('/eliminar/<int:foto_id>', methods=['POST'])
-def eliminar(foto_id):
-    """Borra el recuerdo de la base de datos"""
-    with sqlite3.connect(DB_PATH) as con:
-        con.execute('DELETE FROM galeria WHERE id = ?', (foto_id,))
-        con.commit()
-    return redirect(url_for('login'))
-
-if __name__ == '__main__':
-    inicializar_db()
+if _name_ == '_main_':
+    inicializar_boveda()
     puerto = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=puerto)
