@@ -34,7 +34,7 @@ def inicializar_db():
 
 @app.route('/')
 def login():
-    return render_template('login.html', saludo="Hola Mayda ❤️‍🩹")
+    return render_template('login.html', saludo="Feliz San Valentín mi Mayda  Ya ponle los códigos pues amor, para que entres de una vez a nuestra Bóveda Te amo 🥰❤️‍🩹")
 
 @app.route('/verificar', methods=['POST'])
 def verificar():
