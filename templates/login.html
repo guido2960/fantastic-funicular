@@ -4,13 +4,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bóveda de Mayda</title>
     <style>
-        body { background: #fff0f5; text-align: center; font-family: sans-serif; padding-top: 50px; }
-        .caja { background: white; padding: 20px; border-radius: 15px; display: inline-block; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 80%; max-width: 350px; }
+        body { background: #fff0f5; text-align: center; font-family: sans-serif; padding-top: 50px; overflow-x: hidden; }
+        .caja { background: white; padding: 20px; border-radius: 15px; display: inline-block; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 80%; max-width: 350px; position: relative; z-index: 10; }
         h1 { color: #d63384; font-size: 1.4rem; }
         input { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ffc0cb; border-radius: 5px; }
-        button { background: #d63384; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; width: 95%; }
-        /* Estilo para el botón de música */
+        button { background: #d63384; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; width: 95%; font-weight: bold; }
         .btn-musica { background: none; border: none; color: #d63384; margin-top: 15px; cursor: pointer; font-size: 0.8rem; text-decoration: underline; width: 100%; }
+        /* Efecto de corazones */
+        .corazon { position: fixed; top: -10px; color: #d63384; font-size: 20px; animation: caer linear forwards; z-index: 1; }
+        @keyframes caer { to { transform: translateY(100vh) rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -23,11 +25,28 @@
         </form>
 
         <audio id="musicaBoveda" loop>
-            <source src="TU_ENLACE_DE_DRIVE_AQUI" type="audio/mpeg">
+            <source src="https://docs.google.com/uc?export=download&id=1mf6d6JIUOO9l4j4Ch71vQuPip0ipRDBC" type="audio/mpeg">
         </audio>
-        <button class="btn-musica" onclick="document.getElementById('musicaBoveda').play()">
-            🎵 Activar nuestra música
+        <button class="btn-musica" onclick="iniciarMagia()">
+            🎵 Activar nuestra canción y magia
         </button>
     </div>
+
+    <script>
+        function iniciarMagia() {
+            document.getElementById('musicaBoveda').play();
+            for(let i=0; i<30; i++) {
+                setTimeout(() => {
+                    const c = document.createElement('div');
+                    c.innerHTML = '❤️';
+                    c.className = 'corazon';
+                    c.style.left = Math.random() * 100 + 'vw';
+                    c.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                    c.style.opacity = Math.random();
+                    document.body.appendChild(c);
+                }, i * 200);
+            }
+        }
+    </script>
 </body>
 </html>
