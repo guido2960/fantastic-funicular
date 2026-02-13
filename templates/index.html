@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nuestra Bóveda: Mayda & Abel ❤️</title>
     <style>
-        /* MANTENGO TODO TU ESTILO ORIGINAL */
+        /* MANTENGO TODO TU ESTILO ORIGINAL SIN CAMBIOS */
         body { 
             margin: 0; background: #ffe5ec; font-family: 'Segoe UI', Arial, sans-serif;
             overflow-x: hidden; display: flex; flex-direction: column; align-items: center;
@@ -51,6 +51,10 @@
 </head>
 <body>
 
+    <audio id="musicaFondo" loop>
+        <source src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1770994214/Carla_Morrison_-_Disfruto_letra_qremt7.mp3" type="audio/mpeg">
+    </audio>
+
     <div class="tarjeta">
         <h2 style="color: #ff4d6d; margin-top: 0;">🌹 Nuestro Universo 🌹</h2>
         
@@ -88,7 +92,7 @@
     </div>
 
     <script>
-        // MANTENGO TUS SCRIPTS ORIGINALES
+        // MANTENGO TUS SCRIPTS ORIGINALES INTACTOS
         const iconos = ['🌹', '❤️', '🌸', '💖', '✨'];
         setInterval(() => {
             const e = document.createElement('div');
@@ -101,7 +105,15 @@
             setTimeout(() => e.remove(), 5000);
         }, 400);
 
+        // SOLO SE ACTIVA LA MÚSICA AL CARGAR O AL TOCAR EL BOTÓN
+        window.onload = function() {
+            document.getElementById('musicaFondo').play().catch(() => {});
+        }
+
         function hechizoAmuleto() {
+            // Aseguramos que la música suene al interactuar
+            document.getElementById('musicaFondo').play();
+
             for (let i = 0; i < 60; i++) {
                 const c = document.createElement('div');
                 c.className = 'chispa';
