@@ -5,42 +5,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nuestra Bóveda: Mayda & Abel ❤️</title>
     <style>
-        /* TU ESTILO ORIGINAL SE MANTIENE 100% IGUAL */
-        body { margin: 0; background: #ffe5ec; font-family: 'Segoe UI', Arial, sans-serif; overflow-x: hidden; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
-        .caida { position: absolute; top: -50px; user-select: none; pointer-events: none; z-index: 1; animation: bajar linear forwards; }
+        /* MANTENGO TODO TU ESTILO ORIGINAL */
+        body { 
+            margin: 0; background: #ffe5ec; font-family: 'Segoe UI', Arial, sans-serif;
+            overflow-x: hidden; display: flex; flex-direction: column; align-items: center;
+            min-height: 100vh; padding: 20px;
+        }
+        .caida {
+            position: absolute; top: -50px; user-select: none; pointer-events: none;
+            z-index: 1; animation: bajar linear forwards;
+        }
         @keyframes bajar { to { transform: translateY(110vh) rotate(360deg); } }
-        .tarjeta { z-index: 10; background: white; padding: 25px; border-radius: 35px; box-shadow: 0 10px 40px rgba(255, 77, 109, 0.3); width: 90%; max-width: 400px; border: 2px solid #ff4d6d; text-align: center; margin-bottom: 25px; }
-        .foto-marco { width: 100%; height: 320px; border-radius: 25px; overflow: hidden; background: #fff0f3; border: 3px solid #ffc2d1; margin-bottom: 15px; }
+        .tarjeta { 
+            z-index: 10; background: white; padding: 25px; border-radius: 35px; 
+            box-shadow: 0 10px 40px rgba(255, 77, 109, 0.3); width: 90%; max-width: 400px;
+            border: 2px solid #ff4d6d; text-align: center; margin-bottom: 25px;
+        }
+        .foto-marco { 
+            width: 100%; height: 320px; border-radius: 25px; overflow: hidden; 
+            background: #fff0f3; border: 3px solid #ffc2d1; margin-bottom: 15px;
+        }
         img { width: 100%; height: 100%; object-fit: cover; }
-        button, .label-subir { background: #ff4d6d; color: white; border: none; padding: 14px; border-radius: 25px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; display: inline-block; font-size: 1rem; }
-        .btn-amuleto { background: linear-gradient(45deg, #ffd700, #ffa500); border: 2px solid white; box-shadow: 0 5px 20px rgba(255, 204, 51, 0.6); }
-        .chispa { position: absolute; pointer-events: none; z-index: 100; font-size: 25px; animation: explotar 1.2s ease-out forwards; }
-        @keyframes explotar { 0% { transform: scale(0); opacity: 1; } 100% { transform: translate(var(--x), var(--y)) scale(1.5); opacity: 0; } }
-        textarea { width: 90%; border-radius: 15px; border: 1px solid #ffb3c1; padding: 12px; margin-top: 10px; font-family: inherit; resize: none; }
-        .btn-eliminar { background: #ffb3c1 !important; color: #c9184a !important; font-size: 0.8rem !important; }
+        button, .label-subir { 
+            background: #ff4d6d; color: white; border: none; padding: 14px; 
+            border-radius: 25px; cursor: pointer; font-weight: bold; 
+            width: 100%; margin-top: 10px; display: inline-block; font-size: 1rem;
+        }
+        .btn-amuleto { 
+            background: linear-gradient(45deg, #ffd700, #ffa500); 
+            border: 2px solid white; box-shadow: 0 5px 20px rgba(255, 204, 51, 0.6);
+        }
+        .chispa {
+            position: absolute; pointer-events: none; z-index: 100; font-size: 25px;
+            animation: explotar 1.2s ease-out forwards;
+        }
+        @keyframes explotar {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)) scale(1.5); opacity: 0; }
+        }
+        textarea { 
+            width: 90%; border-radius: 15px; border: 1px solid #ffb3c1; 
+            padding: 12px; margin-top: 10px; font-family: inherit; resize: none;
+        }
     </style>
 </head>
 <body>
+
     <div class="tarjeta">
         <h2 style="color: #ff4d6d; margin-top: 0;">🌹 Nuestro Universo 🌹</h2>
+        
         {% if fotos %}
             {% for foto in fotos %}
             <div style="margin-bottom: 40px; border-bottom: 2px solid #ffe5ec; padding-bottom: 25px;">
-                <div class="foto-marco"><img src="{{ foto[0] }}" alt="Nuestro Recuerdo"></div>
-                <p style="color: #c9184a; font-size: 1.1rem; background: #fff0f3; padding: 10px; border-radius: 15px;"><b>Dedicatoria:</b><br>{{ foto[1] }}</p>
-                <form action="/comentar" method="POST">
-                    <input type="hidden" name="foto_id" value="{{ foto[2] }}">
-                    <textarea name="nuevo_mensaje" placeholder="Actualizar este mensaje de amor..."></textarea>
-                    <button type="submit">Guardar Nueva Dedicatoria 💌</button>
-                </form>
-                <form action="/eliminar/{{ foto[2] }}" method="POST" onsubmit="return confirm('Abel, ¿estás seguro de borrar este recuerdo?');" style="margin-top: 10px;">
-                    <button type="submit" class="btn-eliminar">Eliminar esta foto 🗑️</button>
+                <div class="foto-marco">
+                    <img src="{{ foto[0] }}" alt="Nuestro Recuerdo">
+                </div>
+                
+                <p style="color: #c9184a; font-size: 1.1rem; background: #fff0f3; padding: 10px; border-radius: 15px;">
+                    <b>Dedicatoria:</b> <br> {{ foto[1] }}
+                </p>
+
+                <form action="/eliminar/{{ foto[2] }}" method="POST" onsubmit="return confirm('Abel, ¿estás seguro de borrar este recuerdo?');">
+                    <button type="submit" style="background: #ffb3c1 !important; color: #c9184a !important; font-size: 0.8rem !important;">Eliminar esta foto 🗑️</button>
                 </form>
             </div>
             {% endfor %}
         {% else %}
             <p style="color: #ff758f;">La bóveda está esperando vuestro primer recuerdo, Abel.</p>
         {% endif %}
+
         <button class="btn-amuleto" onclick="hechizoAmuleto()">💍 Nuestro Amuleto (26/01)</button>
     </div>
 
@@ -49,13 +82,13 @@
         <form action="/subir" method="POST" enctype="multipart/form-data">
             <input type="file" name="foto_usuario" id="file" hidden accept="image/*" required>
             <label for="file" class="label-subir">Elegir Foto del Dispositivo</label>
-            <textarea name="mensaje_usuario" placeholder="Escribe la dedicatoria inicial..."></textarea>
+            <textarea name="mensaje_usuario" placeholder="Escribe la dedicatoria inicial..." required></textarea>
             <button type="submit" style="background: #4caf50;">Subir a la Bóveda ✨</button>
         </form>
     </div>
 
     <script>
-        /* TU SCRIPT DE ROSAS Y AMULETO INTACTO */
+        // MANTENGO TUS SCRIPTS ORIGINALES
         const iconos = ['🌹', '❤️', '🌸', '💖', '✨'];
         setInterval(() => {
             const e = document.createElement('div');
@@ -71,7 +104,8 @@
         function hechizoAmuleto() {
             for (let i = 0; i < 60; i++) {
                 const c = document.createElement('div');
-                c.className = 'chispa'; c.innerText = '✨';
+                c.className = 'chispa';
+                c.innerText = '✨';
                 c.style.left = '50vw'; c.style.top = '50vh';
                 const x = (Math.random() - 0.5) * 800 + 'px';
                 const y = (Math.random() - 0.5) * 800 + 'px';
