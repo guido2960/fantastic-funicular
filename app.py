@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
 
-# --- 1. CONFIGURACIÓN CLOUDINARY (Tu configuración intacta) ---
+# --- 1. CONFIGURACIÓN DE LA NUBE (Blindada) ---
 cloudinary.config( 
   cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME'), 
   api_key = os.environ.get('CLOUDINARY_API_KEY'), 
@@ -14,12 +14,13 @@ cloudinary.config(
   secure = True
 )
 
-# --- 2. SEGURIDAD (Tus códigos intactos) ---
+# --- 2. SEGURIDAD DE LA BÓVEDA ---
 CODIGO_PUERTA = "amor123"
 CODIGO_AMULETO = "241125"
 DB_PATH = os.path.join(os.getcwd(), 'base_datos_pro.db')
 
 def inicializar_db():
+    """Crea el cofre de recuerdos si no existe"""
     with sqlite3.connect(DB_PATH) as con:
         con.execute('''CREATE TABLE IF NOT EXISTS galeria (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -29,7 +30,7 @@ def inicializar_db():
         )''')
         con.commit()
 
-# --- 3. RUTAS ---
+# --- 3. RUTAS DE ACCESO ---
 
 @app.route('/')
 def login():
@@ -51,9 +52,11 @@ def verificar():
 
 @app.route('/subir', methods=['POST'])
 def subir():
+    """Envía el recuerdo a la nube y lo guarda en la base de datos"""
     archivo = request.files.get('foto_usuario')
     mensaje = request.form.get('mensaje_usuario', '') 
     if archivo and archivo.filename != '':
+        # La magia de la nube ocurre aquí
         res = cloudinary.uploader.upload(archivo)
         url_nube = res['secure_url'] 
         with sqlite3.connect(DB_PATH) as con:
@@ -61,19 +64,19 @@ def subir():
             con.commit()
     return redirect(url_for('login')) 
 
-# --- ESTA ES LA ÚNICA FUNCIÓN NUEVA QUE INCLUIMOS ---
 @app.route('/comentar', methods=['POST'])
 def comentar():
+    """Actualiza la dedicatoria de un recuerdo"""
     foto_id = request.form.get('foto_id')
     nuevo_msj = request.form.get('nuevo_mensaje')
     with sqlite3.connect(DB_PATH) as con:
         con.execute('UPDATE galeria SET mensaje = ? WHERE id = ?', (nuevo_msj, foto_id))
         con.commit()
     return redirect(url_for('login'))
-# --------------------------------------------------
 
 @app.route('/eliminar/<int:foto_id>', methods=['POST'])
 def eliminar(foto_id):
+    """Borra el recuerdo de la base de datos"""
     with sqlite3.connect(DB_PATH) as con:
         con.execute('DELETE FROM galeria WHERE id = ?', (foto_id,))
         con.commit()
