@@ -7,7 +7,6 @@
         body { background: #fff0f5; text-align: center; font-family: sans-serif; padding-top: 50px; }
         .caja { background: white; padding: 20px; border-radius: 15px; display: inline-block; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 80%; max-width: 350px; }
         h1 { color: #d63384; font-size: 1.4rem; }
-        /* Cambié el tipo de 'password' a 'text' en el correo para que se vea lo que escribes */
         input { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ffc0cb; border-radius: 5px; }
         button { background: #d63384; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; width: 95%; }
     </style>
@@ -16,9 +15,9 @@
     <div class="caja">
         <h1>{{ saludo }}</h1>
         <form action="/verificar" method="POST">
-            <input type="text" name="correo" placeholder="maydaycooking@amor.com" required>
+            <input type="text" name="correo" placeholder="Tu correo de amor" required>
             
-            <input type="password" name="clave" placeholder="Código del amuleto (260126)" required>
+            <input type="password" name="clave" placeholder="Introduce el amuleto" required>
             
             <button type="submit">Entrar</button>
         </form>
