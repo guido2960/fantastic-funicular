@@ -4,7 +4,7 @@ import cloudinary
 import cloudinary.uploader
 from flask import Flask, render_template, request, redirect, url_for
 
-app = Flask(_name_)
+app = Flask(__name__)
 
 # --- 1. CONFIGURACIÓN DE CLOUDINARY ---
 cloudinary.config( 
@@ -105,7 +105,7 @@ def subir():
         conn.close()
     return redirect(url_for('login')) 
 
-if _name_ == '_main_':
+if __name__ == '__main__':
     inicializar_db()
     puerto = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=puerto)
