@@ -32,11 +32,12 @@ def inicializar_db():
         mensaje TEXT,
         fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )''')
-    # Tabla para notas (Ajustada para que coincida con el HTML)
+    # Tabla para notas (Añadida la columna 'categoria' para evitar el Error 500)
     cur.execute('''CREATE TABLE IF NOT EXISTS notas_amor (
         id SERIAL PRIMARY KEY,
         contenido TEXT NOT NULL,
         autor TEXT NOT NULL,
+        categoria TEXT DEFAULT 'General',
         fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )''')
     conn.commit()
@@ -61,8 +62,8 @@ def verificar():
         # Traer fotos
         cur.execute('SELECT archivo, mensaje, id FROM galeria ORDER BY id DESC')
         fotos_db = cur.fetchall()
-        # Traer notas con el formato de fecha que pediste para el chat
-        cur.execute("SELECT autor, contenido, TO_CHAR(fecha, 'DD/MM HH:MI AM') FROM notas_amor ORDER BY fecha ASC")
+        # Traer notas con el formato de fecha y autor
+        cur.execute("SELECT autor, contenido, TO_CHAR(fecha, 'DD/MM HH:MI AM'), categoria FROM notas_amor ORDER BY fecha ASC")
         notas_db = cur.fetchall()
         cur.close()
         conn.close()
@@ -70,22 +71,35 @@ def verificar():
     
     return "🔐 Acceso denegado, intenta de nuevo.", 403
 
-# --- 4. GUARDAR NOTAS (EL CHAT) ---
+# --- 4. GUARDAR NOTAS (EL CHAT CORREGIDO) ---
 
 @app.route('/nueva_nota', methods=['POST'])
 def nueva_nota():
     autor = request.form.get('autor_nombre')
     contenido = request.form.get('contenido_nota')
 
+    # Lógica para asignar categoría según el autor
+    if autor and ("Abel" in autor or "Norte" in autor):
+        categoria = "Norte"
+    else:
+        categoria = "May"
+
     if contenido and autor:
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute('INSERT INTO notas_amor (autor, contenido) VALUES (%s, %s)', (autor, contenido))
-        conn.commit()
-        cur.close()
-        conn.close()
+        try:
+            conn = get_db_connection()
+            cur = conn.cursor()
+            # AGREGAMOS 'categoria' en el INSERT para que la DB no de error
+            cur.execute(
+                'INSERT INTO notas_amor (autor, contenido, categoria) VALUES (%s, %s, %s)', 
+                (autor, contenido, categoria)
+            )
+            conn.commit()
+            cur.close()
+            conn.close()
+        except Exception as e:
+            print(f"Error al guardar nota: {e}")
+            return f"Error en el servidor: {e}", 500
     
-    # Después de guardar, redirigimos para refrescar la página
     return redirect(url_for('login')) 
 
 # --- 5. GESTIÓN DE FOTOS ---
@@ -108,4 +122,4 @@ def subir():
 if __name__ == '__main__':
     inicializar_db()
     puerto = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=puerto)
+    app.run(host='0.0.0.0
