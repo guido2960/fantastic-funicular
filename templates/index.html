@@ -10,7 +10,7 @@
             overflow-x: hidden; display: flex; flex-direction: column; align-items: center;
             min-height: 100vh; padding: 20px; padding-bottom: 100px;
         }
-        /* LLUVIA DE ROSAS Y CORAZONES */
+        /* LLUVIA DE ROSAS, CORAZONES Y FLORES */
         .caida {
             position: fixed; top: -50px; user-select: none; pointer-events: none;
             z-index: 1; animation: bajar linear forwards; font-size: 24px;
@@ -38,12 +38,15 @@
         .btn-estado { 
             background: #fff0f3; color: #c9184a; border: 1px solid #ffb3c1; 
             font-size: 0.8rem; padding: 10px; margin: 4px; border-radius: 12px;
+            cursor: pointer; font-weight: bold;
         }
 
         .selector-musica {
             width: 100%; padding: 10px; border-radius: 15px; border: 1px solid #ff4d6d;
             margin-bottom: 10px; background: #fff0f3; color: #c9184a; font-weight: bold;
         }
+
+        /* EFECTOS ESPECIALES */
         .besito-volador {
             position: fixed; pointer-events: none; z-index: 9999; font-size: 35px;
             animation: volar 2s ease-out forwards;
@@ -81,7 +84,7 @@
 
     <div class="tarjeta" style="border-color: #ffb3c1;">
         <h3 style="color: #c9184a; margin: 0;">🧭 Tu Norte: Abel</h3>
-        <p id="mensajeNorte" style="color: #ff4d6d; font-size: 0.9rem; margin: 10px 0; min-height: 40px;">
+        <p id="mensajeNorte" style="color: #ff4d6d; font-size: 0.9rem; margin: 10px 0; min-height: 45px;">
             ¿Cómo está tu corazón hoy, Mayda?
         </p>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
@@ -93,7 +96,7 @@
         <hr style="border: 0; border-top: 1px dashed #ffb3c1; margin: 15px 0;">
         <h4 style="color: #ff4d6d; margin: 0;">💋 Mis Besos</h4>
         <div id="contadorBesos" style="font-size: 2.5rem; font-weight: bold; color: #ff4d6d; margin: 5px 0;">0</div>
-        <button onclick="darBeso()" style="border-radius: 30px;">Enviar Beso 😘</button>
+        <button onclick="darBeso()" style="border-radius: 30px; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4);">Enviar Beso 😘</button>
     </div>
 
     <div class="tarjeta" style="background: #fffdf5; border: 2px solid #d7c49e;">
@@ -103,8 +106,17 @@
                 <option value="Mayda">Soy Mayda 🌹</option>
                 <option value="Abel">Soy Abel 🧭</option>
             </select>
-            <textarea name="contenido_nota" placeholder="Escribe aquí..." required style="width: 90%; padding: 10px; border-radius: 10px; border: 1px solid #d7c49e;"></textarea>
-            <button type="submit" style="background: #5d4037;">Guardar Nota ✨</button>
+            
+            <p style="color: #8d734a; font-size: 0.8rem; font-weight: bold; margin: 5px 0;">¿Qué quieres expresar?</p>
+            <select name="modo_nota" class="selector-musica" style="border-color: #d7c49e; background: #faf3e0;">
+                <option value="Cariñoso">Modo Cariñoso 🥰</option>
+                <option value="Tristeza/Desahogo">Modo Tristeza/Desahogo ☁️</option>
+                <option value="Plan">Modo Plan/Idea 🎬</option>
+                <option value="Inspiración">Modo Inspiración ✨</option>
+            </select>
+
+            <textarea name="contenido_nota" placeholder="Escribe aquí tu mensaje..." required style="width: 90%; height: 70px; padding: 10px; border-radius: 10px; border: 1px solid #d7c49e; margin-top: 10px;"></textarea>
+            <button type="submit" style="background: #5d4037;">Guardar en la Bóveda ✨</button>
         </form>
     </div>
 
@@ -115,9 +127,9 @@
             <div style="margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #ffe5ec;">
                 <div class="foto-marco"><img src="{{ foto[0] }}"></div>
                 <p style="color: #c9184a; font-weight: bold;">{{ foto[1] }}</p>
-                <form action="/editar/{{ foto[2] }}" method="POST">
-                    <input type="text" name="nuevo_mensaje" placeholder="Editar mensaje..." required style="width: 70%; padding: 5px; border-radius: 10px; border: 1px solid #ffb3c1;">
-                    <button type="submit" style="background: #4caf50; width: auto; padding: 5px 10px; font-size: 0.8rem;">✍️</button>
+                <form action="/editar/{{ foto[2] }}" method="POST" style="display: flex; gap: 5px; justify-content: center;">
+                    <input type="text" name="nuevo_mensaje" placeholder="Editar mensaje..." required style="width: 60%; padding: 5px; border-radius: 10px; border: 1px solid #ffb3c1;">
+                    <button type="submit" style="background: #4caf50; width: auto; margin: 0; padding: 5px 12px;">✍️</button>
                 </form>
             </div>
             {% endfor %}
@@ -128,14 +140,14 @@
         <h3 style="color: #ff4d6d;">Subir Foto Nueva</h3>
         <form action="/subir" method="POST" enctype="multipart/form-data">
             <input type="file" name="foto_usuario" accept="image/*" required>
-            <textarea name="mensaje_usuario" placeholder="¿Qué quieres decir?" required style="width: 90%; margin-top: 10px;"></textarea>
-            <button type="submit" style="background: #4caf50;">Añadir a la Bóveda</button>
+            <textarea name="mensaje_usuario" placeholder="¿Qué quieres decir sobre esta foto?" required style="width: 90%; margin-top: 10px; border-radius: 10px; border: 1px solid #ffb3c1; padding: 10px;"></textarea>
+            <button type="submit" style="background: #4caf50;">Añadir Foto</button>
         </form>
     </div>
 
     <script>
-        // LLUVIA DE ROSAS CONSTANTE
-        const iconos = ['🌹', '❤️', '💖', '✨', '🌸'];
+        // LLUVIA DE ROSAS Y CORAZONES (RESTAURADA)
+        const iconos = ['🌹', '❤️', '💖', '✨', '🌸', '🌸'];
         function crearLluvia() {
             const e = document.createElement('div');
             e.className = 'caida';
@@ -146,18 +158,18 @@
             document.body.appendChild(e);
             setTimeout(() => e.remove(), 5000);
         }
-        setInterval(crearLluvia, 300); // Lluvia rápida
+        setInterval(crearLluvia, 300);
 
-        // FUNCIONES DE APOYO
+        // FUNCIONES DEL NORTE 🧭
         function apoyo(estado) {
             const texto = document.getElementById('mensajeNorte');
-            if(estado === 'estresada') texto.innerHTML = "<b>Suelta el celular 5 minutos, amor.</b> Yo me encargo de todo. Te mereces descansar. ☁️";
-            if(estado === 'triste') texto.innerHTML = "<b>No estás sola.</b> Recuerda nuestra charla del 5 de enero. Soy tu refugio. 🛡️";
-            if(estado === 'cariñosa') texto.innerHTML = "<b>¡Aprovechemos!</b> Dame besos y recuerda: <i>'A menos que te cases conmigo...'</i> 💍";
-            if(estado === 'accion') texto.innerHTML = "<b>¡Dale con todo!</b> Admiro lo enfocada que eres. Aquí te espero. 🧭";
+            if(estado === 'estresada') texto.innerHTML = "<b>Tómate un respiro, amor.</b> Abel está aquí para cuidarte. Todo estará bien. ☁️";
+            if(estado === 'triste') texto.innerHTML = "<b>No temas a tus miedos.</b> Recuerda que soy tu refugio desde aquel 5 de enero. 🛡️";
+            if(estado === 'cariñosa') texto.innerHTML = "<b>¡Qué linda te pones!</b> Recuerda: <i>'A menos que te cases conmigo...'</i> 💍";
+            if(estado === 'accion') texto.innerHTML = "<b>¡A darle con todo!</b> Admiro tu fuerza. Te espero aquí con un beso. 🧭";
         }
 
-        // BESOS
+        // BESOS RENOVADOS
         let nBesos = 0;
         function darBeso() {
             nBesos++;
@@ -166,7 +178,7 @@
                 const b = document.createElement('div');
                 b.className = 'besito-volador';
                 b.innerText = '😘';
-                b.style.left = Math.random() * 100 + "vw";
+                b.style.left = (Math.random() * 80 + 10) + "vw";
                 b.style.top = "90vh";
                 document.body.appendChild(b);
                 setTimeout(() => b.remove(), 2000);
@@ -187,7 +199,7 @@
                 document.body.appendChild(c);
                 setTimeout(() => c.remove(), 1000);
             }
-            alert("¡Te amo! Nuestra promesa del 26 de enero es eterna. 💍");
+            alert("¡Promesa Eterna! Abel & Mayda 26/01 💍");
         }
 
         function cambiarMelodia(url) {
