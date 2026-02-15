@@ -50,6 +50,11 @@
             width: 90%; border-radius: 15px; border: 1px solid #ffb3c1; 
             padding: 12px; margin-top: 10px; font-family: inherit; resize: none;
         }
+        /* ESTILOS NUEVOS PARA EL CHAT CREMA */
+        .nota-chat {
+            max-width: 85%; padding: 12px; margin-bottom: 10px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.05); border: 1px solid #e2d1a3;
+        }
     </style>
 </head>
 <body>
@@ -72,25 +77,62 @@
             </select>
         </div>
 
+        <button class="btn-amuleto" onclick="hechizoAmuleto()">💍 Nuestro Amuleto (26/01)</button>
+    </div>
+
+    <div class="tarjeta" style="background: #fffdf5; border: 2px solid #d7c49e;">
+        <h3 style="color: #5d4037;">📜 Refugio de Notas</h3>
+        <p style="color: #8d6e63; font-style: italic; font-size: 0.85rem;">"Desahógate acá mi amor, o planeemos el futuro..."</p>
+        
+        <form action="/nueva_nota" method="POST" style="text-align: left;">
+            <select name="autor_nombre" class="selector-musica" style="border-color: #d7c49e;">
+                <option value="Mayda">Soy Mayda 🌹</option>
+                <option value="Abel">Soy Abel 🧭</option>
+            </select>
+            <select name="categoria" class="selector-musica" style="border-color: #d7c49e;">
+                <option value="Sentimiento">❤️ Sentimiento</option>
+                <option value="Desahogo">☁️ Desahogo / Tristeza</option>
+                <option value="Plan">✨ Plan a Futuro</option>
+            </select>
+            <textarea name="contenido_nota" placeholder="Escribe tu nota aquí..." required style="width: 93%; border: 1px solid #d7c49e; background: #fdf5e6;"></textarea>
+            <button type="submit" style="background: #5d4037;">Guardar en el Corazón ✨</button>
+        </form>
+
+        <hr style="border: 0; border-top: 1px dashed #d7c49e; margin: 20px 0;">
+
+        <div style="display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto;">
+            {% if notas %}
+                {% for nota in notas %}
+                    {% set es_abel = (nota[1] == 'Abel') %}
+                    <div style="align-self: {{ 'flex-end' if es_abel else 'flex-start' }}; width: 85%; text-align: left;">
+                        <div class="nota-chat" style="background: {{ '#fffdd0' if es_abel else '#fdf5e6' }}; border-radius: {{ '20px 20px 5px 20px' if es_abel else '20px 20px 20px 5px' }};">
+                            <span style="font-size: 1.1rem;">{% if nota[2] == 'Desahogo' %}☁️{% elif nota[2] == 'Plan' %}✨{% else %}❤️{% endif %}</span>
+                            <p style="margin: 5px 0; color: #4e342e; font-size: 0.95rem;">{{ nota[0] }}</p>
+                            <small style="color: #a1887f; font-size: 0.7rem; font-weight: bold;">{{ nota[1] }} • {{ nota[3] }}</small>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="tarjeta">
+        <h3 style="color: #ff4d6d; margin-top: 0;">Galería de Recuerdos 📸</h3>
         {% if fotos %}
             {% for foto in fotos %}
-            <div style="margin-bottom: 40px; border-bottom: 2px solid #ffe5ec; padding-bottom: 25px;">
+            <div style="margin-bottom: 30px; border-bottom: 2px solid #ffe5ec; padding-bottom: 20px;">
                 <div class="foto-marco">
                     <img src="{{ foto[0] }}" alt="Nuestro Recuerdo">
                 </div>
-                
-                <p style="color: #c9184a; font-size: 1.1rem; background: #fff0f3; padding: 10px; border-radius: 15px;">
-                    <b>Dedicatoria:</b> <br> {{ foto[1] }}
+                <p style="color: #c9184a; font-size: 1rem; background: #fff0f3; padding: 10px; border-radius: 15px;">
+                    {{ foto[1] }}
                 </p>
-
-                <form action="/eliminar/{{ foto[2] }}" method="POST" onsubmit="return confirm('Abel, ¿estás seguro de borrar este recuerdo?');">
-                    <button type="submit" style="background: #ffb3c1 !important; color: #c9184a !important; font-size: 0.8rem !important;">Eliminar esta foto 🗑️</button>
+                <form action="/eliminar/{{ foto[2] }}" method="POST">
+                    <button type="submit" style="background: #ffb3c1 !important; color: #c9184a !important; font-size: 0.7rem; padding: 8px;">Eliminar 🗑️</button>
                 </form>
             </div>
             {% endfor %}
         {% endif %}
-
-        <button class="btn-amuleto" onclick="hechizoAmuleto()">💍 Nuestro Amuleto (26/01)</button>
     </div>
 
     <div class="tarjeta">
@@ -109,7 +151,7 @@
             const source = document.getElementById('audioSource');
             source.src = url;
             audio.load();
-            audio.play().catch(() => console.log("Clic requerido para sonar"));
+            audio.play().catch(() => console.log("Clic requerido"));
         }
 
         const iconos = ['🌹', '❤️', '🌸', '💖', '✨'];
