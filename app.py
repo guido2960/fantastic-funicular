@@ -4,9 +4,9 @@ import cloudinary
 import cloudinary.uploader
 from flask import Flask, render_template, request, redirect, url_for
 
-app = Flask(__name__)
+app = Flask(_name_)
 
-# --- 1. CONFIGURACIÓN DE LA NUBE ---
+# --- 1. CONFIGURACIÓN DE CLOUDINARY ---
 cloudinary.config( 
   cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME'), 
   api_key = os.environ.get('CLOUDINARY_API_KEY'), 
@@ -14,7 +14,7 @@ cloudinary.config(
   secure = True
 )
 
-# --- 2. SEGURIDAD DE NUESTRA HISTORIA ---
+# --- 2. SEGURIDAD ---
 USUARIO_ACCESO = "maydaycookingamor@gmail.com" 
 CLAVE_ACCESO = "cariño241125"
 
@@ -23,7 +23,6 @@ def get_db_connection():
     return psycopg2.connect(url)
 
 def inicializar_db():
-    """Crea la galería y el cofre de notas si no existen"""
     conn = get_db_connection()
     cur = conn.cursor()
     # Tabla para fotos
@@ -33,23 +32,22 @@ def inicializar_db():
         mensaje TEXT,
         fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )''')
-    # NUEVA TABLA: Para tus notas estilo chat
+    # Tabla para notas (Ajustada para que coincida con el HTML)
     cur.execute('''CREATE TABLE IF NOT EXISTS notas_amor (
         id SERIAL PRIMARY KEY,
         contenido TEXT NOT NULL,
         autor TEXT NOT NULL,
-        categoria TEXT NOT NULL,
         fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )''')
     conn.commit()
     cur.close()
     conn.close()
 
-# --- 3. RUTAS DE ACCESO ---
+# --- 3. RUTAS ---
 
 @app.route('/')
 def login():
-    return render_template('login.html', saludo="¡Feliz San Valentín! Este es nuestro refugio digital. Te amo.")
+    return render_template('login.html')
 
 @app.route('/verificar', methods=['POST'])
 def verificar():
@@ -63,34 +61,32 @@ def verificar():
         # Traer fotos
         cur.execute('SELECT archivo, mensaje, id FROM galeria ORDER BY id DESC')
         fotos_db = cur.fetchall()
-        # Traer notas
-        cur.execute('SELECT contenido, autor, categoria, TO_CHAR(fecha, \'DD Mon, HH:MI AM\') FROM notas_amor ORDER BY id ASC')
+        # Traer notas con el formato de fecha que pediste para el chat
+        cur.execute("SELECT autor, contenido, TO_CHAR(fecha, 'DD/MM HH:MI AM') FROM notas_amor ORDER BY fecha ASC")
         notas_db = cur.fetchall()
         cur.close()
         conn.close()
-        return render_template('index.html', fotos=fotos_db, notas=notas_db, nombre="Mayda")
+        return render_template('index.html', fotos=fotos_db, notas=notas_db)
     
-    return "🔐 Acceso denegado, amor.", 403
+    return "🔐 Acceso denegado, intenta de nuevo.", 403
 
-# --- 4. GESTIÓN DE NOTAS (CHAT CREMA) ---
+# --- 4. GUARDAR NOTAS (EL CHAT) ---
 
 @app.route('/nueva_nota', methods=['POST'])
 def nueva_nota():
+    autor = request.form.get('autor_nombre')
     contenido = request.form.get('contenido_nota')
-    categoria = request.form.get('categoria', 'Sentimiento')
-    # Aquí definimos quién escribe basándonos en una lógica simple por ahora
-    # En el futuro podrías tener dos logins, pero para este portal:
-    autor = request.form.get('autor_nombre', 'Mayda') 
 
-    if contenido:
+    if contenido and autor:
         conn = get_db_connection()
         cur = conn.cursor()
-        cur.execute('INSERT INTO notas_amor (contenido, autor, categoria) VALUES (%s, %s, %s)', 
-                    (contenido, autor, categoria))
+        cur.execute('INSERT INTO notas_amor (autor, contenido) VALUES (%s, %s)', (autor, contenido))
         conn.commit()
         cur.close()
         conn.close()
-    return redirect(url_for('login'))
+    
+    # Después de guardar, redirigimos para refrescar la página
+    return redirect(url_for('login')) 
 
 # --- 5. GESTIÓN DE FOTOS ---
 
@@ -109,7 +105,7 @@ def subir():
         conn.close()
     return redirect(url_for('login')) 
 
-if __name__ == '__main__':
+if _name_ == '_main_':
     inicializar_db()
     puerto = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=puerto)
