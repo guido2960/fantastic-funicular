@@ -3,66 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nuestra Bóveda: Mayda & Abel ❤️</title>
+    <title>Nuestra Bóveda: Mayda & Abel 🧭</title>
     <style>
         body { 
             margin: 0; background: #ffe5ec; font-family: 'Segoe UI', Arial, sans-serif;
             overflow-x: hidden; display: flex; flex-direction: column; align-items: center;
-            min-height: 100vh; padding: 20px;
+            min-height: 100vh; padding: 20px; padding-bottom: 100px;
         }
+        /* LLUVIA DE ROSAS Y CORAZONES */
         .caida {
-            position: absolute; top: -50px; user-select: none; pointer-events: none;
-            z-index: 1; animation: bajar linear forwards;
+            position: fixed; top: -50px; user-select: none; pointer-events: none;
+            z-index: 1; animation: bajar linear forwards; font-size: 24px;
         }
         @keyframes bajar { to { transform: translateY(110vh) rotate(360deg); } }
+
         .tarjeta { 
-            z-index: 10; background: white; padding: 25px; border-radius: 35px; 
-            box-shadow: 0 10px 40px rgba(255, 77, 109, 0.3); width: 90%; max-width: 400px;
-            border: 2px solid #ff4d6d; text-align: center; margin-bottom: 25px;
+            z-index: 10; background: white; padding: 25px; border-radius: 30px; 
+            box-shadow: 0 10px 30px rgba(255, 77, 109, 0.2); width: 90%; max-width: 400px;
+            border: 2px solid #ff4d6d; text-align: center; margin-bottom: 20px;
         }
         .foto-marco { 
-            width: 100%; height: 320px; border-radius: 25px; overflow: hidden; 
+            width: 100%; height: 300px; border-radius: 20px; overflow: hidden; 
             background: #fff0f3; border: 3px solid #ffc2d1; margin-bottom: 15px;
         }
         img { width: 100%; height: 100%; object-fit: cover; }
-        button, .label-subir { 
-            background: #ff4d6d; color: white; border: none; padding: 14px; 
-            border-radius: 25px; cursor: pointer; font-weight: bold; 
-            width: 100%; margin-top: 10px; display: inline-block; font-size: 1rem;
+        
+        button { 
+            background: #ff4d6d; color: white; border: none; padding: 12px; 
+            border-radius: 20px; cursor: pointer; font-weight: bold; width: 100%;
+            margin-top: 10px; transition: 0.3s;
         }
-        .btn-amuleto { 
-            background: linear-gradient(45deg, #ffd700, #ffa500); 
-            border: 2px solid white; box-shadow: 0 5px 20px rgba(255, 204, 51, 0.6);
+        button:hover { transform: scale(1.02); background: #c9184a; }
+
+        .btn-estado { 
+            background: #fff0f3; color: #c9184a; border: 1px solid #ffb3c1; 
+            font-size: 0.8rem; padding: 10px; margin: 4px; border-radius: 12px;
         }
+
         .selector-musica {
             width: 100%; padding: 10px; border-radius: 15px; border: 1px solid #ff4d6d;
-            margin-bottom: 15px; background: #fff0f3; color: #c9184a; font-weight: bold;
+            margin-bottom: 10px; background: #fff0f3; color: #c9184a; font-weight: bold;
+        }
+        .besito-volador {
+            position: fixed; pointer-events: none; z-index: 9999; font-size: 35px;
+            animation: volar 2s ease-out forwards;
+        }
+        @keyframes volar {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-80vh) scale(2) rotate(45deg); opacity: 0; }
         }
         .chispa {
-            position: absolute; pointer-events: none; z-index: 100; font-size: 25px;
-            animation: explotar 1.2s ease-out forwards;
+            position: absolute; pointer-events: none; z-index: 100; font-size: 20px;
+            animation: explotar 1s ease-out forwards;
         }
         @keyframes explotar {
             0% { transform: scale(0); opacity: 1; }
-            100% { transform: translate(var(--x), var(--y)) scale(1.5); opacity: 0; }
-        }
-        textarea { 
-            width: 90%; border-radius: 15px; border: 1px solid #ffb3c1; 
-            padding: 12px; margin-top: 10px; font-family: inherit; resize: none;
-        }
-        .nota-chat {
-            max-width: 85%; padding: 12px; margin-bottom: 10px;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.05); border: 1px solid #e2d1a3;
-        }
-        .btn-beso-animado { animation: latido 1.5s infinite; }
-        @keyframes latido { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        .besito-volador {
-            position: fixed; pointer-events: none; z-index: 9999; font-size: 30px;
-            animation: volarSubir 2s ease-out forwards;
-        }
-        @keyframes volarSubir {
-            0% { transform: translateY(0) scale(1); opacity: 1; }
-            100% { transform: translateY(-100vh) scale(2) rotate(45deg); opacity: 0; }
+            100% { transform: translate(var(--x), var(--y)) scale(1.2); opacity: 0; }
         }
     </style>
 </head>
@@ -73,76 +69,55 @@
     </audio>
 
     <div class="tarjeta">
-        <h2 style="color: #ff4d6d; margin-top: 0;">🌹 Nuestro Universo 🌹</h2>
+        <h2 style="color: #ff4d6d; margin: 0 0 10px 0;">🌹 Nuestro Universo 🌹</h2>
         <select class="selector-musica" onchange="cambiarMelodia(this.value)">
-            <option value="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1771137815/Kali_Uchis_Cris_MJ_-_Si_No_Es_Contigo_REMIX_-_No_Jhayco_sin_Jhayco_e1vfkb.mp3">Kali Uchis & Cris MJ - Si No Es Contigo</option>
+            <option value="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1771137815/Kali_Uchis_Cris_MJ_-_Si_No_Es_Contigo_REMIX_-_No_Jhayco_sin_Jhayco_e1vfkb.mp3">Kali Uchis - Si No Es Contigo</option>
+            <option value="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1771137817/A_700_Km_Con_Elena_skt67k.mp3">Porta - A 700 Km 🎧</option>
             <option value="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1771137816/Cristian_Castro_-_Nunca_Voy_a_Olvidarte_-_Primera_Fila__Día_1_En_Directo_ogvw25.mp3">Cristian Castro - Nunca Voy a Olvidarte</option>
             <option value="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1771137816/Jeanette_-_Corazón_De_Poeta_Actuación_TVE_wdgalg.mp3">Jeanette - Corazón De Poeta</option>
         </select>
-        <button class="btn-amuleto" onclick="hechizoAmuleto()">💍 Nuestro Amuleto (26/01)</button>
+        <button onclick="hechizoAmuleto()" style="background: linear-gradient(45deg, #ffd700, #ffa500); border: 1px solid white;">💍 Amuleto del 26/01</button>
     </div>
 
-    <div class="tarjeta" id="panelAmor" style="background: white; border: 3px solid #ffb3c1; position: relative; overflow: hidden;">
-        <div id="seccionGatito" style="padding: 10px; border-bottom: 2px dashed #ffb3c1; transition: 0.5s;">
-            <h3 id="tituloGatito" style="color: #ff4d6d; margin: 0;">🐾 Estado: Normal</h3>
-            <p id="textoGatito" style="color: #c9184a; font-size: 0.85rem; margin: 5px 0;">Mayda está en modo serio...</p>
-            <button id="btnGatito" onclick="activarModoGatito()" style="background: #fff0f3; color: #ff4d6d; border: 1px solid #ff4d6d; padding: 8px; border-radius: 15px; font-size: 0.8rem;">
-                Activar Modo Gatito 🐱
-            </button>
+    <div class="tarjeta" style="border-color: #ffb3c1;">
+        <h3 style="color: #c9184a; margin: 0;">🧭 Tu Norte: Abel</h3>
+        <p id="mensajeNorte" style="color: #ff4d6d; font-size: 0.9rem; margin: 10px 0; min-height: 40px;">
+            ¿Cómo está tu corazón hoy, Mayda?
+        </p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+            <button class="btn-estado" onclick="apoyo('estresada')">Estresada 😫</button>
+            <button class="btn-estado" onclick="apoyo('triste')">Miedo/Tristeza ☁️</button>
+            <button class="btn-estado" onclick="apoyo('cariñosa')">Cariñosa 🥰</button>
+            <button class="btn-estado" onclick="apoyo('accion')">Modo Acción 💼</button>
         </div>
-        <div style="padding: 20px 10px;">
-            <h3 style="color: #ff4d6d; margin: 0;">💋 Mis Besos</h3>
-            <div style="font-size: 3.5rem; font-weight: bold; color: #ff4d6d; margin: 5px 0;" id="contadorBesos">0</div>
-            <button onclick="darBeso()" class="btn-beso-animado" style="background: #ff4d6d; color: white; border: none; padding: 15px 30px; border-radius: 30px; font-weight: bold; font-size: 1.1rem; cursor: pointer;">
-                ¡Enviar Beso! 😘
-            </button>
-        </div>
+        <hr style="border: 0; border-top: 1px dashed #ffb3c1; margin: 15px 0;">
+        <h4 style="color: #ff4d6d; margin: 0;">💋 Mis Besos</h4>
+        <div id="contadorBesos" style="font-size: 2.5rem; font-weight: bold; color: #ff4d6d; margin: 5px 0;">0</div>
+        <button onclick="darBeso()" style="border-radius: 30px;">Enviar Beso 😘</button>
     </div>
 
     <div class="tarjeta" style="background: #fffdf5; border: 2px solid #d7c49e;">
         <h3 style="color: #5d4037;">📜 Refugio de Notas</h3>
-        <form action="/nueva_nota" method="POST" style="text-align: left;">
-            <select name="autor_nombre" class="selector-musica" style="border-color: #d7c49e; background: #fdf5e6;">
+        <form action="/nueva_nota" method="POST">
+            <select name="autor_nombre" class="selector-musica" style="border-color: #d7c49e;">
                 <option value="Mayda">Soy Mayda 🌹</option>
                 <option value="Abel">Soy Abel 🧭</option>
             </select>
-            <select name="categoria" class="selector-musica" style="border-color: #d7c49e; background: #fdf5e6;">
-                <option value="Sentimiento">❤️ Sentimiento</option>
-                <option value="Desahogo">☁️ Desahogo</option>
-                <option value="Plan">✨ Plan a Futuro</option>
-            </select>
-            <textarea name="contenido_nota" placeholder="Escribe tu nota aquí..." required style="width: 93%; border: 1px solid #d7c49e; background: #fdf5e6;"></textarea>
-            <button type="submit" style="background: #5d4037;">Guardar en el Corazón ✨</button>
+            <textarea name="contenido_nota" placeholder="Escribe aquí..." required style="width: 90%; padding: 10px; border-radius: 10px; border: 1px solid #d7c49e;"></textarea>
+            <button type="submit" style="background: #5d4037;">Guardar Nota ✨</button>
         </form>
-        <div style="display: flex; flex-direction: column; gap: 10px; max-height: 350px; overflow-y: auto; margin-top: 15px; padding: 5px;">
-            {% if notas %}
-                {% for nota in notas %}
-                    {% set es_abel = (nota[1] == 'Abel') %}
-                    <div style="align-self: {{ 'flex-end' if es_abel else 'flex-start' }}; width: 85%; text-align: left;">
-                        <div class="nota-chat" style="background: {{ '#fffdd0' if es_abel else '#fdf5e6' }}; border-radius: {{ '20px 20px 5px 20px' if es_abel else '20px 20px 20px 5px' }};">
-                            <span style="font-size: 0.9rem;">{% if nota[2] == 'Desahogo' %}☁️{% elif nota[2] == 'Plan' %}✨{% else %}❤️{% endif %}</span>
-                            <p style="margin: 5px 0; color: #4e342e; font-size: 0.95rem;">{{ nota[0] }}</p>
-                            <small style="color: #a1887f; font-size: 0.7rem; font-weight: bold;">{{ nota[1] }} • {{ nota[3] }}</small>
-                        </div>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        </div>
     </div>
 
     <div class="tarjeta">
-        <h3 style="color: #ff4d6d; margin-top: 0;">Galería de Recuerdos 📸</h3>
+        <h3 style="color: #ff4d6d;">Nuestros Recuerdos 📸</h3>
         {% if fotos %}
             {% for foto in fotos %}
-            <div style="margin-bottom: 30px; border-bottom: 2px solid #ffe5ec; padding-bottom: 20px;">
+            <div style="margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #ffe5ec;">
                 <div class="foto-marco"><img src="{{ foto[0] }}"></div>
-                <p style="color: #c9184a; font-size: 1rem; background: #fff0f3; padding: 10px; border-radius: 15px;">{{ foto[1] }}</p>
-                <form action="/editar/{{ foto[2] }}" method="POST" style="margin-top: 10px;">
-                    <input type="text" name="nuevo_mensaje" placeholder="Editar mensaje..." required style="width: 70%; padding: 8px; border-radius: 10px; border: 1px solid #ffb3c1;">
-                    <button type="submit" style="background: #4caf50; font-size: 0.8rem; padding: 8px; width: auto;">✍️</button>
-                </form>
-                <form action="/eliminar/{{ foto[2] }}" method="POST" style="margin-top: 5px;">
-                    <button type="submit" style="background: #ffb3c1 !important; color: #c9184a !important; font-size: 0.7rem; padding: 8px;">Eliminar 🗑️</button>
+                <p style="color: #c9184a; font-weight: bold;">{{ foto[1] }}</p>
+                <form action="/editar/{{ foto[2] }}" method="POST">
+                    <input type="text" name="nuevo_mensaje" placeholder="Editar mensaje..." required style="width: 70%; padding: 5px; border-radius: 10px; border: 1px solid #ffb3c1;">
+                    <button type="submit" style="background: #4caf50; width: auto; padding: 5px 10px; font-size: 0.8rem;">✍️</button>
                 </form>
             </div>
             {% endfor %}
@@ -150,67 +125,69 @@
     </div>
 
     <div class="tarjeta">
-        <h3 style="color: #ff4d6d; margin-top: 0;">Añadir Foto Nueva 📸</h3>
+        <h3 style="color: #ff4d6d;">Subir Foto Nueva</h3>
         <form action="/subir" method="POST" enctype="multipart/form-data">
-            <input type="file" name="foto_usuario" id="file" hidden accept="image/*" required>
-            <label for="file" class="label-subir">Elegir Foto</label>
-            <textarea name="mensaje_usuario" placeholder="Dedicatoria..." required></textarea>
-            <button type="submit" style="background: #4caf50;">Subir a la Bóveda ✨</button>
+            <input type="file" name="foto_usuario" accept="image/*" required>
+            <textarea name="mensaje_usuario" placeholder="¿Qué quieres decir?" required style="width: 90%; margin-top: 10px;"></textarea>
+            <button type="submit" style="background: #4caf50;">Añadir a la Bóveda</button>
         </form>
     </div>
 
     <script>
-        let besos = 0;
+        // LLUVIA DE ROSAS CONSTANTE
+        const iconos = ['🌹', '❤️', '💖', '✨', '🌸'];
+        function crearLluvia() {
+            const e = document.createElement('div');
+            e.className = 'caida';
+            e.innerText = iconos[Math.floor(Math.random() * iconos.length)];
+            e.style.left = Math.random() * 100 + "vw";
+            e.style.animationDuration = (Math.random() * 3 + 2) + "s";
+            e.style.opacity = Math.random();
+            document.body.appendChild(e);
+            setTimeout(() => e.remove(), 5000);
+        }
+        setInterval(crearLluvia, 300); // Lluvia rápida
+
+        // FUNCIONES DE APOYO
+        function apoyo(estado) {
+            const texto = document.getElementById('mensajeNorte');
+            if(estado === 'estresada') texto.innerHTML = "<b>Suelta el celular 5 minutos, amor.</b> Yo me encargo de todo. Te mereces descansar. ☁️";
+            if(estado === 'triste') texto.innerHTML = "<b>No estás sola.</b> Recuerda nuestra charla del 5 de enero. Soy tu refugio. 🛡️";
+            if(estado === 'cariñosa') texto.innerHTML = "<b>¡Aprovechemos!</b> Dame besos y recuerda: <i>'A menos que te cases conmigo...'</i> 💍";
+            if(estado === 'accion') texto.innerHTML = "<b>¡Dale con todo!</b> Admiro lo enfocada que eres. Aquí te espero. 🧭";
+        }
+
+        // BESOS
+        let nBesos = 0;
         function darBeso() {
-            besos++;
-            document.getElementById('contadorBesos').innerText = besos;
-            for (let i = 0; i < 15; i++) {
+            nBesos++;
+            document.getElementById('contadorBesos').innerText = nBesos;
+            for(let i=0; i<10; i++) {
                 const b = document.createElement('div');
                 b.className = 'besito-volador';
-                b.innerText = Math.random() > 0.5 ? '😘' : '💋';
+                b.innerText = '😘';
                 b.style.left = Math.random() * 100 + "vw";
-                b.style.top = "80vh";
+                b.style.top = "90vh";
                 document.body.appendChild(b);
                 setTimeout(() => b.remove(), 2000);
             }
         }
 
-        let gatitoActivo = false;
-        function activarModoGatito() {
-            const panel = document.getElementById('panelAmor');
-            const titulo = document.getElementById('tituloGatito');
-            const texto = document.getElementById('textoGatito');
-            const btn = document.getElementById('btnGatito');
-            if (!gatitoActivo) {
-                gatitoActivo = true;
-                panel.style.background = "#ffe5ec";
-                titulo.innerHTML = "🐾 MODO GATITO: ACTIVO";
-                texto.innerHTML = "¡Miau! Hora de ser cariñosa con Abel. 🥰";
-                btn.innerHTML = "Desactivar ❌";
-                alert("¡Purrr! Modo Gatito activado. ¡A darle amor a tu Norte! 🐈");
-            } else {
-                gatitoActivo = false;
-                panel.style.background = "white";
-                titulo.innerHTML = "🐾 Estado: Normal";
-                texto.innerHTML = "Mayda volvió a la normalidad...";
-                btn.innerHTML = "Activar Modo Gatito 🐱";
-            }
-        }
-
+        // AMULETO
         function hechizoAmuleto() {
             document.getElementById('musicaFondo').play();
-            for (let i = 0; i < 50; i++) {
+            for (let i = 0; i < 40; i++) {
                 const c = document.createElement('div');
                 c.className = 'chispa';
                 c.innerText = '✨';
-                c.style.left = '50vw'; c.style.top = '50vh';
-                const x = (Math.random() - 0.5) * 800 + 'px';
-                const y = (Math.random() - 0.5) * 800 + 'px';
+                c.style.left = '50vw'; c.style.top = '30vh';
+                const x = (Math.random() - 0.5) * 600 + 'px';
+                const y = (Math.random() - 0.5) * 600 + 'px';
                 c.style.setProperty('--x', x); c.style.setProperty('--y', y);
                 document.body.appendChild(c);
-                setTimeout(() => c.remove(), 1200);
+                setTimeout(() => c.remove(), 1000);
             }
-            alert("¡Te amo, Mayda! 🌹 Nuestra promesa eterna del 26 de enero. 💍");
+            alert("¡Te amo! Nuestra promesa del 26 de enero es eterna. 💍");
         }
 
         function cambiarMelodia(url) {
@@ -218,16 +195,6 @@
             document.getElementById('audioSource').src = url;
             audio.load(); audio.play();
         }
-
-        const iconos = ['🌹', '❤️', '💖', '✨'];
-        setInterval(() => {
-            const e = document.createElement('div');
-            e.className = 'caida';
-            e.innerText = iconos[Math.floor(Math.random() * iconos.length)];
-            e.style.left = Math.random() * 100 + "vw";
-            document.body.appendChild(e);
-            setTimeout(() => e.remove(), 5000);
-        }, 600);
     </script>
 </body>
 </html>
