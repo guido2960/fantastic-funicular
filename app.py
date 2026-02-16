@@ -25,12 +25,14 @@ def get_db_connection():
 def inicializar_db():
     conn = get_db_connection()
     cur = conn.cursor()
+    # Tabla para fotos
     cur.execute('''CREATE TABLE IF NOT EXISTS galeria (
         id SERIAL PRIMARY KEY,
         archivo TEXT NOT NULL,
         mensaje TEXT,
         fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )''')
+    # Tabla para notas
     cur.execute('''CREATE TABLE IF NOT EXISTS notas_amor (
         id SERIAL PRIMARY KEY,
         contenido TEXT NOT NULL,
@@ -42,55 +44,64 @@ def inicializar_db():
     cur.close()
     conn.close()
 
-# --- 3. RUTAS ---
+# --- 3. RUTAS DE ACCESO ---
 
 @app.route('/')
 def login():
     return render_template('login.html')
 
-@app.route('/verificar', methods=['GET', 'POST'])
+@app.route('/verificar', methods=['POST'])
 def verificar():
-    # Permitimos GET para que al redireccionar tras subir foto/nota no de error
-    if request.method == 'POST':
-        entrada_email = request.form.get('correo', '').strip()
-        entrada_clave = request.form.get('clave', '').strip()
-        if entrada_email != USUARIO_ACCESO or entrada_clave != CLAVE_ACCESO:
-            return "🔐 Acceso denegado.", 403
+    entrada_email = request.form.get('correo', '').strip()
+    entrada_clave = request.form.get('clave', '').strip()
+
+    if entrada_email == USUARIO_ACCESO and entrada_clave == CLAVE_ACCESO:
+        # Si el login es correcto, entramos al universo de la Bóveda
+        return redirect(url_for('boveda'))
     
+    return "🔐 Acceso denegado, intenta de nuevo.", 403
+
+@app.route('/boveda')
+def boveda():
+    # Esta es la ruta principal donde todo sucede sin que te pida clave otra vez
     inicializar_db()
     conn = get_db_connection()
     cur = conn.cursor()
+    # Traer fotos
     cur.execute('SELECT archivo, mensaje, id FROM galeria ORDER BY id DESC')
     fotos_db = cur.fetchall()
+    # Traer notas
     cur.execute("SELECT autor, contenido, TO_CHAR(fecha, 'DD/MM HH:MI AM'), categoria FROM notas_amor ORDER BY fecha DESC")
     notas_db = cur.fetchall()
     cur.close()
     conn.close()
     return render_template('index.html', fotos=fotos_db, notas=notas_db)
 
-# --- 4. GESTIÓN DE NOTAS ---
+# --- 4. GESTIÓN DE NOTAS (SE QUEDA EN LA BÓVEDA) ---
 
 @app.route('/nueva_nota', methods=['POST'])
 def nueva_nota():
     autor = request.form.get('autor_nombre')
     contenido = request.form.get('contenido_nota')
-    modo = request.form.get('modo_nota', 'General') # Capturamos el modo del select
+    modo = request.form.get('modo_nota', 'General')
 
     if contenido and autor:
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute(
-            'INSERT INTO notas_amor (autor, contenido, categoria) VALUES (%s, %s, %s)', 
-            (autor, contenido, modo)
-        )
-        conn.commit()
-        cur.close()
-        conn.close()
+        try:
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute(
+                'INSERT INTO notas_amor (autor, contenido, categoria) VALUES (%s, %s, %s)', 
+                (autor, contenido, modo)
+            )
+            conn.commit()
+            cur.close()
+            conn.close()
+        except Exception as e:
+            print(f"Error al guardar nota: {e}")
     
-    # Redirigimos a verificar para que la página se actualice sin salir
-    return redirect(url_for('verificar'), code=307) 
+    return redirect(url_for('boveda')) 
 
-# --- 5. GESTIÓN DE FOTOS ---
+# --- 5. GESTIÓN DE FOTOS (SUBIR Y ELIMINAR) ---
 
 @app.route('/subir', methods=['POST'])
 def subir():
@@ -105,21 +116,25 @@ def subir():
         conn.commit()
         cur.close()
         conn.close()
-    return redirect(url_for('verificar'), code=307)
+    return redirect(url_for('boveda')) 
 
 @app.route('/eliminar/<int:id>', methods=['POST'])
 def eliminar(id):
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('DELETE FROM galeria WHERE id = %s', (id,))
-    conn.commit()
-    cur.close()
-    conn.close()
-    return redirect(url_for('verificar'), code=307)
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('DELETE FROM galeria WHERE id = %s', (id,))
+        conn.commit()
+        cur.close()
+        conn.close()
+    except Exception as e:
+        print(f"Error al eliminar foto: {e}")
+    return redirect(url_for('boveda'))
 
-# --- 6. EJECUCIÓN ---
+# --- 6. EJECUCIÓN DEL SERVIDOR ---
 
 if __name__ == '__main__':
     inicializar_db()
+    # Puerto dinámico para Render con fallback a 10000
     puerto = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=puerto)
