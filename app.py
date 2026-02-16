@@ -25,14 +25,12 @@ def get_db_connection():
 def inicializar_db():
     conn = get_db_connection()
     cur = conn.cursor()
-    # Tabla para fotos
     cur.execute('''CREATE TABLE IF NOT EXISTS galeria (
         id SERIAL PRIMARY KEY,
         archivo TEXT NOT NULL,
         mensaje TEXT,
         fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )''')
-    # Tabla para notas
     cur.execute('''CREATE TABLE IF NOT EXISTS notas_amor (
         id SERIAL PRIMARY KEY,
         contenido TEXT NOT NULL,
@@ -54,54 +52,41 @@ def login():
 def verificar():
     entrada_email = request.form.get('correo', '').strip()
     entrada_clave = request.form.get('clave', '').strip()
-
     if entrada_email == USUARIO_ACCESO and entrada_clave == CLAVE_ACCESO:
-        # Si el login es correcto, entramos al universo de la Bóveda
         return redirect(url_for('boveda'))
-    
     return "🔐 Acceso denegado, intenta de nuevo.", 403
 
 @app.route('/boveda')
 def boveda():
-    # Esta es la ruta principal donde todo sucede sin que te pida clave otra vez
     inicializar_db()
     conn = get_db_connection()
     cur = conn.cursor()
-    # Traer fotos
     cur.execute('SELECT archivo, mensaje, id FROM galeria ORDER BY id DESC')
     fotos_db = cur.fetchall()
-    # Traer notas
+    # Traemos las notas: el índice 0 es autor, 1 contenido, 2 fecha, 3 categoria
     cur.execute("SELECT autor, contenido, TO_CHAR(fecha, 'DD/MM HH:MI AM'), categoria FROM notas_amor ORDER BY fecha DESC")
     notas_db = cur.fetchall()
     cur.close()
     conn.close()
     return render_template('index.html', fotos=fotos_db, notas=notas_db)
 
-# --- 4. GESTIÓN DE NOTAS (SE QUEDA EN LA BÓVEDA) ---
+# --- 4. GESTIÓN DE NOTAS ---
 
 @app.route('/nueva_nota', methods=['POST'])
 def nueva_nota():
     autor = request.form.get('autor_nombre')
     contenido = request.form.get('contenido_nota')
     modo = request.form.get('modo_nota', 'General')
-
     if contenido and autor:
-        try:
-            conn = get_db_connection()
-            cur = conn.cursor()
-            cur.execute(
-                'INSERT INTO notas_amor (autor, contenido, categoria) VALUES (%s, %s, %s)', 
-                (autor, contenido, modo)
-            )
-            conn.commit()
-            cur.close()
-            conn.close()
-        except Exception as e:
-            print(f"Error al guardar nota: {e}")
-    
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('INSERT INTO notas_amor (autor, contenido, categoria) VALUES (%s, %s, %s)', (autor, contenido, modo))
+        conn.commit()
+        cur.close()
+        conn.close()
     return redirect(url_for('boveda')) 
 
-# --- 5. GESTIÓN DE FOTOS (SUBIR Y ELIMINAR) ---
+# --- 5. GESTIÓN DE FOTOS (SUBIR, ELIMINAR, EDITAR) ---
 
 @app.route('/subir', methods=['POST'])
 def subir():
@@ -120,21 +105,29 @@ def subir():
 
 @app.route('/eliminar/<int:id>', methods=['POST'])
 def eliminar(id):
-    try:
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('DELETE FROM galeria WHERE id = %s', (id,))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return redirect(url_for('boveda'))
+
+@app.route('/editar/<int:id>', methods=['POST'])
+def editar(id):
+    nuevo_mensaje = request.form.get('mensaje_editado')
+    if nuevo_mensaje:
         conn = get_db_connection()
         cur = conn.cursor()
-        cur.execute('DELETE FROM galeria WHERE id = %s', (id,))
+        cur.execute('UPDATE galeria SET mensaje = %s WHERE id = %s', (nuevo_mensaje, id))
         conn.commit()
         cur.close()
         conn.close()
-    except Exception as e:
-        print(f"Error al eliminar foto: {e}")
     return redirect(url_for('boveda'))
 
-# --- 6. EJECUCIÓN DEL SERVIDOR ---
+# --- 6. EJECUCIÓN ---
 
 if _name_ == '_main_':
     inicializar_db()
-    # Puerto dinámico para Render con fallback a 10000
     puerto = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=puerto)
