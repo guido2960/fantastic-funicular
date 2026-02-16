@@ -4,7 +4,7 @@ import cloudinary
 import cloudinary.uploader
 from flask import Flask, render_template, request, redirect, url_for
 
-app = Flask(__name__)
+app = Flask(_name_)
 
 # --- 1. CONFIGURACIÓN DE CLOUDINARY ---
 cloudinary.config( 
@@ -133,7 +133,7 @@ def eliminar(id):
 
 # --- 6. EJECUCIÓN DEL SERVIDOR ---
 
-if __name__ == '__main__':
+if _name_ == '_main_':
     inicializar_db()
     # Puerto dinámico para Render con fallback a 10000
     puerto = int(os.environ.get("PORT", 10000))
