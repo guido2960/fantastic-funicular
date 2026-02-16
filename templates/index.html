@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nuestra Bóveda: Mayda & Abel 🧭</title>
+    
+    <title>Amorcito 💍</title>
     
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
 
@@ -79,8 +80,8 @@
         <select class="selector-musica" onchange="cambiarMelodia(this.value)">
             <option value="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1771137815/Kali_Uchis_Cris_MJ_-_Si_No_Es_Contigo_REMIX_-_No_Jhayco_sin_Jhayco_e1vfkb.mp3">Kali Uchis - Si No Es Contigo</option>
             <option value="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1771137817/A_700_Km_Con_Elena_skt67k.mp3">Porta - A 700 Km 🎧</option>
-            <option value="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1771137816/Cristian_Castro_-_Nunca_Voy_a_Olvidarte_-_Primera_Fila__Día_1_En_Directo_ogvw25.mp3">Cristian Castro - Nunca Voy a Olvidarte</option>
-            <option value="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1771137816/Jeanette_-_Corazón_De_Poeta_Actuación_TVE_wdgalg.mp3">Jeanette - Corazón De Poeta</option>
+            <option value="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1771137816/Cristian_Castro_-_Nunca_Voy_a_Olvidarte_ogvw25.mp3">Cristian Castro - Nunca Voy a Olvidarte</option>
+            <option value="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1771137816/Jeanette_-_Corazón_De_Poeta_wdgalg.mp3">Jeanette - Corazón De Poeta</option>
         </select>
         <button onclick="hechizoAmuleto()" style="background: linear-gradient(45deg, #ffd700, #ffa500); border: 1px solid white;">💍 Amuleto del 26/01</button>
     </div>
@@ -109,15 +110,6 @@
                 <option value="Mayda">Soy Mayda 🌹</option>
                 <option value="Abel">Soy Abel 🧭</option>
             </select>
-            
-            <p style="color: #8d734a; font-size: 0.8rem; font-weight: bold; margin: 5px 0;">¿Qué quieres expresar?</p>
-            <select name="modo_nota" class="selector-musica" style="border-color: #d7c49e; background: #faf3e0;">
-                <option value="Cariñoso">Modo Cariñoso 🥰</option>
-                <option value="Tristeza/Desahogo">Modo Tristeza/Desahogo ☁️</option>
-                <option value="Plan">Modo Plan/Idea 🎬</option>
-                <option value="Inspiración">Modo Inspiración ✨</option>
-            </select>
-
             <textarea name="contenido_nota" placeholder="Escribe aquí tu mensaje..." required style="width: 90%; height: 70px; padding: 10px; border-radius: 10px; border: 1px solid #d7c49e; margin-top: 10px;"></textarea>
             <button type="submit" style="background: #5d4037;">Guardar en la Bóveda ✨</button>
         </form>
@@ -130,15 +122,13 @@
             <div style="margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #ffe5ec;">
                 <div class="foto-marco"><img src="{{ foto[0] }}"></div>
                 <p style="color: #c9184a; font-weight: bold;">{{ foto[1] }}</p>
-                
-                <div style="display: flex; gap: 5px; justify-content: center; flex-wrap: wrap;">
+                <div style="display: flex; gap: 5px; justify-content: center;">
                     <form action="/editar/{{ foto[2] }}" method="POST" style="display: flex; gap: 3px;">
                         <input type="text" name="nuevo_mensaje" placeholder="Editar..." required style="width: 80px; padding: 5px; border-radius: 10px; border: 1px solid #ffb3c1; font-size: 0.7rem;">
                         <button type="submit" style="background: #4caf50; width: auto; margin: 0; padding: 5px 12px;">✏️</button>
                     </form>
-                    
-                    <form action="/eliminar/{{ foto[2] }}" method="POST" onsubmit="return confirm('¿Borrar este recuerdo, amor?');">
-                        <button type="submit" style="background: #ff4d6d; width: auto; margin: 0; padding: 5px 12px; font-size: 0.7rem;">🗑️ Borrar</button>
+                    <form action="/eliminar/{{ foto[2] }}" method="POST" onsubmit="return confirm('¿Borrar recuerdo?');">
+                        <button type="submit" style="background: #ff4d6d; width: auto; margin: 0; padding: 5px 12px;">🗑️</button>
                     </form>
                 </div>
             </div>
@@ -148,15 +138,14 @@
 
     <div class="tarjeta">
         <h3 style="color: #ff4d6d;">Subir Foto Nueva</h3>
-        <form action="/subir" method="POST" enctype="multipart/form-data">
-            <input type="file" name="foto_usuario" accept="image/*" required>
-            <textarea name="mensaje_usuario" placeholder="¿Qué quieres decir sobre esta foto?" required style="width: 90%; margin-top: 10px; border-radius: 10px; border: 1px solid #ffb3c1; padding: 10px;"></textarea>
+        <form action="/subir" method="POST">
+            <input type="text" name="foto_usuario" placeholder="Link de Cloudinary" required style="width: 90%; padding: 10px; border-radius: 10px; border: 1px solid #ffb3c1;">
+            <textarea name="mensaje_usuario" placeholder="Mensaje..." required style="width: 90%; margin-top: 10px; border-radius: 10px; border: 1px solid #ffb3c1; padding: 10px;"></textarea>
             <button type="submit" style="background: #4caf50;">Añadir Foto</button>
         </form>
     </div>
 
     <script>
-        // LLUVIA DE ROSAS Y CORAZONES
         const iconos = ['🌹', '❤️', '💖', '✨', '🌸', '🌸'];
         function crearLluvia() {
             const e = document.createElement('div');
@@ -164,33 +153,26 @@
             e.innerText = iconos[Math.floor(Math.random() * iconos.length)];
             e.style.left = Math.random() * 100 + "vw";
             e.style.animationDuration = (Math.random() * 3 + 2) + "s";
-            e.style.opacity = Math.random();
             document.body.appendChild(e);
             setTimeout(() => e.remove(), 5000);
         }
         setInterval(crearLluvia, 300);
 
-        // MÚSICA AUTOMÁTICA
         const audio = document.getElementById('musicaFondo');
         let iniciada = false;
         function reproducirMusica() {
-            if(!iniciada) {
-                audio.play().catch(() => console.log("Esperando interacción..."));
-                iniciada = true;
-            }
+            if(!iniciada) { audio.play().catch(() => {}); iniciada = true; }
         }
 
-        // FUNCIONES DEL NORTE 🧭
         function apoyo(estado) {
             const texto = document.getElementById('mensajeNorte');
-            if(estado === 'estresada') texto.innerHTML = "<b>Tómate un respiro, amor.</b> Abel está aquí para cuidarte. Todo estará bien. ☁️";
-            if(estado === 'triste') texto.innerHTML = "<b>No temas a tus miedos.</b> Recuerda que soy tu refugio desde aquel 5 de enero. 🛡️";
+            if(estado === 'estresada') texto.innerHTML = "<b>Tómate un respiro, amor.</b> Abel está aquí para cuidarte. ☁️";
+            if(estado === 'triste') texto.innerHTML = "<b>No temas a tus miedos.</b> Soy tu refugio desde el 5 de enero. 🛡️";
             if(estado === 'cariñosa') texto.innerHTML = "<b>¡Qué linda te pones!</b> Recuerda: <i>'A menos que te cases conmigo...'</i> 💍";
-            if(estado === 'accion') texto.innerHTML = "<b>¡A darle con todo!</b> Admiro tu fuerza. Te espero aquí con un beso. 🧭";
+            if(estado === 'accion') texto.innerHTML = "<b>¡A darle con todo!</b> Te espero aquí con un beso. 🧭";
             reproducirMusica();
         }
 
-        // BESOS
         function darBeso() {
             const cont = document.getElementById('contadorBesos');
             cont.innerText = parseInt(cont.innerText) + 1;
@@ -204,9 +186,8 @@
             }
         }
 
-        // AMULETO
         function hechizoAmuleto() {
-            audio.play();
+            reproducirMusica();
             for (let i = 0; i < 40; i++) {
                 const c = document.createElement('div');
                 c.className = 'chispa'; c.innerText = '✨';
@@ -222,8 +203,7 @@
 
         function cambiarMelodia(url) {
             document.getElementById('audioSource').src = url;
-            audio.load(); audio.play();
-            iniciada = true;
+            audio.load(); audio.play(); iniciada = true;
         }
     </script>
 </body>
