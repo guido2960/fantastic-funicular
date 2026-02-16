@@ -3,18 +3,20 @@
   "short_name": "La Bóveda",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "background_color": "#ffe5ec",
+  "theme_color": "#ff4d6d",
   "icons": [
     {
-      "src": "/static/icon.png",
+      "src": "/static/icon.png?v=2",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "/static/icon.png",
+      "src": "/static/icon.png?v=2",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
