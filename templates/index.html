@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nuestra Bóveda: Mayda & Abel 🧭</title>
+    
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+
     <style>
         body { 
             margin: 0; background: #ffe5ec; font-family: 'Segoe UI', Arial, sans-serif;
@@ -65,9 +68,9 @@
         }
     </style>
 </head>
-<body>
+<body onmouseover="reproducirMusica()" onclick="reproducirMusica()" ontouchstart="reproducirMusica()">
 
-    <audio id="musicaFondo" loop>
+    <audio id="musicaFondo" loop autoplay>
         <source id="audioSource" src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1771137815/Kali_Uchis_Cris_MJ_-_Si_No_Es_Contigo_REMIX_-_No_Jhayco_sin_Jhayco_e1vfkb.mp3" type="audio/mpeg">
     </audio>
 
@@ -127,10 +130,17 @@
             <div style="margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #ffe5ec;">
                 <div class="foto-marco"><img src="{{ foto[0] }}"></div>
                 <p style="color: #c9184a; font-weight: bold;">{{ foto[1] }}</p>
-                <form action="/editar/{{ foto[2] }}" method="POST" style="display: flex; gap: 5px; justify-content: center;">
-                    <input type="text" name="nuevo_mensaje" placeholder="Editar mensaje..." required style="width: 60%; padding: 5px; border-radius: 10px; border: 1px solid #ffb3c1;">
-                    <button type="submit" style="background: #4caf50; width: auto; margin: 0; padding: 5px 12px;">✍️</button>
-                </form>
+                
+                <div style="display: flex; gap: 5px; justify-content: center; flex-wrap: wrap;">
+                    <form action="/editar/{{ foto[2] }}" method="POST" style="display: flex; gap: 3px;">
+                        <input type="text" name="nuevo_mensaje" placeholder="Editar..." required style="width: 80px; padding: 5px; border-radius: 10px; border: 1px solid #ffb3c1; font-size: 0.7rem;">
+                        <button type="submit" style="background: #4caf50; width: auto; margin: 0; padding: 5px 12px;">✏️</button>
+                    </form>
+                    
+                    <form action="/eliminar/{{ foto[2] }}" method="POST" onsubmit="return confirm('¿Borrar este recuerdo, amor?');">
+                        <button type="submit" style="background: #ff4d6d; width: auto; margin: 0; padding: 5px 12px; font-size: 0.7rem;">🗑️ Borrar</button>
+                    </form>
+                </div>
             </div>
             {% endfor %}
         {% endif %}
@@ -146,7 +156,7 @@
     </div>
 
     <script>
-        // LLUVIA DE ROSAS Y CORAZONES (RESTAURADA)
+        // LLUVIA DE ROSAS Y CORAZONES
         const iconos = ['🌹', '❤️', '💖', '✨', '🌸', '🌸'];
         function crearLluvia() {
             const e = document.createElement('div');
@@ -160,6 +170,16 @@
         }
         setInterval(crearLluvia, 300);
 
+        // MÚSICA AUTOMÁTICA
+        const audio = document.getElementById('musicaFondo');
+        let iniciada = false;
+        function reproducirMusica() {
+            if(!iniciada) {
+                audio.play().catch(() => console.log("Esperando interacción..."));
+                iniciada = true;
+            }
+        }
+
         // FUNCIONES DEL NORTE 🧭
         function apoyo(estado) {
             const texto = document.getElementById('mensajeNorte');
@@ -167,19 +187,18 @@
             if(estado === 'triste') texto.innerHTML = "<b>No temas a tus miedos.</b> Recuerda que soy tu refugio desde aquel 5 de enero. 🛡️";
             if(estado === 'cariñosa') texto.innerHTML = "<b>¡Qué linda te pones!</b> Recuerda: <i>'A menos que te cases conmigo...'</i> 💍";
             if(estado === 'accion') texto.innerHTML = "<b>¡A darle con todo!</b> Admiro tu fuerza. Te espero aquí con un beso. 🧭";
+            reproducirMusica();
         }
 
-        // BESOS RENOVADOS
-        let nBesos = 0;
+        // BESOS
         function darBeso() {
-            nBesos++;
-            document.getElementById('contadorBesos').innerText = nBesos;
+            const cont = document.getElementById('contadorBesos');
+            cont.innerText = parseInt(cont.innerText) + 1;
+            reproducirMusica();
             for(let i=0; i<10; i++) {
                 const b = document.createElement('div');
-                b.className = 'besito-volador';
-                b.innerText = '😘';
-                b.style.left = (Math.random() * 80 + 10) + "vw";
-                b.style.top = "90vh";
+                b.className = 'besito-volador'; b.innerText = '😘';
+                b.style.left = (Math.random() * 80 + 10) + "vw"; b.style.top = "90vh";
                 document.body.appendChild(b);
                 setTimeout(() => b.remove(), 2000);
             }
@@ -187,11 +206,10 @@
 
         // AMULETO
         function hechizoAmuleto() {
-            document.getElementById('musicaFondo').play();
+            audio.play();
             for (let i = 0; i < 40; i++) {
                 const c = document.createElement('div');
-                c.className = 'chispa';
-                c.innerText = '✨';
+                c.className = 'chispa'; c.innerText = '✨';
                 c.style.left = '50vw'; c.style.top = '30vh';
                 const x = (Math.random() - 0.5) * 600 + 'px';
                 const y = (Math.random() - 0.5) * 600 + 'px';
@@ -203,9 +221,9 @@
         }
 
         function cambiarMelodia(url) {
-            const audio = document.getElementById('musicaFondo');
             document.getElementById('audioSource').src = url;
             audio.load(); audio.play();
+            iniciada = true;
         }
     </script>
 </body>
