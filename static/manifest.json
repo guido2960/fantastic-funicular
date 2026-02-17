@@ -1,7 +1,6 @@
 {
   "name": "Nuestra Bóveda: Mayda & Abel 🧭",
   "short_name": "Bóveda",
-  "description": "Un lugar seguro para nuestro amor",
   "start_url": "/boveda",
   "display": "standalone",
   "background_color": "#ffe5ec",
