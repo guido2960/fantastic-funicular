@@ -61,16 +61,19 @@ def boveda():
     inicializar_db()
     conn = get_db_connection()
     cur = conn.cursor()
+    # Fotos
     cur.execute('SELECT archivo, mensaje, id FROM galeria ORDER BY id DESC')
     fotos_db = cur.fetchall()
-    # Traemos las notas: el índice 0 es autor, 1 contenido, 2 fecha, 3 categoria
-    cur.execute("SELECT autor, contenido, TO_CHAR(fecha, 'DD/MM HH:MI AM'), categoria FROM notas_amor ORDER BY fecha DESC")
+    
+    # Notas: Ahora incluimos el ID al final (índice 4) para que funcionen los botones
+    cur.execute("SELECT autor, contenido, TO_CHAR(fecha, 'DD/MM HH:MI AM'), categoria, id FROM notas_amor ORDER BY fecha DESC")
     notas_db = cur.fetchall()
+    
     cur.close()
     conn.close()
     return render_template('index.html', fotos=fotos_db, notas=notas_db)
 
-# --- 4. GESTIÓN DE NOTAS ---
+# --- 4. GESTIÓN DE NOTAS (NUEVO: EDITAR Y ELIMINAR) ---
 
 @app.route('/nueva_nota', methods=['POST'])
 def nueva_nota():
@@ -86,7 +89,29 @@ def nueva_nota():
         conn.close()
     return redirect(url_for('boveda')) 
 
-# --- 5. GESTIÓN DE FOTOS (SUBIR, ELIMINAR, EDITAR) ---
+@app.route('/editar_nota/<int:id>', methods=['POST'])
+def editar_nota(id):
+    nuevo_contenido = request.form.get('contenido_editado')
+    if nuevo_contenido:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('UPDATE notas_amor SET contenido = %s WHERE id = %s', (nuevo_contenido, id))
+        conn.commit()
+        cur.close()
+        conn.close()
+    return redirect(url_for('boveda'))
+
+@app.route('/eliminar_nota/<int:id>', methods=['POST'])
+def eliminar_nota(id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('DELETE FROM notas_amor WHERE id = %s', (id,))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return redirect(url_for('boveda'))
+
+# --- 5. GESTIÓN DE FOTOS ---
 
 @app.route('/subir', methods=['POST'])
 def subir():
