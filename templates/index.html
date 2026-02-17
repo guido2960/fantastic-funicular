@@ -9,91 +9,179 @@
 
     <style>
         body { 
-            margin: 0; background: #ffe5ec; font-family: 'Segoe UI', Arial, sans-serif;
-            overflow-x: hidden; display: flex; flex-direction: column; align-items: center;
-            min-height: 100vh; padding: 20px; padding-bottom: 100px;
+            margin: 0;
+            background: #ffe5ec;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 100px;
         }
+
         /* LLUVIA DE ROSAS, CORAZONES Y FLORES */
         .caida {
-            position: fixed; top: -50px; user-select: none; pointer-events: none;
-            z-index: 1; animation: bajar linear forwards; font-size: 24px;
+            position: fixed;
+            top: -50px;
+            user-select: none;
+            pointer-events: none;
+            z-index: 1;
+            animation: bajar linear forwards;
+            font-size: 24px;
         }
-        @keyframes bajar { to { transform: translateY(110vh) rotate(360deg); } }
+
+        @keyframes bajar {
+            to {
+                transform: translateY(110vh) rotate(360deg);
+            }
+        }
 
         .tarjeta { 
-            z-index: 10; background: white; padding: 25px; border-radius: 30px; 
-            box-shadow: 0 10px 30px rgba(255, 77, 109, 0.2); width: 90%; max-width: 400px;
-            border: 2px solid #ff4d6d; text-align: center; margin-bottom: 20px;
+            z-index: 10;
+            background: white;
+            padding: 25px;
+            border-radius: 30px; 
+            box-shadow: 0 10px 30px rgba(255, 77, 109, 0.2);
+            width: 90%;
+            max-width: 400px;
+            border: 2px solid #ff4d6d;
+            text-align: center;
+            margin-bottom: 20px;
         }
+
         .foto-marco { 
-            width: 100%; height: 300px; border-radius: 20px; overflow: hidden; 
-            background: #fff0f3; border: 3px solid #ffc2d1; margin-bottom: 15px;
+            width: 100%;
+            height: 300px;
+            border-radius: 20px;
+            overflow: hidden; 
+            background: #fff0f3;
+            border: 3px solid #ffc2d1;
+            margin-bottom: 15px;
         }
-        img { width: 100%; height: 100%; object-fit: cover; }
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
         
         button { 
-            background: #ff4d6d; color: white; border: none; padding: 12px; 
-            border-radius: 20px; cursor: pointer; font-weight: bold; width: 100%;
-            margin-top: 10px; transition: 0.3s;
+            background: #ff4d6d;
+            color: white;
+            border: none;
+            padding: 12px; 
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 10px;
+            transition: 0.3s;
         }
-        button:hover { transform: scale(1.02); background: #c9184a; }
+
+        button:hover {
+            transform: scale(1.02);
+            background: #c9184a;
+        }
 
         .btn-estado { 
-            background: #fff0f3; color: #c9184a; border: 1px solid #ffb3c1; 
-            font-size: 0.8rem; padding: 10px; margin: 4px; border-radius: 12px;
-            cursor: pointer; font-weight: bold;
+            background: #fff0f3;
+            color: #c9184a;
+            border: 1px solid #ffb3c1; 
+            font-size: 0.8rem;
+            padding: 10px;
+            margin: 4px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
         }
 
         .selector-musica {
-            width: 100%; padding: 10px; border-radius: 15px; border: 1px solid #ff4d6d;
-            margin-bottom: 10px; background: #fff0f3; color: #c9184a; font-weight: bold;
+            width: 100%;
+            padding: 10px;
+            border-radius: 15px;
+            border: 1px solid #ff4d6d;
+            margin-bottom: 10px;
+            background: #fff0f3;
+            color: #c9184a;
+            font-weight: bold;
         }
 
-        /* DISEÑO DEL CHAT MEJORADO CON LADOS Y COLORES */
+        /* DISEÑO DEL CHAT CON LADOS Y COLORES */
         .contenedor-chat {
-            margin-top: 20px; display: flex; flex-direction: column; gap: 10px;
-            max-height: 350px; overflow-y: auto; padding: 15px; 
-            background: #fffafb; border-radius: 20px; border: 1px solid #ffe5ec;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 350px;
+            overflow-y: auto;
+            padding: 15px; 
+            background: #fffafb;
+            border-radius: 20px;
+            border: 1px solid #ffe5ec;
         }
+
         .burbuja-nota {
-            max-width: 85%; padding: 10px 15px; border-radius: 18px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative;
+            max-width: 85%;
+            padding: 10px 15px;
+            border-radius: 18px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            position: relative;
         }
+
         /* Lados */
-        .nota-der { align-self: flex-end; border-bottom-right-radius: 2px; text-align: right; }
-        .nota-izq { align-self: flex-start; border-bottom-left-radius: 2px; text-align: left; }
+        .nota-der {
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+            text-align: right;
+        }
+
+        .nota-izq {
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+            text-align: left;
+        }
 
         /* Colores por Modo */
         .color-cariñoso { background: #ffccd5; color: #c9184a; }
-        .color-tristeza { background: #dbeafe; color: #1e40af; }
-        .color-plan { background: #374151; color: #ffffff; } /* Gris oscuro */
+        .color-tristezadesahogo { background: #dbeafe; color: #1e40af; }
+        .color-plan { background: #374151; color: #ffffff; }
         .color-inspiración { background: #fef3c7; color: #92400e; }
         .color-general { background: #f3f4f6; color: #374151; }
 
         /* EFECTOS ESPECIALES */
         .besito-volador {
-            position: fixed; pointer-events: none; z-index: 9999; font-size: 35px;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            font-size: 35px;
             animation: volar 2s ease-out forwards;
         }
+
         @keyframes volar {
             0% { transform: translateY(0) scale(1); opacity: 1; }
             100% { transform: translateY(-80vh) scale(2) rotate(45deg); opacity: 0; }
         }
+
         .chispa {
-            position: absolute; pointer-events: none; z-index: 100; font-size: 20px;
+            position: absolute;
+            pointer-events: none;
+            z-index: 100;
+            font-size: 20px;
             animation: explotar 1s ease-out forwards;
         }
+
         @keyframes explotar {
             0% { transform: scale(0); opacity: 1; }
             100% { transform: translate(var(--x), var(--y)) scale(1.2); opacity: 0; }
         }
 
-        /* NUEVOS ESTILOS PARA GLOBOS */
         .globo-corazon {
             position: fixed;
-            font-size: 0; 
-            width: 80px; 
-            height: 70px; 
+            font-size: 0;
+            width: 80px;
+            height: 70px;
             background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23FF69B4"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>');
             background-size: contain;
             background-repeat: no-repeat;
@@ -101,7 +189,7 @@
             z-index: 999;
             opacity: 0.9;
             animation: flotar 3s ease-out forwards;
-            bottom: -100px; 
+            bottom: -100px;
             transform-origin: bottom center;
         }
 
@@ -149,31 +237,37 @@
     <div class="tarjeta" style="background: #fffdf5; border: 2px solid #d7c49e;">
         <h3 style="color: #5d4037;">📜 Refugio de Notas</h3>
         <form action="/nueva_nota" method="POST">
-            <select name="autor_nombre" class="selector-musica" style="border-color: #d7c49e;">
+            <select name="autor_nombre" class="selector-musica">
                 <option value="Mayda">Soy Mayda 🌹</option>
                 <option value="Abel">Soy Abel 🧭</option>
             </select>
-            
-            <p style="color: #8d734a; font-size: 0.8rem; font-weight: bold; margin: 5px 0;">¿Qué quieres expresar?</p>
-            <select name="modo_nota" class="selector-musica" style="border-color: #d7c49e; background: #faf3e0;">
+            <select name="modo_nota" class="selector-musica">
                 <option value="Cariñoso">Modo Cariñoso 🥰</option>
                 <option value="Tristeza/Desahogo">Modo Tristeza/Desahogo ☁️</option>
                 <option value="Plan">Modo Plan/Idea 🎬</option>
                 <option value="Inspiración">Modo Inspiración ✨</option>
             </select>
-
-            <textarea name="contenido_nota" placeholder="Escribe aquí tu mensaje..." required style="width: 90%; height: 70px; padding: 10px; border-radius: 10px; border: 1px solid #d7c49e; margin-top: 10px;"></textarea>
+            <textarea name="contenido_nota" placeholder="Escribe aquí..." required style="width: 90%; height: 70px; padding: 10px; border-radius: 10px; border: 1px solid #d7c49e; margin-top: 10px;"></textarea>
             <button type="submit" style="background: #5d4037;">Guardar en la Bóveda ✨</button>
         </form>
 
         <div class="contenedor-chat">
             {% for nota in notas %}
             <div class="burbuja-nota {{ 'nota-der' if nota[0] == 'Abel' else 'nota-izq' }} color-{{ nota[3]|lower|replace('/', '')|replace(' ', '') }}">
-                <strong style="font-size: 0.75rem;">
-                    {{ nota[0] }} ({{ nota[3] }}):
-                </strong>
+                <strong style="font-size: 0.75rem;">{{ nota[0] }} ({{ nota[3] }}):</strong>
                 <p style="margin: 3px 0; font-size: 0.9rem;">{{ nota[1] }}</p>
-                <small style="font-size: 0.7rem; opacity: 0.7;">{{ nota[2] }}</small>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
+                    <small style="font-size: 0.65rem; opacity: 0.6;">{{ nota[2] }}</small>
+                    <div style="display: flex; gap: 8px;">
+                        
+                        <button onclick="editarNota('{{ nota[4] }}', '{{ nota[1] }}')" style="background:none; border:none; padding:0; cursor:pointer; font-size:0.8rem; width:auto; margin:0;">✏️</button>
+                        
+                        <form action="/eliminar_nota/{{ nota[4] }}" method="POST" onsubmit="return confirm('¿Borrar mensaje?');" style="margin:0;">
+                            <button type="submit" style="background:none; border:none; padding:0; cursor:pointer; font-size:0.8rem; width:auto; margin:0;">🗑️</button>
+                        </form>
+
+                    </div>
+                </div>
             </div>
             {% endfor %}
         </div>
@@ -188,6 +282,7 @@
                 <p style="color: #c9184a; font-weight: bold;">{{ foto[1] }}</p>
                 
                 <div style="display: flex; flex-direction: column; gap: 5px; margin-top: 10px;">
+                    
                     <form action="/editar/{{ foto[2] }}" method="POST" style="display: flex; flex-direction: column; gap: 5px; align-items: center;">
                         <input type="text" name="mensaje_editado" placeholder="Escribe el nuevo nombre..." required 
                                style="width: 90%; padding: 10px; border-radius: 15px; border: 1px solid #ffb3c1; font-size: 0.8rem;">
@@ -202,6 +297,7 @@
                             🗑️ Borrar Foto
                         </button>
                     </form>
+
                 </div>
             </div>
             {% endfor %}
@@ -218,34 +314,52 @@
     </div>
 
     <script>
-        const iconos = ['🌹', '❤️', '💖', '✨', '🌸', '🌸'];
+        function editarNota(id, texto) {
+            const nuevo = prompt("Edita tu mensaje:", texto);
+            if (nuevo) {
+                const f = document.createElement('form');
+                f.method = 'POST';
+                f.action = '/editar_nota/' + id;
+                const i = document.createElement('input');
+                i.type = 'hidden';
+                i.name = 'contenido_editado';
+                i.value = nuevo;
+                f.appendChild(i);
+                document.body.appendChild(f);
+                f.submit();
+            }
+        }
+
+        const iconos = ['🌹', '❤️', '💖', '✨', '🌸'];
+
         function crearLluvia() {
             const e = document.createElement('div');
             e.className = 'caida';
             e.innerText = iconos[Math.floor(Math.random() * iconos.length)];
             e.style.left = Math.random() * 100 + "vw";
             e.style.animationDuration = (Math.random() * 3 + 2) + "s";
-            e.style.opacity = Math.random();
             document.body.appendChild(e);
             setTimeout(() => e.remove(), 5000);
         }
+
         setInterval(crearLluvia, 300);
 
         const audio = document.getElementById('musicaFondo');
         let iniciada = false;
+
         function reproducirMusica() {
             if(!iniciada) {
-                audio.play().catch(() => console.log("Esperando interacción..."));
+                audio.play().catch(()=>{});
                 iniciada = true;
             }
         }
 
         function apoyo(estado) {
             const texto = document.getElementById('mensajeNorte');
-            if(estado === 'estresada') texto.innerHTML = "<b>Tómate un respiro, amor.</b> Abel está aquí para cuidarte. ☁️";
-            if(estado === 'triste') texto.innerHTML = "<b>No temas a tus miedos.</b> Soy tu refugio desde el 5 de enero. 🛡️";
-            if(estado === 'cariñosa') texto.innerHTML = "<b>¡Qué linda te pones!</b> <i>'A menos que te cases conmigo...'</i> 💍";
-            if(estado === 'accion') texto.innerHTML = "<b>¡A darle con todo!</b> Admiro tu fuerza. Te espero aquí. 🧭";
+            if(estado === 'estresada') texto.innerHTML = "<b>Tómate un respiro, amor.</b> Abel está aquí. ☁️";
+            if(estado === 'triste') texto.innerHTML = "<b>No temas a tus miedos.</b> Soy tu refugio. 🛡️";
+            if(estado === 'cariñosa') texto.innerHTML = "<b>¡Qué linda te pones!</b> 💍";
+            if(estado === 'accion') texto.innerHTML = "<b>¡A darle con todo!</b> 🧭";
             reproducirMusica();
         }
 
@@ -253,13 +367,17 @@
             const cont = document.getElementById('contadorBesos');
             cont.innerText = parseInt(cont.innerText) + 1;
             reproducirMusica();
+            
             for(let i=0; i<10; i++) {
                 const b = document.createElement('div');
-                b.className = 'besito-volador'; b.innerText = '😘';
-                b.style.left = (Math.random() * 80 + 10) + "vw"; b.style.top = "90vh";
+                b.className = 'besito-volador';
+                b.innerText = '😘';
+                b.style.left = (Math.random() * 80 + 10) + "vw";
+                b.style.top = "90vh";
                 document.body.appendChild(b);
                 setTimeout(() => b.remove(), 2000);
             }
+
             for(let i=0; i<3; i++) {
                 const globo = document.createElement('div');
                 globo.className = 'globo-corazon';
@@ -273,20 +391,24 @@
             audio.play();
             for (let i = 0; i < 40; i++) {
                 const c = document.createElement('div');
-                c.className = 'chispa'; c.innerText = '✨';
-                c.style.left = '50vw'; c.style.top = '30vh';
+                c.className = 'chispa';
+                c.innerText = '✨';
+                c.style.left = '50vw';
+                c.style.top = '30vh';
                 const x = (Math.random() - 0.5) * 600 + 'px';
                 const y = (Math.random() - 0.5) * 600 + 'px';
-                c.style.setProperty('--x', x); c.style.setProperty('--y', y);
+                c.style.setProperty('--x', x);
+                c.style.setProperty('--y', y);
                 document.body.appendChild(c);
                 setTimeout(() => c.remove(), 1000);
             }
-            alert("¡Promesa Eterna! Abel & Mayda 26/01 💍");
+            alert("¡Promesa Eterna! Abel & Mayda 💍");
         }
 
         function cambiarMelodia(url) {
             document.getElementById('audioSource').src = url;
-            audio.load(); audio.play();
+            audio.load();
+            audio.play();
             iniciada = true;
         }
     </script>
