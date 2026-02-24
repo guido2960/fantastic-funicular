@@ -4,7 +4,7 @@ import cloudinary
 import cloudinary.uploader
 from flask import Flask, render_template, request, redirect, url_for
 
-app = Flask(__name__)
+app = Flask(_name_, static_folder='static', static_url_path='/static')
 
 # --- 1. CONFIGURACIÓN DE CLOUDINARY ---
 cloudinary.config( 
