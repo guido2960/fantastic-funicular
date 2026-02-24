@@ -201,6 +201,13 @@
     </style>
 </head>
 <body onmouseover="reproducirMusica()" onclick="reproducirMusica()" ontouchstart="reproducirMusica()">
+    <body onmouseover="reproducirMusica()" ...>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <img src="{{ url_for('static', filename='cat.png') }}" alt="Gatitos" style="width: 250px; border-radius: 15px;">
+    </div>
+
+<audio id="musicaFondo" ...>
 
     <audio id="musicaFondo" loop autoplay>
         <source id="audioSource" src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1771137815/Kali_Uchis_Cris_MJ_-_Si_No_Es_Contigo_REMIX_-_No_Jhayco_sin_Jhayco_e1vfkb.mp3" type="audio/mpeg">
