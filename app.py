@@ -4,7 +4,7 @@ import cloudinary
 import cloudinary.uploader
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 
-app = Flask(_name_, static_folder='static', static_url_path='/static')
+app = Flask(__name__, static_folder='static', static_url_path='/static')
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'llave_secreta_para_sesiones_2601')
 
 # --- 1. CONFIGURACIÓN DE CLOUDINARY ---
