@@ -1,4 +1,4 @@
-import os  # Corregido: import en minúscula
+import os
 import psycopg2
 import cloudinary
 import cloudinary.uploader
@@ -22,9 +22,9 @@ PIN_ADMIN = "2601"
 
 def get_db_connection():
     url = os.environ.get('DATABASE_URL')
-    # Agregamos un try básico para que la app no muera si la URL falla un segundo
     try:
-        return psycopg2.connect(url)
+        # CORRECCIÓN CRÍTICA: sslmode='require' para evitar el rechazo de Render
+        return psycopg2.connect(url, sslmode='require')
     except Exception as e:
         print(f"❌ Error de conexión: {e}")
         return None
@@ -33,13 +33,14 @@ def inicializar_db():
     conn = get_db_connection()
     if conn:
         cur = conn.cursor()
-        # Tus tablas originales
+        # Creación de tablas de Galería
         cur.execute('''CREATE TABLE IF NOT EXISTS galeria (
             id SERIAL PRIMARY KEY,
             archivo TEXT NOT NULL,
             mensaje TEXT,
             fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )''')
+        # Creación de tablas de Notas
         cur.execute('''CREATE TABLE IF NOT EXISTS notas_amor (
             id SERIAL PRIMARY KEY,
             contenido TEXT NOT NULL,
@@ -47,12 +48,12 @@ def inicializar_db():
             categoria TEXT DEFAULT 'General',
             fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )''')
-        # NUEVA TABLA: Control Maestro de Sesiones
+        # Tabla de Control de Sesiones (Aquí fallaba antes)
         cur.execute('''CREATE TABLE IF NOT EXISTS control_seguridad (
             id SERIAL PRIMARY KEY,
             session_version INTEGER DEFAULT 1
         )''')
-        # Insertar versión inicial si no existe
+        # Insertar versión inicial
         cur.execute("INSERT INTO control_seguridad (id, session_version) SELECT 1, 1 WHERE NOT EXISTS (SELECT 1 FROM control_seguridad WHERE id = 1)")
         
         conn.commit()
@@ -71,27 +72,28 @@ def verificar():
     entrada_clave = request.form.get('clave', '').strip()
     
     if entrada_email == USUARIO_ACCESO and entrada_clave == CLAVE_ACCESO:
-        # EXPERIENCIA: Alerta de IP
+        # GARANTÍA 100%: Forzamos la creación de tablas aquí mismo
+        inicializar_db()
+
         user_ip = request.remote_addr
         print(f"✅ ALERTA: Acceso de {entrada_email} desde IP: {user_ip} - ¡Ya entró, tranquilo!")
 
-        # Obtener versión de sesión actual
         conn = get_db_connection()
         cur = conn.cursor()
+        # Ahora esta consulta funcionará siempre
         cur.execute('SELECT session_version FROM control_seguridad WHERE id = 1')
         row = cur.fetchone()
         version = row[0] if row else 1
         cur.close()
         conn.close()
 
-        # EXPERIENCIA: Prioridad Maestro
         session['user_email'] = entrada_email
         session['session_version'] = version
         return redirect(url_for('boveda'))
     
     return "🔐 Acceso denegado, intenta de nuevo.", 403
 
-# EXPERIENCIA: Latido de Seguridad (Polling)
+# Latido de Seguridad (Polling)
 @app.route('/check_session')
 def check_session():
     if 'user_email' not in session:
@@ -109,7 +111,7 @@ def check_session():
         return jsonify({"status": "expired"}), 401
     return jsonify({"status": "ok"}), 200
 
-# EXPERIENCIA: El Interruptor Maestro (Cierre Global)
+# El Interruptor Maestro (Cierre Global)
 @app.route('/cierre_global', methods=['POST'])
 def cierre_global():
     pin_ingresado = request.form.get('pin_admin')
@@ -121,7 +123,7 @@ def cierre_global():
         cur.close()
         conn.close()
         session.clear() 
-        print("🚨 CIERRE GLOBAL EJECUTADO: Todos los dispositivos expulsados.")
+        print("🚨 CIERRE GLOBAL EJECUTADO")
         return redirect(url_for('login'))
     return "PIN Incorrecto", 403
 
@@ -130,9 +132,10 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
+# --- 4. LA BÓVEDA ---
+
 @app.route('/boveda')
 def boveda():
-    # Verificación de sesión
     if 'user_email' not in session:
         return redirect(url_for('login'))
         
@@ -146,7 +149,7 @@ def boveda():
     conn.close()
     return render_template('index.html', fotos=fotos_db, notas=notas_db)
 
-# --- 4. GESTIÓN DE NOTAS ---
+# --- 5. GESTIÓN DE NOTAS ---
 
 @app.route('/nueva_nota', methods=['POST'])
 def nueva_nota():
@@ -158,8 +161,7 @@ def nueva_nota():
         cur = conn.cursor()
         cur.execute('INSERT INTO notas_amor (autor, contenido, categoria) VALUES (%s, %s, %s)', (autor, contenido, modo))
         conn.commit()
-        cur.close()
-        conn.close()
+        cur.close(); conn.close()
     return redirect(url_for('boveda')) 
 
 @app.route('/editar_nota/<int:id>', methods=['POST'])
@@ -170,8 +172,7 @@ def editar_nota(id):
         cur = conn.cursor()
         cur.execute('UPDATE notas_amor SET contenido = %s WHERE id = %s', (nuevo_contenido, id))
         conn.commit()
-        cur.close()
-        conn.close()
+        cur.close(); conn.close()
     return redirect(url_for('boveda'))
 
 @app.route('/eliminar_nota/<int:id>', methods=['POST'])
@@ -180,25 +181,23 @@ def eliminar_nota(id):
     cur = conn.cursor()
     cur.execute('DELETE FROM notas_amor WHERE id = %s', (id,))
     conn.commit()
-    cur.close()
-    conn.close()
+    cur.close(); conn.close()
     return redirect(url_for('boveda'))
 
-# --- 5. GESTIÓN DE FOTOS ---
+# --- 6. GESTIÓN DE FOTOS ---
 
 @app.route('/subir', methods=['POST'])
 def subir():
     archivo = request.files.get('foto_usuario')
     mensaje = request.form.get('mensaje_usuario', '') 
-    if archivo and archivo.filename != '':
+    if archivo:
         res = cloudinary.uploader.upload(archivo)
         url_nube = res['secure_url'] 
         conn = get_db_connection()
         cur = conn.cursor()
         cur.execute('INSERT INTO galeria (archivo, mensaje) VALUES (%s, %s)', (url_nube, mensaje))
         conn.commit()
-        cur.close()
-        conn.close()
+        cur.close(); conn.close()
     return redirect(url_for('boveda')) 
 
 @app.route('/eliminar/<int:id>', methods=['POST'])
@@ -207,8 +206,7 @@ def eliminar(id):
     cur = conn.cursor()
     cur.execute('DELETE FROM galeria WHERE id = %s', (id,))
     conn.commit()
-    cur.close()
-    conn.close()
+    cur.close(); conn.close()
     return redirect(url_for('boveda'))
 
 @app.route('/editar/<int:id>', methods=['POST'])
@@ -219,11 +217,10 @@ def editar(id):
         cur = conn.cursor()
         cur.execute('UPDATE galeria SET mensaje = %s WHERE id = %s', (nuevo_mensaje, id))
         conn.commit()
-        cur.close()
-        conn.close()
+        cur.close(); conn.close()
     return redirect(url_for('boveda'))
 
-# --- 6. EJECUCIÓN ---
+# --- 7. EJECUCIÓN ---
 
 if __name__ == '__main__':
     inicializar_db()
