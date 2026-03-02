@@ -2,9 +2,10 @@ import os
 import psycopg2
 import cloudinary
 import cloudinary.uploader
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 
-app = Flask(__name__, static_folder='static', static_url_path='/static')
+app = Flask(_name_, static_folder='static', static_url_path='/static')
+app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'llave_secreta_para_sesiones_2601')
 
 # --- 1. CONFIGURACIÓN DE CLOUDINARY ---
 cloudinary.config( 
@@ -17,6 +18,7 @@ cloudinary.config(
 # --- 2. SEGURIDAD ---
 USUARIO_ACCESO = "maydaycookingamor@gmail.com" 
 CLAVE_ACCESO = "cariño241125"
+PIN_ADMIN = "2601" # Tu PIN de 4 dígitos (puedes cambiarlo)
 
 def get_db_connection():
     url = os.environ.get('DATABASE_URL')
@@ -25,6 +27,7 @@ def get_db_connection():
 def inicializar_db():
     conn = get_db_connection()
     cur = conn.cursor()
+    # Tus tablas originales
     cur.execute('''CREATE TABLE IF NOT EXISTS galeria (
         id SERIAL PRIMARY KEY,
         archivo TEXT NOT NULL,
@@ -38,11 +41,19 @@ def inicializar_db():
         categoria TEXT DEFAULT 'General',
         fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )''')
+    # NUEVA TABLA: Control Maestro de Sesiones
+    cur.execute('''CREATE TABLE IF NOT EXISTS control_seguridad (
+        id SERIAL PRIMARY KEY,
+        session_version INTEGER DEFAULT 1
+    )''')
+    # Insertar versión inicial si no existe
+    cur.execute("INSERT INTO control_seguridad (id, session_version) SELECT 1, 1 WHERE NOT EXISTS (SELECT 1 FROM control_seguridad WHERE id = 1)")
+    
     conn.commit()
     cur.close()
     conn.close()
 
-# --- 3. RUTAS DE ACCESO ---
+# --- 3. RUTAS DE ACCESO Y SEGURIDAD ---
 
 @app.route('/')
 def login():
@@ -52,28 +63,85 @@ def login():
 def verificar():
     entrada_email = request.form.get('correo', '').strip()
     entrada_clave = request.form.get('clave', '').strip()
+    
     if entrada_email == USUARIO_ACCESO and entrada_clave == CLAVE_ACCESO:
+        # EXPERIENCIA: Alerta de IP (Logs de Render)
+        user_ip = request.remote_addr
+        print(f"✅ ALERTA: Acceso de {entrada_email} desde IP: {user_ip} - ¡Ya entró, tranquilo!")
+
+        # Obtener versión de sesión actual
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('SELECT session_version FROM control_seguridad WHERE id = 1')
+        version = cur.fetchone()[0]
+        cur.close()
+        conn.close()
+
+        # EXPERIENCIA: Prioridad Maestro (Guardar en sesión)
+        session['user_email'] = entrada_email
+        session['session_version'] = version
         return redirect(url_for('boveda'))
+    
     return "🔐 Acceso denegado, intenta de nuevo.", 403
+
+# EXPERIENCIA: Latido de Seguridad (Polling para reinicio forzoso)
+@app.route('/check_session')
+def check_session():
+    if 'user_email' not in session:
+        return jsonify({"status": "expired"}), 401
+        
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('SELECT session_version FROM control_seguridad WHERE id = 1')
+    version_actual = cur.fetchone()[0]
+    cur.close()
+    conn.close()
+
+    if session.get('session_version') != version_actual:
+        session.clear()
+        return jsonify({"status": "expired"}), 401
+    return jsonify({"status": "ok"}), 200
+
+# EXPERIENCIA: El Interruptor Maestro (Cierre Global)
+@app.route('/cierre_global', methods=['POST'])
+def cierre_global():
+    pin_ingresado = request.form.get('pin_admin')
+    if pin_ingresado == PIN_ADMIN:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        # Cambia la llave global (Efecto Chape para todos)
+        cur.execute('UPDATE control_seguridad SET session_version = session_version + 1 WHERE id = 1')
+        conn.commit()
+        cur.close()
+        conn.close()
+        session.clear() # También te saca a ti por seguridad
+        print("🚨 CIERRE GLOBAL EJECUTADO: Todos los dispositivos expulsados.")
+        return redirect(url_for('login'))
+    return "PIN Incorrecto", 403
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
 
 @app.route('/boveda')
 def boveda():
+    # Verificación de sesión antes de entrar
+    if 'user_email' not in session:
+        return redirect(url_for('login'))
+        
     inicializar_db()
     conn = get_db_connection()
     cur = conn.cursor()
-    # Fotos
     cur.execute('SELECT archivo, mensaje, id FROM galeria ORDER BY id DESC')
     fotos_db = cur.fetchall()
-    
-    # Notas: Ahora incluimos el ID al final (índice 4) para que funcionen los botones
     cur.execute("SELECT autor, contenido, TO_CHAR(fecha, 'DD/MM HH:MI AM'), categoria, id FROM notas_amor ORDER BY fecha DESC")
     notas_db = cur.fetchall()
-    
     cur.close()
     conn.close()
     return render_template('index.html', fotos=fotos_db, notas=notas_db)
 
-# --- 4. GESTIÓN DE NOTAS (NUEVO: EDITAR Y ELIMINAR) ---
+# --- 4. GESTIÓN DE NOTAS ---
 
 @app.route('/nueva_nota', methods=['POST'])
 def nueva_nota():
