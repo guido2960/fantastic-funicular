@@ -1,4 +1,4 @@
-import os
+import os  # Corregido: import en minúscula
 import psycopg2
 import cloudinary
 import cloudinary.uploader
@@ -18,40 +18,46 @@ cloudinary.config(
 # --- 2. SEGURIDAD ---
 USUARIO_ACCESO = "maydaycookingamor@gmail.com" 
 CLAVE_ACCESO = "cariño241125"
-PIN_ADMIN = "2601" # Tu PIN de 4 dígitos (puedes cambiarlo)
+PIN_ADMIN = "2601" 
 
 def get_db_connection():
     url = os.environ.get('DATABASE_URL')
-    return psycopg2.connect(url)
+    # Agregamos un try básico para que la app no muera si la URL falla un segundo
+    try:
+        return psycopg2.connect(url)
+    except Exception as e:
+        print(f"❌ Error de conexión: {e}")
+        return None
 
 def inicializar_db():
     conn = get_db_connection()
-    cur = conn.cursor()
-    # Tus tablas originales
-    cur.execute('''CREATE TABLE IF NOT EXISTS galeria (
-        id SERIAL PRIMARY KEY,
-        archivo TEXT NOT NULL,
-        mensaje TEXT,
-        fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )''')
-    cur.execute('''CREATE TABLE IF NOT EXISTS notas_amor (
-        id SERIAL PRIMARY KEY,
-        contenido TEXT NOT NULL,
-        autor TEXT NOT NULL,
-        categoria TEXT DEFAULT 'General',
-        fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )''')
-    # NUEVA TABLA: Control Maestro de Sesiones
-    cur.execute('''CREATE TABLE IF NOT EXISTS control_seguridad (
-        id SERIAL PRIMARY KEY,
-        session_version INTEGER DEFAULT 1
-    )''')
-    # Insertar versión inicial si no existe
-    cur.execute("INSERT INTO control_seguridad (id, session_version) SELECT 1, 1 WHERE NOT EXISTS (SELECT 1 FROM control_seguridad WHERE id = 1)")
-    
-    conn.commit()
-    cur.close()
-    conn.close()
+    if conn:
+        cur = conn.cursor()
+        # Tus tablas originales
+        cur.execute('''CREATE TABLE IF NOT EXISTS galeria (
+            id SERIAL PRIMARY KEY,
+            archivo TEXT NOT NULL,
+            mensaje TEXT,
+            fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )''')
+        cur.execute('''CREATE TABLE IF NOT EXISTS notas_amor (
+            id SERIAL PRIMARY KEY,
+            contenido TEXT NOT NULL,
+            autor TEXT NOT NULL,
+            categoria TEXT DEFAULT 'General',
+            fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )''')
+        # NUEVA TABLA: Control Maestro de Sesiones
+        cur.execute('''CREATE TABLE IF NOT EXISTS control_seguridad (
+            id SERIAL PRIMARY KEY,
+            session_version INTEGER DEFAULT 1
+        )''')
+        # Insertar versión inicial si no existe
+        cur.execute("INSERT INTO control_seguridad (id, session_version) SELECT 1, 1 WHERE NOT EXISTS (SELECT 1 FROM control_seguridad WHERE id = 1)")
+        
+        conn.commit()
+        cur.close()
+        conn.close()
 
 # --- 3. RUTAS DE ACCESO Y SEGURIDAD ---
 
@@ -65,7 +71,7 @@ def verificar():
     entrada_clave = request.form.get('clave', '').strip()
     
     if entrada_email == USUARIO_ACCESO and entrada_clave == CLAVE_ACCESO:
-        # EXPERIENCIA: Alerta de IP (Logs de Render)
+        # EXPERIENCIA: Alerta de IP
         user_ip = request.remote_addr
         print(f"✅ ALERTA: Acceso de {entrada_email} desde IP: {user_ip} - ¡Ya entró, tranquilo!")
 
@@ -73,18 +79,19 @@ def verificar():
         conn = get_db_connection()
         cur = conn.cursor()
         cur.execute('SELECT session_version FROM control_seguridad WHERE id = 1')
-        version = cur.fetchone()[0]
+        row = cur.fetchone()
+        version = row[0] if row else 1
         cur.close()
         conn.close()
 
-        # EXPERIENCIA: Prioridad Maestro (Guardar en sesión)
+        # EXPERIENCIA: Prioridad Maestro
         session['user_email'] = entrada_email
         session['session_version'] = version
         return redirect(url_for('boveda'))
     
     return "🔐 Acceso denegado, intenta de nuevo.", 403
 
-# EXPERIENCIA: Latido de Seguridad (Polling para reinicio forzoso)
+# EXPERIENCIA: Latido de Seguridad (Polling)
 @app.route('/check_session')
 def check_session():
     if 'user_email' not in session:
@@ -109,12 +116,11 @@ def cierre_global():
     if pin_ingresado == PIN_ADMIN:
         conn = get_db_connection()
         cur = conn.cursor()
-        # Cambia la llave global (Efecto Chape para todos)
         cur.execute('UPDATE control_seguridad SET session_version = session_version + 1 WHERE id = 1')
         conn.commit()
         cur.close()
         conn.close()
-        session.clear() # También te saca a ti por seguridad
+        session.clear() 
         print("🚨 CIERRE GLOBAL EJECUTADO: Todos los dispositivos expulsados.")
         return redirect(url_for('login'))
     return "PIN Incorrecto", 403
@@ -126,11 +132,10 @@ def logout():
 
 @app.route('/boveda')
 def boveda():
-    # Verificación de sesión antes de entrar
+    # Verificación de sesión
     if 'user_email' not in session:
         return redirect(url_for('login'))
         
-    inicializar_db()
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute('SELECT archivo, mensaje, id FROM galeria ORDER BY id DESC')
