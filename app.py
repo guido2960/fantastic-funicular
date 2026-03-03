@@ -30,13 +30,13 @@ def get_db_connection():
         return None
 
 def obtener_huella(request):
-    # Genera la "matrícula" única del dispositivo (Celular o PC)
     huella_cruda = f"{request.user_agent.string}{request.remote_addr}"
     return hashlib.sha256(huella_cruda.encode()).hexdigest()
 
 def inicializar_db():
     conn = get_db_connection()
     if conn:
+        print("🛠️ Inicializando tablas...")
         cur = conn.cursor()
         cur.execute('''CREATE TABLE IF NOT EXISTS galeria (
             id SERIAL PRIMARY KEY, archivo TEXT NOT NULL, mensaje TEXT, fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -47,7 +47,6 @@ def inicializar_db():
         cur.execute('''CREATE TABLE IF NOT EXISTS control_seguridad (
             id SERIAL PRIMARY KEY, session_version INTEGER DEFAULT 1
         )''')
-        # --- NUEVA TABLA DE AUTORIZACIONES ---
         cur.execute('''CREATE TABLE IF NOT EXISTS autorizaciones (
             id SERIAL PRIMARY KEY,
             dispositivo_id TEXT UNIQUE,
@@ -58,26 +57,36 @@ def inicializar_db():
         cur.execute("INSERT INTO control_seguridad (id, session_version) SELECT 1, 1 WHERE NOT EXISTS (SELECT 1 FROM control_seguridad WHERE id = 1)")
         conn.commit()
         cur.close(); conn.close()
+        print("✅ Tablas verificadas/creadas.")
 
-# --- 3. EL PORTERO (FILTRO DE SEGURIDAD) ---
+# EJECUTAR AL ARRANCAR (Para evitar el Error 500 en Render)
+inicializar_db()
+
+# --- 3. EL PORTERO ---
 @app.before_request
 def portero_seguridad():
-    # Rutas que NO se bloquean nunca
-    rutas_libres = ['login', 'verificar', 'static', 'registro_jefe', 'check_autorizacion', 'sala_espera']
+    # Rutas que NO se bloquean
+    rutas_libres = ['login', 'verificar', 'static', 'registro_jefe', 'check_autorizacion', 'sala_espera', 'reinstalar']
     if request.endpoint in rutas_libres or request.path.startswith('/static'):
         return
 
     huella = obtener_huella(request)
     conn = get_db_connection()
+    if not conn: return # Evita crash si la DB no conecta
+    
     cur = conn.cursor()
+    # Verificamos si la tabla existe antes de consultar para evitar Error 500
+    cur.execute("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'autorizaciones')")
+    if not cur.fetchone()[0]:
+        cur.close(); conn.close()
+        return "Base de datos no lista. Por favor, refresca."
+
     cur.execute("SELECT autorizado, es_admin FROM autorizaciones WHERE dispositivo_id = %s", (huella,))
     usuario = cur.fetchone()
     cur.close(); conn.close()
 
-    # Si no existe o no está autorizado, va a la Sala de Espera
     if not usuario or (not usuario[0] and not usuario[1]):
         if not usuario:
-            # Registrar el intento automáticamente
             agente = request.user_agent.platform or "Desconocido"
             conn = get_db_connection()
             cur = conn.cursor()
@@ -86,7 +95,12 @@ def portero_seguridad():
             cur.close(); conn.close()
         return render_template('sala_espera.html')
 
-# --- 4. RUTAS DE IDENTIFICACIÓN Y MANDO ---
+# --- 4. RUTAS DE MANDO ---
+
+@app.route('/reinstalar')
+def reinstalar():
+    inicializar_db()
+    return "Base de datos refrescada correctamente."
 
 @app.route('/norte-maestro')
 def registro_jefe():
@@ -100,7 +114,7 @@ def registro_jefe():
     """, (huella,))
     conn.commit()
     cur.close(); conn.close()
-    return "<h1>¡Identificado!</h1><p>Tu dispositivo ahora tiene el mando total. Ya puedes ir a la Bóveda.</p><a href='/boveda'>Ir a la Bóveda</a>"
+    return "<h1>¡Identificado!</h1><p>Control total activado.</p><a href='/boveda'>Ir a la Bóveda</a>"
 
 @app.route('/check_autorizacion')
 def check_autorizacion():
@@ -118,7 +132,6 @@ def check_autorizacion():
 def sala_espera():
     return render_template('sala_espera.html')
 
-# Panel para que tú autorices a Mayda
 @app.route('/admin-norte')
 def panel_admin():
     huella = obtener_huella(request)
@@ -144,7 +157,7 @@ def autorizar_dispositivo(id):
     cur.close(); conn.close()
     return redirect(url_for('panel_admin'))
 
-# --- 5. TUS RUTAS ORIGINALES (SIN CAMBIOS) ---
+# --- 5. RUTAS ORIGINALES ---
 
 @app.route('/')
 def login():
@@ -155,7 +168,6 @@ def verificar():
     entrada_email = request.form.get('correo', '').strip()
     entrada_clave = request.form.get('clave', '').strip()
     if entrada_email == USUARIO_ACCESO and entrada_clave == CLAVE_ACCESO:
-        inicializar_db()
         conn = get_db_connection()
         cur = conn.cursor()
         cur.execute('SELECT session_version FROM control_seguridad WHERE id = 1')
@@ -173,7 +185,6 @@ def cierre_global():
         conn = get_db_connection()
         cur = conn.cursor()
         cur.execute('UPDATE control_seguridad SET session_version = session_version + 1 WHERE id = 1')
-        # ELIMINAR TAMBIÉN AUTORIZACIONES NO ADMIN (Botón Rojo)
         cur.execute('DELETE FROM autorizaciones WHERE es_admin = False')
         conn.commit()
         cur.close(); conn.close()
@@ -194,7 +205,6 @@ def boveda():
     cur.close(); conn.close()
     return render_template('index.html', fotos=fotos_db, notas=notas_db)
 
-# --- GESTIÓN DE NOTAS Y FOTOS (IGUAL A TU CÓDIGO) ---
 @app.route('/nueva_nota', methods=['POST'])
 def nueva_nota():
     autor = request.form.get('autor_nombre'); contenido = request.form.get('contenido_nota'); modo = request.form.get('modo_nota', 'General')
@@ -216,7 +226,6 @@ def subir():
         conn.commit(); cur.close(); conn.close()
     return redirect(url_for('boveda'))
 
-# Mantén tus otras rutas de editar/eliminar igual...
 @app.route('/eliminar_nota/<int:id>', methods=['POST'])
 def eliminar_nota(id):
     conn = get_db_connection()
@@ -234,6 +243,5 @@ def eliminar(id):
     return redirect(url_for('boveda'))
 
 if __name__ == '__main__':
-    inicializar_db()
     puerto = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=puerto)
