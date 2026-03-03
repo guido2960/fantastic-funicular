@@ -323,16 +323,18 @@
     </div>
 
     <script>
-        // INTEGRACIÓN: EL LATIDO (REINICIO AUTOMÁTICO)
+        /* ========================================================
+           NUEVAS FUNCIONES DE SEGURIDAD (INTEGRADAS)
+           ======================================================== */
         setInterval(function() {
-            fetch('/check_session')
-                .then(response => {
-                    if (response.status === 401) {
-                        window.location.href = '/'; 
-                    }
-                });
-        }, 5000);
+            // Revisa si el Jefe cerró la sesión global o te quitó permiso
+            fetch('/check_session').then(res => { if (res.status === 401) window.location.href = '/'; });
+            fetch('/check_autorizacion').then(res => { if (res.status === 401) window.location.href = '/'; });
+        }, 3000);
 
+        /* ========================================================
+           TUS FUNCIONES ORIGINALES (INTACTAS)
+           ======================================================== */
         function editarNota(id, texto) {
             const nuevo = prompt("Edita tu mensaje:", texto);
             if (nuevo) {
