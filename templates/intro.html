@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Para mi Cebollita May</title>
+    <style>
+        /* Estilo de Maestro: Fondo negro y texto elegante */
+        body, html { margin: 0; padding: 0; overflow: hidden; background: #000; font-family: 'Courier New', Courier, monospace; }
+        canvas { display: block; }
+        
+        /* Botón de inicio para activar el audio */
+        #overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.9); z-index: 100;
+        }
+        button {
+            padding: 15px 40px; font-size: 20px; cursor: pointer;
+            background: transparent; color: #fff; border: 2px solid #fff;
+            border-radius: 50px; transition: 0.5s; text-transform: uppercase; letter-spacing: 2px;
+        }
+        button:hover { background: #fff; color: #000; box-shadow: 0 0 30px #fff; }
+    </style>
+</head>
+<body>
+
+    <div id="overlay">
+        <button onclick="comenzarExperiencia()">Entrar a nuestro universo</button>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <audio id="musicaFondo" src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772691824/musica_de_fondo_fuo3r2.m4a"></audio>
+    <audio id="miVoz" src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772691824/mi_audio_e07s2p.mp4"></audio>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const musica = document.getElementById('musicaFondo');
+        const voz = document.getElementById('miVoz');
+
+        let particles = [];
+        let mensajeActual = "";
+        let running = false;
+
+        // Configuración del canvas
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // 1. Lógica de la Experiencia (Tiempos Sincronizados)
+        function comenzarExperiencia() {
+            document.getElementById('overlay').style.display = 'none';
+            running = true;
+
+            // PASO 1: Iniciar música (0s)
+            musica.volume = 0.4;
+            musica.play();
+            crearEstrellas(); // Inicia el fondo visual
+            animar();
+
+            // PASO 2: Saludo Personalizado (5s)
+            setTimeout(() => {
+                mensajeActual = "Hola cebollita May...";
+            }, 5000);
+
+            // PASO 3: Mensaje de Paz y Capas (20s)
+            setTimeout(() => {
+                mensajeActual = "Gracias por ser mi paz en medio del ruido.\nAmo conocer cada capa de ti y caminar a tu lado.";
+            }, 20000);
+
+            // PASO 4 y 5: Tu voz y el Corazón Final (45s)
+            setTimeout(() => {
+                mensajeActual = ""; // Limpiamos texto para los fuegos artificiales
+                musica.volume = 0.1; // Bajamos el fondo para que tu voz brille
+                voz.play();
+                activarEfectoCorazon(); // Disparar visuales finales
+            }, 45000);
+
+            // PASO 6: Redirección a la Bóveda (62s)
+            setTimeout(() => {
+                window.location.href = "boveda.html"; 
+            }, 62000);
+        }
+
+        // --- SISTEMA VISUAL (Simulación simple de estrellas para el ejemplo) ---
+        function crearEstrellas() {
+            for(let i=0; i<200; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2,
+                    speed: Math.random() * 0.5 + 0.1
+                });
+            }
+        }
+
+        function animar() {
+            if(!running) return;
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Dibujar estrellas
+            ctx.fillStyle = 'white';
+            particles.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                p.y -= p.speed;
+                if(p.y < 0) p.y = canvas.height;
+            });
+
+            // Dibujar el texto planificado
+            if(mensajeActual !== "") {
+                ctx.fillStyle = "white";
+                ctx.font = "24px 'Courier New'";
+                ctx.textAlign = "center";
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = "white";
+                
+                const lines = mensajeActual.split('\n');
+                lines.forEach((line, i) => {
+                    ctx.fillText(line, canvas.width / 2, (canvas.height / 2) + (i * 40));
+                });
+            }
+
+            requestAnimationFrame(animar);
+        }
+
+        function activarEfectoCorazon() {
+            // Aquí integrarías tu código específico de fuegos artificiales
+            console.log("Iniciando Fuegos Artificiales y Corazón...");
+        }
+    </script>
+</body>
+</html>
