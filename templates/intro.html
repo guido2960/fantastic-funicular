@@ -2,46 +2,49 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Para mi Administradora</title>
     <style>
         body, html { margin: 0; padding: 0; overflow: hidden; background: #000; font-family: 'Courier New', monospace; }
-        canvas { display: block; position: absolute; top: 0; left: 0; z-index: 1; }
+        canvas { display: block; position: absolute; top: 0; left: 0; }
         #overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; justify-content: center; align-items: center;
-            background: #000; z-index: 100; opacity: 1; transition: opacity 0.8s;
+            background: #000; z-index: 9999;
         }
-        #btnEntrar {
-            padding: 20px 40px; font-size: 20px; cursor: pointer;
-            background: #fff; color: #000; border: none;
-            border-radius: 50px; font-weight: bold; text-transform: uppercase;
-            box-shadow: 0 0 20px rgba(255,255,255,0.5); z-index: 101;
+        /* ESTE ES TU BOTÓN ORIGINAL, EL QUE SÍ FUNCIONABA */
+        .btn-magico {
+            padding: 20px 50px; font-size: 22px; cursor: pointer;
+            background: none; color: white; border: 2px solid white;
+            border-radius: 50px; text-transform: uppercase; letter-spacing: 4px;
+            transition: all 0.5s ease;
         }
+        .btn-magico:hover { background: white; color: black; box-shadow: 0 0 40px white; }
     </style>
 </head>
 <body>
 
     <div id="overlay">
-        <button id="btnEntrar" onclick="iniciarTodo()">Entrar a nuestro universo</button>
+        <button class="btn-magico" id="btnEntrar">Entrar al Universo</button>
     </div>
 
     <canvas id="canvas"></canvas>
 
-    <audio id="musicaFondo" src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772691824/musica_de_fondo_fuo3r2.m4a" preload="auto" loop></audio>
-    <audio id="miVoz" src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772691824/mi_audio_e07s2p.mp4" preload="auto"></audio>
+    <audio id="musicaFondo" src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772691824/musica_de_fondo_fuo3r2.m4a" loop></audio>
+    <audio id="miVoz" src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772691824/mi_audio_e07s2p.mp4"></audio>
 
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
+        const btn = document.getElementById('btnEntrar');
+        const overlay = document.getElementById('overlay');
         const musica = document.getElementById('musicaFondo');
         const voz = document.getElementById('miVoz');
-        const overlay = document.getElementById('overlay');
 
         let estrellas = [];
         let mensaje = "";
-        let modo = "normal";
-        let activo = false;
+        let modo = "paz"; 
+        let animando = false;
 
         function resize() {
             canvas.width = window.innerWidth;
@@ -50,30 +53,29 @@
         window.addEventListener('resize', resize);
         resize();
 
-        // LA FUNCIÓN DEFINITIVA
-        function iniciarTodo() {
-            // 1. Quitar el bloqueo visual de inmediato
-            overlay.style.opacity = '0';
-            setTimeout(() => { overlay.style.display = 'none'; }, 800);
-
-            // 2. Forzar reproducción de audios (esto desbloquea el navegador)
-            musica.play().catch(err => console.log("Audio fail", err));
+        // --- LA LÓGICA DEL PRIMER BOTÓN (VUELTA A LO QUE FUNCIONA) ---
+        btn.onclick = function() {
+            // Desaparecer overlay de inmediato como la primera vez
+            overlay.style.display = 'none';
+            
+            // Arrancar audios con prioridad absoluta
             musica.volume = 0.4;
+            musica.play();
             
-            // 3. Activar animación
-            activo = true;
-            generarEstrellas();
-            animar();
-            
-            // 4. Iniciar los 6 pasos cronometrados
-            comenzarPasos();
-        }
+            animando = true;
+            iniciarEstrellas();
+            buclePrincipal();
+            cronogramaMagico();
+        };
 
-        function comenzarPasos() {
-            setTimeout(() => escribir("Hola mi administradora favorita...", 0), 3000);
-            setTimeout(() => escribir("Gracias por ser mi paz.\nAmo conocer cada capa de ti.", 0), 15000);
-            
-            // Paso 4: Tu voz y fuegos
+        function cronogramaMagico() {
+            // Paso 1 y 2: Saludo (5s)
+            setTimeout(() => escribir("Hola mi administradora favorita...", 0), 5000);
+
+            // Paso 3: Capas (20s)
+            setTimeout(() => escribir("Gracias por ser mi paz.\nAmo conocer cada capa de ti.", 0), 20000);
+
+            // Paso 4: Tu voz y fuegos (45s)
             setTimeout(() => {
                 mensaje = "";
                 musica.volume = 0.1;
@@ -81,63 +83,62 @@
                 modo = "fuego";
             }, 45000);
 
-            // Paso 5: Abrazo y Corazón
+            // Paso 5: El Corazón de Estrellas (55s)
             setTimeout(() => {
                 modo = "corazon";
                 escribir("🫂\nNuestra Unión", 0);
             }, 55000);
 
-            // Paso 6: Beso Final
+            // Paso 6: El Beso Final (58s)
             setTimeout(() => {
                 escribir("👩‍❤️‍💋‍👨\nTe amo, May", 0);
             }, 58000);
 
-            // Redirección
+            // Salto final (63s)
             setTimeout(() => { window.location.href = "/boveda"; }, 63000);
         }
 
-        function escribir(txt, i) {
+        function escribir(t, i) {
             if (i === 0) mensaje = "";
-            if (i < txt.length) {
-                mensaje += txt.charAt(i);
-                setTimeout(() => escribir(txt, i + 1), 70);
+            if (i < t.length) {
+                mensaje += t.charAt(i);
+                setTimeout(() => escribir(t, i + 1), 70);
             }
         }
 
-        function generarEstrellas() {
+        function iniciarEstrellas() {
             for(let i=0; i<250; i++) {
                 const t = (i / 250) * 2 * Math.PI;
                 estrellas.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
-                    vx: (Math.random() - 0.5) * 4,
-                    vy: (Math.random() - 0.5) * 4,
-                    // Coordenadas para el corazón (Fórmula matemática)
+                    vx: (Math.random() - 0.5) * 5,
+                    vy: (Math.random() - 0.5) * 5,
                     tx: (16 * Math.sin(t)**3) * 13 + canvas.width/2,
                     ty: (-(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t))) * 13 + canvas.height/2,
                     r: Math.random() * 2,
-                    c: '#fff'
+                    color: 'white'
                 });
             }
         }
 
-        function animar() {
-            if(!activo) return;
+        function buclePrincipal() {
+            if(!animando) return;
             ctx.fillStyle = 'black';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             estrellas.forEach(e => {
-                if(modo === "normal") {
-                    e.y -= 0.8; if(e.y < 0) e.y = canvas.height;
+                if(modo === "paz") {
+                    e.y -= 0.7; if(e.y < 0) e.y = canvas.height;
                 } else if(modo === "fuego") {
                     e.x += e.vx; e.y += e.vy;
-                    e.c = hsl(${Math.random()*360}, 100%, 70%);
+                    e.color = hsl(${Math.random()*360}, 100%, 75%);
                 } else if(modo === "corazon") {
-                    e.x += (e.tx - e.x) * 0.06;
-                    e.y += (e.ty - e.y) * 0.06;
-                    e.c = "#ff4d6d";
+                    e.x += (e.tx - e.x) * 0.05;
+                    e.y += (e.ty - e.y) * 0.05;
+                    e.color = "#ff4d6d";
                 }
-                ctx.fillStyle = e.c;
+                ctx.fillStyle = e.color;
                 ctx.beginPath(); ctx.arc(e.x, e.y, e.r, 0, Math.PI*2); ctx.fill();
             });
 
@@ -145,11 +146,11 @@
                 ctx.fillStyle = "white";
                 ctx.font = "22px 'Courier New'";
                 ctx.textAlign = "center";
-                const lines = mensaje.split('\n');
-                lines.forEach((l, i) => ctx.fillText(l, canvas.width/2, canvas.height/2 + (i*40)));
+                const lineas = mensaje.split('\n');
+                lineas.forEach((l, i) => ctx.fillText(l, canvas.width/2, canvas.height/2 + (i*45)));
             }
-            requestAnimationFrame(animar);
+            requestAnimationFrame(buclePrincipal);
         }
     </script>
 </body>
-</html
+</html>
