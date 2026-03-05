@@ -12,16 +12,29 @@
             text-shadow: 0 0 15px rgba(255,255,255,0.7);
             transition: opacity 2s; opacity: 0; z-index: 10;
         }
+        #btn-iniciar {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            padding: 20px 40px; font-size: 20px; cursor: pointer; background: white; border: none; border-radius: 10px;
+        }
     </style>
 </head>
 <body>
+    <div id="pantalla-inicio">
+        <button id="btn-iniciar" onclick="iniciarHistoria()">Entrar al universo de Mayda</button>
+    </div>
+    
     <div id="texto-guion"></div>
     <canvas id="canvas"></canvas>
+
+    <audio id="musica-fondo" src="/static/musica.mp3" loop></audio>
+    <audio id="voz-abel" src="/static/voz.mp3"></audio>
 
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const textoDiv = document.getElementById('texto-guion');
+        const musica = document.getElementById('musica-fondo');
+        const voz = document.getElementById('voz-abel');
         let particulas = [];
         let fase = "paz";
 
@@ -38,13 +51,13 @@
                 this.tamaño = Math.random() * 2;
                 this.vx = (Math.random() - 0.5) * 0.8;
                 this.vy = (Math.random() - 0.5) * 0.8;
-                this.velocidadVuelo = 0.3 + Math.random() * 0.6; // Velocidad de cine
+                this.velocidadVuelo = 0.3 + Math.random() * 0.6;
             }
             actualizar() {
                 if (fase === "celebracion") {
                     this.x += this.vx * 2.5; this.y += this.vy * 2.5;
                 } else if (fase === "paz" || fase === "avion") {
-                    this.x -= this.velocidadVuelo; // Movimiento espacial constante
+                    this.x -= this.velocidadVuelo;
                     if (this.x < 0) this.x = canvas.width;
                     this.x += (this.objetivoX - this.x) * 0.05;
                     this.y += (this.objetivoY - this.y) * 0.05;
@@ -75,7 +88,7 @@
             fase = tipo;
             particulas.forEach((p, i) => {
                 if (tipo === "arbol") { 
-                    p.color = "#4CAF50"; // Tu verde favorito
+                    p.color = "#4CAF50"; 
                     if (i < 400) { 
                         p.objetivoX = canvas.width/2 + (Math.random()-0.5)*30;
                         p.objetivoY = canvas.height/2 + (i%200);
@@ -86,7 +99,7 @@
                     }
                 }
                 else if (tipo === "avion") { 
-                    p.color = "#87CEEB"; // Tu azul cielo
+                    p.color = "#87CEEB"; 
                     p.objetivoX = (i % 60) * 8 + (canvas.width/4);
                     p.objetivoY = canvas.height/2 + Math.sin(i)*15;
                 }
@@ -123,16 +136,31 @@
             requestAnimationFrame(animar);
         }
 
-        // --- HISTORIA DE 3 MINUTOS ---
-        setTimeout(() => { animar(); escribir("Todo comenzó con esta paz que me diste, mi Administradora."); }, 1000);
-        setTimeout(() => { formarFigura("arbol"); escribir("Me tomó tiempo entender cada capa de tu alma, pero cada una vale la pena."); }, 30000);
-        setTimeout(() => { formarFigura("avion"); escribir("Admiro tu fuerza en Modo Acción... por eso mi vida vuela hacia tu Norte."); }, 60000);
-        setTimeout(() => { formarFigura("imperio"); escribir("Eres una Administradora brillante. Admiro tu visión y quiero ser tu socio de vida."); }, 90000);
-        setTimeout(() => { fase = "paz"; escribir("Tomo tan en serio cada video y mensaje que me mandas... me encanta escucharte."); }, 120000);
-        setTimeout(() => { particulas.forEach(p => p.color = "#ffffff"); escribir("Me encantaría darte ese primer beso... pero amo aún más respetar tu ritmo."); }, 155000);
-        setTimeout(() => { formarFigura("corazon"); escribir("Escucha esto que tengo guardado solo para ti..."); }, 175000);
-        setTimeout(() => { granFinal(); escribir("👩‍❤️‍💋‍👨 TE AMO PARA SIEMPRE, MAYDA 👩‍❤️‍💋‍👨"); }, 183000);
-        setTimeout(() => { window.location.href = "/boveda"; }, 196000);
+        function iniciarHistoria() {
+            document.getElementById('pantalla-inicio').style.display = 'none';
+            musica.volume = 0.3;
+            musica.play();
+            animar();
+            
+            // --- CRONOLOGÍA ---
+            escribir("Todo comenzó con esta paz que me diste, mi Administradora."); 
+
+            setTimeout(() => { formarFigura("arbol"); escribir("Me tomó tiempo entender cada capa de tu alma, pero cada una vale la pena."); }, 30000);
+            setTimeout(() => { formarFigura("avion"); escribir("Admiro tu fuerza en Modo Acción... por eso mi vida vuela hacia tu Norte."); }, 60000);
+            setTimeout(() => { formarFigura("imperio"); escribir("Eres una Administradora brillante. Admiro tu visión y quiero ser tu socio de vida."); }, 90000);
+            setTimeout(() => { fase = "paz"; escribir("Tomo tan en serio cada video y mensaje que me mandas... me encanta escucharte."); }, 120000);
+            setTimeout(() => { particulas.forEach(p => p.color = "#ffffff"); escribir("Me encantaría darte ese primer beso... pero amo aún más respetar tu ritmo."); }, 155000);
+            
+            setTimeout(() => { 
+                formarFigura("corazon"); 
+                escribir("Escucha esto que tengo guardado solo para ti...");
+                musica.volume = 0.1; 
+                voz.play(); // AQUÍ ENTRA TU VOZ
+            }, 175000);
+
+            setTimeout(() => { granFinal(); escribir("👩‍❤️‍💋‍👨 TE AMO PARA SIEMPRE, MAYDA 👩‍❤️‍💋‍👨"); }, 185000);
+            setTimeout(() => { window.location.href = "/boveda"; }, 196000);
+        }
     </script>
 </body>
 </html>
