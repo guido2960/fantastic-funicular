@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Para mi Administradora - Mayda & Abel</title>
+    <title>Para mi Administradora</title>
     <style>
         body { margin: 0; background: #000; color: white; font-family: 'Courier New', monospace; overflow: hidden; }
         #canvasUniverso { position: absolute; top: 0; left: 0; }
@@ -25,8 +25,12 @@
 
 <canvas id="canvasUniverso"></canvas>
 
-<audio id="musicaFondo" loop preload="auto"><source src="{{ url_for('static', filename='musica_fondo.mp3') }}" type="audio/mpeg"></audio>
-<audio id="audioVoz" preload="auto"><source src="{{ url_for('static', filename='mi_voz.mp3') }}" type="audio/mpeg"></audio>
+<audio id="musicaFondo" loop preload="auto">
+    <source src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772691824/musica_de_fondo_fuo3r2.m4a" type="audio/mp4">
+</audio>
+<audio id="audioVoz" preload="auto">
+    <source src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772691824/mi_audio_e07s2p.mp4" type="audio/mp4">
+</audio>
 
 <script>
     const canvas = document.getElementById('canvasUniverso');
@@ -41,12 +45,11 @@
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    // Crear el fondo cósmico que nunca se apaga (como en la imagen)
     for(let i=0; i<300; i++) {
         estrellasFijas.push({
             x: Math.random() * canvas.width,
             y: Math.random() * canvas.height,
-            opacidad: Math.random() * 0.4 + 0.1 // Muy sutiles
+            opacidad: Math.random() * 0.5 + 0.1
         });
     }
 
@@ -58,7 +61,7 @@
             this.vx = (Math.random() - 0.5) * 2;
             this.vy = -Math.random() * 1.5;
             this.color = "white";
-            this.tamaño = Math.random() * 2 + 1;
+            this.tamaño = Math.random() * 2 + 0.5;
             this.opacidad = 1;
             this.objetivoX = null;
             this.objetivoY = null;
@@ -79,7 +82,6 @@
                 this.x += Math.sin(this.y * 0.03) * 1.5;
                 this.color = "rgba(255, 182, 193, " + this.opacidad + ")";
                 if (this.y > canvas.height) { this.y = -10; this.opacidad = Math.random(); }
-                this.opacidad -= 0.001;
             }
         }
         dibujar() {
@@ -98,7 +100,7 @@
         const intervalId = setInterval(() => {
             if(i < txt.length) { textoDiv.innerHTML += txt.charAt(i); i++; }
             else clearInterval(intervalId);
-        }, 70);
+        }, 75);
     }
 
     function formarFigura(tipo) {
@@ -120,11 +122,12 @@
     function iniciarHistoria() {
         document.getElementById('pantalla-inicio').style.display = 'none';
         
-        // REPRODUCCIÓN FORZADA (El botón libera el sonido)
-        musica.volume = 0.2;
-        musica.play().catch(e => console.log("Audio no cargado, revisa los nombres en static"));
-        
-        // LAS 6 ETAPAS SINCRONIZADAS
+        // FORZAR AUDIO AL CLIC
+        musica.load();
+        voz.load();
+        musica.volume = 0.3;
+        musica.play().catch(e => console.log("Error de audio:", e));
+
         escribir("Todo comenzó con esta paz que me diste...");
         setTimeout(() => escribir("Me permitiste conocer cada capa de tu alma..."), 10000);
 
@@ -135,8 +138,8 @@
 
         setTimeout(() => {
             formarFigura("corazon");
-            musica.volume = 0.05; 
-            voz.play();
+            musica.volume = 0.08; 
+            voz.play().catch(e => console.log("Error de voz:", e));
             escribir("Escucha esto que tengo para ti...");
         }, 45000);
 
@@ -152,21 +155,18 @@
             setTimeout(() => {
                 document.body.style.transition = "opacity 2s";
                 document.body.style.opacity = "0";
-                // REDIRECCIÓN ADAPTADA A PYTHON
                 setTimeout(() => { window.location.href = "/boveda"; }, 2000);
             }, 9000);
         }, 65000);
     }
 
     function animar() {
-        // FONDO DE NEBULOSA (Púrpura Profundo a Negro, como en la imagen)
         let gradient = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, canvas.width);
         gradient.addColorStop(0, "#0c001a"); 
         gradient.addColorStop(1, "#000000"); 
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // DIBUJAR ESTRELLAS FIJAS DE FONDO
         ctx.fillStyle = "white";
         estrellasFijas.forEach(ef => {
             ctx.globalAlpha = ef.opacidad;
