@@ -5,7 +5,7 @@ import cloudinary
 import cloudinary.uploader
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 
-app = Flask(__name__, static_folder='static', static_url_path='/static')
+app = Flask(_name_, static_folder='static', static_url_path='/static')
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'llave_secreta_para_sesiones_2601')
 
 # --- 1. CONFIGURACIÓN DE CLOUDINARY ---
@@ -48,11 +48,7 @@ def inicializar_db():
             id SERIAL PRIMARY KEY, session_version INTEGER DEFAULT 1
         )''')
         cur.execute('''CREATE TABLE IF NOT EXISTS autorizaciones (
-            id SERIAL PRIMARY KEY,
-            dispositivo_id TEXT UNIQUE,
-            nombre_equipo TEXT,
-            autorizado BOOLEAN DEFAULT FALSE,
-            es_admin BOOLEAN DEFAULT FALSE
+            id SERIAL PRIMARY KEY, dispositivo_id TEXT UNIQUE, nombre_equipo TEXT, autorizado BOOLEAN DEFAULT FALSE, es_admin BOOLEAN DEFAULT FALSE
         )''')
         cur.execute("INSERT INTO control_seguridad (id, session_version) SELECT 1, 1 WHERE NOT EXISTS (SELECT 1 FROM control_seguridad WHERE id = 1)")
         conn.commit()
@@ -60,29 +56,20 @@ def inicializar_db():
         conn.close()
         print("✅ Tablas verificadas/creadas.")
 
-# EJECUTAR AL ARRANCAR (Para evitar el Error 500 en Render)
 inicializar_db()
 
 # --- 3. EL PORTERO ---
 @app.before_request
 def portero_seguridad():
-    # Rutas que NO se bloquean
     rutas_libres = ['login', 'verificar', 'static', 'registro_jefe', 'check_autorizacion', 'sala_espera', 'reinstalar']
     if request.endpoint in rutas_libres or request.path.startswith('/static'):
         return
 
     huella = obtener_huella(request)
     conn = get_db_connection()
-    if not conn: return # Evita crash si la DB no conecta
+    if not conn: return 
     
     cur = conn.cursor()
-    # Verificamos si la tabla existe antes de consultar para evitar Error 500
-    cur.execute("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'autorizaciones')")
-    if not cur.fetchone()[0]:
-        cur.close()
-        conn.close()
-        return "Base de datos no lista. Por favor, refresca."
-
     cur.execute("SELECT autorizado, es_admin FROM autorizaciones WHERE dispositivo_id = %s", (huella,))
     usuario = cur.fetchone()
     cur.close()
@@ -99,7 +86,7 @@ def portero_seguridad():
             conn.close()
         return render_template('sala_espera.html')
 
-# --- 4. RUTAS DE MANDO ---
+# --- 4. RUTAS DE MANDO (Tus funciones originales) ---
 
 @app.route('/reinstalar')
 def reinstalar():
@@ -121,23 +108,6 @@ def registro_jefe():
     conn.close()
     return "<h1>¡Identificado!</h1><p>Control total activado.</p><a href='/boveda'>Ir a la Bóveda</a>"
 
-@app.route('/check_autorizacion')
-def check_autorizacion():
-    huella = obtener_huella(request)
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT autorizado FROM autorizaciones WHERE dispositivo_id = %s", (huella,))
-    row = cur.fetchone()
-    cur.close()
-    conn.close()
-    if row and row[0]:
-        return jsonify({"autorizado": True}), 200
-    return jsonify({"autorizado": False}), 401
-
-@app.route('/sala-espera')
-def sala_espera():
-    return render_template('sala_espera.html')
-
 @app.route('/admin-norte')
 def panel_admin():
     huella = obtener_huella(request)
@@ -149,7 +119,6 @@ def panel_admin():
         cur.close()
         conn.close()
         return "Acceso Denegado", 403
-    
     cur.execute("SELECT id, nombre_equipo, autorizado FROM autorizaciones WHERE es_admin = False")
     lista = cur.fetchall()
     cur.close()
@@ -166,14 +135,12 @@ def autorizar_dispositivo(id):
     conn.close()
     return redirect(url_for('panel_admin'))
 
-# --- RUTA NUEVA: EL UNIVERSO DE MAYDA (INTRO) ---
+# --- 5. RUTAS DE LA EXPERIENCIA ---
+
 @app.route('/intro')
 def intro():
-    if 'user_email' not in session:
-        return redirect(url_for('login'))
+    if 'user_email' not in session: return redirect(url_for('login'))
     return render_template('intro.html')
-
-# --- 5. RUTAS ORIGINALES ---
 
 @app.route('/')
 def login():
@@ -184,71 +151,33 @@ def verificar():
     entrada_email = request.form.get('correo', '').strip()
     entrada_clave = request.form.get('clave', '').strip()
     if entrada_email == USUARIO_ACCESO and entrada_clave == CLAVE_ACCESO:
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute('SELECT session_version FROM control_seguridad WHERE id = 1')
-        version = cur.fetchone()[0]
-        cur.close()
-        conn.close()
         session['user_email'] = entrada_email
-        session['session_version'] = version
-        # CAMBIO: Ahora redirigimos al Intro antes de la Bóveda
         return redirect(url_for('intro'))
     return "🔐 Acceso denegado.", 403
 
-@app.route('/cierre_global', methods=['POST'])
-def cierre_global():
-    pin_ingresado = request.form.get('pin_admin')
-    if pin_ingresado == PIN_ADMIN:
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute('UPDATE control_seguridad SET session_version = session_version + 1 WHERE id = 1')
-        cur.execute('DELETE FROM autorizaciones WHERE es_admin = False')
-        conn.commit()
-        cur.close()
-        conn.close()
-        session.clear() 
-        return redirect(url_for('login'))
-    return "PIN Incorrecto", 403
-
 @app.route('/boveda')
 def boveda():
-    if 'user_email' not in session:
-        return redirect(url_for('login'))
+    if 'user_email' not in session: return redirect(url_for('login'))
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute('SELECT archivo, mensaje, id FROM galeria ORDER BY id DESC')
-    fotos_db = cur.fetchall()
+    fotos = cur.fetchall()
     cur.execute("SELECT autor, contenido, TO_CHAR(fecha, 'DD/MM HH:MI AM'), categoria, id FROM notas_amor ORDER BY fecha DESC")
-    notas_db = cur.fetchall()
+    notas = cur.fetchall()
     cur.close()
     conn.close()
-    return render_template('index.html', fotos=fotos_db, notas=notas_db)
+    return render_template('index.html', fotos=fotos, notas=notas)
+
+# --- 6. GESTIÓN DE CONTENIDO (Tus funciones de borrar/subir) ---
 
 @app.route('/nueva_nota', methods=['POST'])
 def nueva_nota():
-    autor = request.form.get('autor_nombre')
-    contenido = request.form.get('contenido_nota')
+    autor, contenido = request.form.get('autor_nombre'), request.form.get('contenido_nota')
     modo = request.form.get('modo_nota', 'General')
     if contenido and autor:
         conn = get_db_connection()
         cur = conn.cursor()
         cur.execute('INSERT INTO notas_amor (autor, contenido, categoria) VALUES (%s, %s, %s)', (autor, contenido, modo))
-        conn.commit()
-        cur.close()
-        conn.close()
-    return redirect(url_for('boveda'))
-
-@app.route('/subir', methods=['POST'])
-def subir():
-    archivo = request.files.get('foto_usuario')
-    mensaje = request.form.get('mensaje_usuario', '') 
-    if archivo:
-        res = cloudinary.uploader.upload(archivo)
-        url_nube = res['secure_url'] 
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute('INSERT INTO galeria (archivo, mensaje) VALUES (%s, %s)', (url_nube, mensaje))
         conn.commit()
         cur.close()
         conn.close()
@@ -264,6 +193,20 @@ def eliminar_nota(id):
     conn.close()
     return redirect(url_for('boveda'))
 
+@app.route('/subir', methods=['POST'])
+def subir():
+    archivo = request.files.get('foto_usuario')
+    mensaje = request.form.get('mensaje_usuario', '') 
+    if archivo:
+        res = cloudinary.uploader.upload(archivo)
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('INSERT INTO galeria (archivo, mensaje) VALUES (%s, %s)', (res['secure_url'], mensaje))
+        conn.commit()
+        cur.close()
+        conn.close()
+    return redirect(url_for('boveda'))
+
 @app.route('/eliminar/<int:id>', methods=['POST'])
 def eliminar(id):
     conn = get_db_connection()
@@ -274,6 +217,8 @@ def eliminar(id):
     conn.close()
     return redirect(url_for('boveda'))
 
-if __name__ == '__main__':
-    puerto = int(os.environ.get("PORT", 10000))
-    app.run(host='0.0.0.0', port=puerto)
+# --- 7. EL ARREGLO FINAL PARA RENDER ---
+if _name_ == '_main_':
+    # Esto soluciona el error naranja de "No open HTTP ports"
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port)
