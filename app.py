@@ -1,4 +1,4 @@
-import os
+mport os
 import hashlib
 import psycopg2
 import cloudinary
@@ -86,8 +86,7 @@ def portero_seguridad():
             conn.close()
         return render_template('sala_espera.html')
 
-# --- 4. RUTAS DE MANDO (Tus funciones originales) ---
-
+# --- 4. RUTAS DE MANDO ---
 @app.route('/reinstalar')
 def reinstalar():
     inicializar_db()
@@ -136,7 +135,6 @@ def autorizar_dispositivo(id):
     return redirect(url_for('panel_admin'))
 
 # --- 5. RUTAS DE LA EXPERIENCIA ---
-
 @app.route('/intro')
 def intro():
     if 'user_email' not in session: return redirect(url_for('login'))
@@ -168,8 +166,7 @@ def boveda():
     conn.close()
     return render_template('index.html', fotos=fotos, notas=notas)
 
-# --- 6. GESTIÓN DE CONTENIDO (Tus funciones de borrar/subir) ---
-
+# --- 6. GESTIÓN DE CONTENIDO ---
 @app.route('/nueva_nota', methods=['POST'])
 def nueva_nota():
     autor, contenido = request.form.get('autor_nombre'), request.form.get('contenido_nota')
@@ -217,8 +214,7 @@ def eliminar(id):
     conn.close()
     return redirect(url_for('boveda'))
 
-# --- 7. EL ARREGLO FINAL PARA RENDER ---
+# --- 7. EL ARREGLO FINAL ---
 if __name__ == '__main__':
-    # Esto soluciona el error naranja de "No open HTTP ports"
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
