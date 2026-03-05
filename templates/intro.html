@@ -2,188 +2,176 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Para mi Administradora - Sincronización Total</title>
+    <title>Nuestro Universo - Abel & Mayda</title>
     <style>
         body { margin: 0; background: #000; color: white; font-family: 'Courier New', monospace; overflow: hidden; }
-        canvas { position: absolute; top: 0; left: 0; }
-        #interfaz { position: relative; z-index: 10; width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; pointer-events: none; }
-        #texto-emocional { font-size: 26px; text-align: center; text-shadow: 0 0 20px #ff4d94, 0 0 10px #fff; padding: 25px; font-weight: bold; max-width: 85%; line-height: 1.5; }
-        #pantalla-inicio { position: fixed; width: 100%; height: 100%; background: #000; z-index: 100; display: flex; justify-content: center; align-items: center; }
-        #btn-entrar { padding: 22px 60px; font-size: 22px; cursor: pointer; background: none; border: 2px solid #ff4d94; color: #fff; border-radius: 100px; box-shadow: 0 0 40px #ff4d94; transition: 0.6s; letter-spacing: 5px; font-weight: bold; }
-        #btn-entrar:hover { background: #ff4d94; transform: scale(1.1); box-shadow: 0 0 60px #ff4d94; }
+        #canvasUniverso { position: absolute; top: 0; left: 0; }
+        #interfaz { position: relative; z-index: 10; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; pointer-events: none; }
+        #texto-emocional { 
+            font-size: 24px; text-align: center; text-shadow: 0 0 15px #ff4d94; 
+            padding: 40px; font-weight: bold; max-width: 75%; line-height: 1.6;
+        }
+        #pantalla-inicio { position: fixed; width: 100%; height: 100%; background: black; z-index: 100; display: flex; justify-content: center; align-items: center; }
+        #btn-entrar { padding: 15px 35px; font-size: 20px; cursor: pointer; background: transparent; border: 2px solid #ff4d94; color: white; border-radius: 30px; box-shadow: 0 0 15px #ff4d94; transition: 0.5s; }
+        #btn-entrar:hover { background: #ff4d94; transform: scale(1.05); }
     </style>
 </head>
 <body>
 
-<div id="pantalla-inicio"><button id="btn-entrar" onclick="iniciarExperiencia()">SINTONIZAR</button></div>
-<div id="interfaz"><div id="texto-emocional"></div></div>
-<canvas id="universo"></canvas>
+<div id="pantalla-inicio">
+    <button id="btn-entrar" onclick="iniciarHistoria()">Entrar a nuestro universo</button>
+</div>
 
-<audio id="musica" loop src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772691824/musica_de_fondo_fuo3r2.m4a"></audio>
-<audio id="voz" src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772691824/mi_audio_e07s2p.mp4"></audio>
+<div id="interfaz"><div id="texto-emocional"></div></div>
+<canvas id="canvasUniverso"></canvas>
+
+<audio id="musicaFondo" loop preload="auto"><source src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772691824/musica_de_fondo_fuo3r2.m4a" type="audio/mp4"></audio>
+<audio id="audioVoz" preload="auto"><source src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772691824/mi_audio_e07s2p.mp4" type="audio/mp4"></audio>
 
 <script>
-    const canvas = document.getElementById('universo');
+    const canvas = document.getElementById('canvasUniverso');
     const ctx = canvas.getContext('2d');
     const textoDiv = document.getElementById('texto-emocional');
-    const musica = document.getElementById('musica');
-    const voz = document.getElementById('voz');
-
-    let particulas = [], fase = "paz", t = 0;
+    const musica = document.getElementById('musicaFondo');
+    const voz = document.getElementById('audioVoz');
+    
+    let particulas = [];
+    let estrellasFijas = []; 
+    let fase = "paz"; 
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    // --- MOTOR DE PARTÍCULAS (MÁXIMO BRILLO Y ESTELA) ---
+    for(let i=0; i<400; i++) {
+        estrellasFijas.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            z: Math.random() * canvas.width,
+            opacidad: Math.random()
+        });
+    }
+
     class Particula {
-        constructor() {
-            this.reset();
+        constructor() { this.reset(); }
+        reset() {
             this.x = Math.random() * canvas.width;
             this.y = Math.random() * canvas.height;
+            this.vx = (Math.random() - 0.5) * 0.5;
+            this.vy = -Math.random() * 0.5;
+            this.color = "white";
+            this.tamaño = Math.random() * 1.5;
+            this.opacidad = Math.random();
+            this.objetivoX = null;
+            this.objetivoY = null;
         }
-        reset() {
-            this.targetX = Math.random() * canvas.width;
-            this.targetY = Math.random() * canvas.height;
-            this.color = "255, 255, 255";
-            this.size = Math.random() * 1.8 + 0.4;
-            this.speed = 0.06 + Math.random() * 0.04; // MÁS RÁPIDAS PARA ARMAR LA FIGURA
-        }
-        update() {
-            if (fase === "paz") {
-                this.y -= 0.6;
-                if (this.y < 0) this.y = canvas.height;
+        actualizar() {
+            if (["arbol", "avion", "edificio", "corazon"].includes(fase)) {
+                this.x += (this.objetivoX - this.x) * 0.08;
+                this.y += (this.objetivoY - this.y) * 0.08;
             } else {
-                this.x += (this.targetX - this.x) * this.speed;
-                this.y += (this.targetY - this.y) * this.speed;
+                this.y += this.vy;
+                if (this.y < 0) this.y = canvas.height;
             }
         }
-        draw() {
+        dibujar() {
             ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fillStyle = rgb(${this.color});
+            ctx.arc(this.x, this.y, this.tamaño, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.globalAlpha = this.opacidad;
             ctx.fill();
         }
     }
 
-    for (let i = 0; i < 2000; i++) particulas.push(new Particula());
+    for (let i = 0; i < 1500; i++) particulas.push(new Particula());
 
-    // --- LOGICA DE SINCRONIZACIÓN (LA CLAVE) ---
-    // Cada evento define: el texto detonante Y la figura a formar al FINAL de la frase.
-    const secuencia = [
-        { texto: "Todo comenzó con esta paz que me diste, mi Administradora favorita...", figura: "paz" },
-        { texto: "Me tomó tiempo entender tus capas, pero cada silencio es mi tesoro.", figura: "arbol" },
-        { texto: "Admiro tu fuerza en Modo Acción. Eres brillante; quiero construir un imperio a tu lado.", figura: "imperio" },
-        { texto: "Por eso mi vida siempre vuela hacia tu Norte, porque contigo el camino es más claro.", figura: "avion" },
-        { texto: "Daría todo por ese primer beso, pero amo más respetar tu ritmo y esperarte siempre.", figura: "corazon" },
-        { texto: "Escucha esto que guardé solo para ti...", figura: "voz", callbackAudio: true }
-    ];
-
-    let indexEvento = 0;
-
-    function procesarSiguienteEvento() {
-        if (indexEvento < secuencia.length) {
-            const evento = secuencia[indexEvento];
-            indexEvento++;
-
-            // Primero, escribimos el texto.
-            escribir(evento.texto, () => {
-                // Al terminar de escribir, detona la figura.
-                formarFigura(evento.figura);
-
-                // Si este evento detona el audio, lo coordinamos.
-                if (evento.callbackAudio) {
-                    musica.volume = 0.15;
-                    voz.play();
-                }
-
-                // Esperamos un momento para que ella aprecie la figura y el texto, y pasamos al siguiente.
-                // Esta espera es para el flujo de lectura, no para la formación de la imagen.
-                setTimeout(procesarSiguienteEvento, 3500);
-            });
-        } else {
-            // Finalización de la experiencia
-            fase = "paz";
-            escribir("👩‍❤️‍💋‍👨 TE AMO PARA SIEMPRE, MAYDA 👩‍❤️‍💋‍👨");
-            setTimeout(() => {
-                document.body.style.transition = "opacity 6s";
-                document.body.style.opacity = "0";
-                setTimeout(() => { window.location.href = "/boveda"; }, 6000);
-            }, 18000);
-        }
+    // FUNCIÓN DE ESCRITURA MEJORADA (Ahora devuelve una "promesa" para sincronizar)
+    function escribir(txt, callback) {
+        let i = 0; textoDiv.innerHTML = "";
+        const intervalId = setInterval(() => {
+            if(i < txt.length) { textoDiv.innerHTML += txt.charAt(i); i++; }
+            else { 
+                clearInterval(intervalId); 
+                if(callback) setTimeout(callback, 2500); // Espera 2.5 seg para que lea y cambia de imagen
+            }
+        }, 70);
     }
 
-    // --- MOTOR VISUAL DE FIGURAS (LOS DETONANTES) ---
-    function formarFigura(figura) {
-        fase = figura;
-        // Ajustamos la velocidad de las partículas para que sea un "armado" rápido.
-        const velocidadArmado = figura === "paz" ? 0.02 : 0.12; 
-        
+    function formarFigura(tipo) {
+        fase = tipo;
         particulas.forEach((p, i) => {
-            p.speed = velocidadArmado; // Cambiamos la velocidad según la fase
-            const ang = (i / particulas.length) * Math.PI * 2;
-            
-            if (figura === "arbol") { // El Árbol de las Capas
-                p.color = "140, 255, 140";
-                if (i < 1000) { 
-                    p.targetX = canvas.width/2 + Math.cos(i) * (220 * Math.random());
-                    p.targetY = canvas.height/2 - 60 - (Math.random() * 250);
-                } else {
-                    p.targetX = canvas.width/2 + (i % 25 - 12);
-                    p.targetY = canvas.height/2 + (i % 220);
-                }
-            } else if (figura === "imperio") { // El Imperio de la Administradora
-                p.color = "255, 230, 100";
-                p.targetX = (canvas.width/2 - 280) + (i % 35 * 16);
-                p.targetY = (canvas.height - 180) - (Math.floor(i / 35) * 6);
-            } else if (figura === "avion") { // El Vuelo al Norte
-                p.color = "150, 230, 255";
-                if (i < 800) {
-                    p.targetX = canvas.width/2 + Math.cos(i) * 450;
-                    p.targetY = canvas.height/2 + (i % 2 === 0 ? 18 : -18);
-                } else {
-                    p.targetX = canvas.width/2 + (i - 1200) * 5;
-                    p.targetY = canvas.height/2;
-                }
-            } else if (figura === "corazon") { // Amor Puro
-                p.color = "255, 100, 180";
-                p.targetX = canvas.width/2 + 280 * Math.pow(Math.sin(ang), 3);
-                p.targetY = canvas.height/2 - (230 * Math.cos(ang) - 90 * Math.cos(2*ang) - 45 * Math.cos(3*ang) - 20 * Math.cos(4*ang));
-            } else {
-                p.color = "255, 255, 255"; // Paz
-                p.reset(); 
+            const t = i / particulas.length * Math.PI * 2;
+            if (tipo === "arbol") {
+                p.color = "#4CAF50";
+                if (i < 800) { p.objetivoX = canvas.width/2 + Math.cos(i)*150 * Math.random(); p.objetivoY = canvas.height/2 - 50 - Math.random()*150; }
+                else { p.objetivoX = canvas.width/2 + (i%15 - 7); p.objetivoY = canvas.height/2 + (i%120); }
+            } else if (tipo === "avion") {
+                p.color = "#87CEEB";
+                if (i < 700) { p.objetivoX = canvas.width/2 + (Math.cos(i)*250); p.objetivoY = canvas.height/2 + (i%2===0?5:-5); }
+                else { p.objetivoX = canvas.width/2 + (i-1000)*2.5; p.objetivoY = canvas.height/2; }
+            } else if (tipo === "edificio") {
+                p.color = "#FFD700";
+                p.objetivoX = canvas.width/2 + (i%35 * 15) - 250;
+                p.objetivoY = canvas.height/2 + (Math.floor(i/35) * -8) + 100;
+            } else if (tipo === "corazon") {
+                p.color = "#ff4d94";
+                p.objetivoX = canvas.width/2 + 180 * Math.pow(Math.sin(t), 3);
+                p.objetivoY = canvas.height/2 - (150 * Math.cos(t) - 60 * Math.cos(2*t) - 30 * Math.cos(3*t) - 10 * Math.cos(4*t));
             }
         });
     }
 
-    // --- UTILIDADES ---
-    function escribir(txt, next) {
-        let i = 0; textoDiv.innerHTML = "";
-        const interval = setInterval(() => {
-            if (i < txt.length) { textoDiv.innerHTML += txt.charAt(i); i++; }
-            else { clearInterval(interval); if (next) next(); }
-        }, 55);
-    }
-
-    function iniciarExperiencia() {
+    function iniciarHistoria() {
+        // Al hacer clic, desbloqueamos los audios
         document.getElementById('pantalla-inicio').style.display = 'none';
-        musica.volume = 0.4; musica.play();
-        // Iniciamos la secuencia coordinada
-        procesarSiguienteEvento();
+        musica.play().catch(e => console.log("Error musica:", e));
+        musica.volume = 0.3;
+
+        // SECUENCIA SINCRONIZADA (Ya no depende de tiempos fijos locos)
+        escribir("Todo comenzó con esta paz que me diste, mi Administradora favorita.", () => {
+            formarFigura("arbol");
+            escribir("Entender tus capas me tomó tiempo, pero cada una de ellas vale la pena.", () => {
+                formarFigura("avion");
+                escribir("Admiro tu fuerza en Modo Acción... por eso mi vida siempre vuela hacia tu Norte.", () => {
+                    formarFigura("edificio");
+                    escribir("Eres una Administradora brillante. Admiro tu visión y quiero construir un imperio a tu lado.", () => {
+                        fase = "paz";
+                        escribir("Tomo tan en serio cada mensaje que me mandas... me encanta cómo te expresas.", () => {
+                            formarFigura("corazon");
+                            musica.volume = 0.1; 
+                            voz.play().catch(e => console.log("Error voz:", e));
+                            escribir("Escucha esto que tengo guardado solo para ti...", () => {
+                                escribir("👩‍❤️‍💋‍👨 TE AMO PARA SIEMPRE, MAYDA 👩‍❤️‍💋‍👨", () => {
+                                    setTimeout(() => { 
+                                        document.body.style.transition = "opacity 5s"; 
+                                        document.body.style.opacity = "0"; 
+                                        setTimeout(() => { window.location.href = "/boveda"; }, 5000); 
+                                    }, 8000);
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
     }
 
-    function render() {
-        // Estela larga y elegante (Motion Blur)
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.08)'; 
+    function animar() {
+        // EFECTO DE RASTRO (Hace que se vea fluido como el video)
+        ctx.fillStyle = "rgba(0, 0, 0, 0.1)"; 
         ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        estrellasFijas.forEach(ef => {
+            ef.z -= 0.5; if (ef.z <= 0) ef.z = canvas.width;
+            let x = (ef.x - canvas.width/2) * (canvas.width/ef.z) + canvas.width/2;
+            let y = (ef.y - canvas.height/2) * (canvas.width/ef.z) + canvas.height/2;
+            let s = (1 - ef.z/canvas.width) * 2;
+            ctx.fillStyle = "white"; ctx.globalAlpha = ef.opacidad;
+            ctx.fillRect(x, y, s, s);
+        });
 
-        // Brillo acumulativo (Bloom / Neón)
-        ctx.globalCompositeOperation = "lighter";
-        particulas.forEach(p => { p.update(); p.draw(); });
-        ctx.globalCompositeOperation = "source-over";
-
-        requestAnimationFrame(render);
+        particulas.forEach(p => { p.actualizar(); p.dibujar(); });
+        requestAnimationFrame(animar);
     }
-    render();
+    animar();
 </script>
 </body>
 </html>
