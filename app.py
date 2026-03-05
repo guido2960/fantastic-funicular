@@ -1,4 +1,4 @@
-mport os
+import os
 import hashlib
 import psycopg2
 import cloudinary
