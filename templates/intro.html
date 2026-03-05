@@ -2,20 +2,18 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Para mi Cebollita May</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Universo de Abel y May</title>
     <style>
-        /* Estilo de Maestro: Fondo negro y texto elegante */
         body, html { margin: 0; padding: 0; overflow: hidden; background: #000; font-family: 'Courier New', Courier, monospace; }
         canvas { display: block; }
-        
-        /* Botón de inicio para activar el audio */
         #overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; justify-content: center; align-items: center;
             background: rgba(0,0,0,0.9); z-index: 100;
         }
         button {
-            padding: 15px 40px; font-size: 20px; cursor: pointer;
+            padding: 15px 40px; font-size: 18px; cursor: pointer;
             background: transparent; color: #fff; border: 2px solid #fff;
             border-radius: 50px; transition: 0.5s; text-transform: uppercase; letter-spacing: 2px;
         }
@@ -30,7 +28,7 @@
 
     <canvas id="canvas"></canvas>
 
-    <audio id="musicaFondo" src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772691824/musica_de_fondo_fuo3r2.m4a"></audio>
+    <audio id="musicaFondo" src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772691824/musica_de_fondo_fuo3r2.m4a" loop></audio>
     <audio id="miVoz" src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772691824/mi_audio_e07s2p.mp4"></audio>
 
     <script>
@@ -39,11 +37,13 @@
         const musica = document.getElementById('musicaFondo');
         const voz = document.getElementById('miVoz');
 
-        let particles = [];
-        let mensajeActual = "";
-        let running = false;
+        let estrellas = [];
+        let mensajeCompleto = "";
+        let mensajeMostrado = "";
+        let indexLetra = 0;
+        let animando = false;
+        let modoMagia = "normal"; // normal, fuego, abrazo
 
-        // Configuración del canvas
         function resize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -51,88 +51,119 @@
         window.addEventListener('resize', resize);
         resize();
 
-        // 1. Lógica de la Experiencia (Tiempos Sincronizados)
         function comenzarExperiencia() {
             document.getElementById('overlay').style.display = 'none';
-            running = true;
-
-            // PASO 1: Iniciar música (0s)
+            animando = true;
             musica.volume = 0.4;
             musica.play();
-            crearEstrellas(); // Inicia el fondo visual
-            animar();
+            crearEstrellas();
+            update();
 
-            // PASO 2: Saludo Personalizado (5s)
+            // 5s: Saludo Inicial
             setTimeout(() => {
-                mensajeActual = "Hola cebollita May...";
+                mensajeCompleto = "Hola mi administradora favorita...";
+                escribirTexto();
             }, 5000);
 
-            // PASO 3: Mensaje de Paz y Capas (20s)
+            // 20s: Reflexión de las capas
             setTimeout(() => {
-                mensajeActual = "Gracias por ser mi paz en medio del ruido.\nAmo conocer cada capa de ti y caminar a tu lado.";
+                mensajeCompleto = "Gracias por ser mi paz.\nAmo conocer cada capa de ti.";
+                mensajeMostrado = ""; indexLetra = 0;
+                escribirTexto();
             }, 20000);
 
-            // PASO 4 y 5: Tu voz y el Corazón Final (45s)
+            // 45s: Tu voz + Fuegos Artificiales
             setTimeout(() => {
-                mensajeActual = ""; // Limpiamos texto para los fuegos artificiales
-                musica.volume = 0.1; // Bajamos el fondo para que tu voz brille
+                mensajeMostrado = ""; 
+                musica.volume = 0.1;
                 voz.play();
-                activarEfectoCorazon(); // Disparar visuales finales
+                modoMagia = "fuego"; 
             }, 45000);
 
-            // PASO 6: Redirección a la Bóveda (62s)
+            // 52s: El encuentro (Programador y Administradora)
             setTimeout(() => {
-                window.location.href = "boveda.html"; 
+                modoMagia = "abrazo";
+                mensajeMostrado = "👨‍💻       👩‍💼"; 
+            }, 52000);
+
+            // 55s: El Abrazo
+            setTimeout(() => {
+                mensajeMostrado = "🫂\nNuestra Unión";
+            }, 55000);
+
+            // 58s: EL BESO FINAL
+            setTimeout(() => {
+                mensajeMostrado = "👩‍❤️‍💋‍👨\nTe amo, May";
+            }, 58000);
+
+            // 62s: Redirección automática a la Bóveda
+            setTimeout(() => {
+                window.location.href = "/boveda";
             }, 62000);
         }
 
-        // --- SISTEMA VISUAL (Simulación simple de estrellas para el ejemplo) ---
+        function escribirTexto() {
+            if (indexLetra < mensajeCompleto.length) {
+                mensajeMostrado += mensajeCompleto.charAt(indexLetra);
+                indexLetra++;
+                setTimeout(escribirTexto, 100);
+            }
+        }
+
         function crearEstrellas() {
-            for(let i=0; i<200; i++) {
-                particles.push({
+            const total = 250;
+            for(let i=0; i<total; i++) {
+                const t = (i / total) * 2 * Math.PI;
+                estrellas.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
-                    size: Math.random() * 2,
-                    speed: Math.random() * 0.5 + 0.1
+                    vx: (Math.random() - 0.5) * 4,
+                    vy: (Math.random() - 0.5) * 4,
+                    // Destino para formar el corazón
+                    tx: (16 * Math.sin(t) ** 3) * 12 + canvas.width/2,
+                    ty: (- (13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t))) * 12 + canvas.height/2,
+                    r: Math.random() * 2,
+                    color: 'white'
                 });
             }
         }
 
-        function animar() {
-            if(!running) return;
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+        function update() {
+            if(!animando) return;
+            ctx.fillStyle = 'black';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Dibujar estrellas
-            ctx.fillStyle = 'white';
-            particles.forEach(p => {
+            estrellas.forEach(e => {
+                if (modoMagia === "normal") {
+                    e.y -= 0.5;
+                    if(e.y < 0) e.y = canvas.height;
+                } else if (modoMagia === "fuego") {
+                    e.x += e.vx;
+                    e.y += e.vy;
+                    e.color = hsl(${Math.random() * 360}, 100%, 70%);
+                } else if (modoMagia === "abrazo") {
+                    // Las estrellas viajan hacia el corazón
+                    e.x += (e.tx - e.x) * 0.05;
+                    e.y += (e.ty - e.y) * 0.05;
+                    e.color = "#ff4d6d";
+                }
+                
+                ctx.fillStyle = e.color;
                 ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.arc(e.x, e.y, e.r, 0, Math.PI*2);
                 ctx.fill();
-                p.y -= p.speed;
-                if(p.y < 0) p.y = canvas.height;
             });
 
-            // Dibujar el texto planificado
-            if(mensajeActual !== "") {
+            if(mensajeMostrado) {
                 ctx.fillStyle = "white";
-                ctx.font = "24px 'Courier New'";
+                ctx.font = "22px 'Courier New'";
                 ctx.textAlign = "center";
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = "white";
-                
-                const lines = mensajeActual.split('\n');
-                lines.forEach((line, i) => {
-                    ctx.fillText(line, canvas.width / 2, (canvas.height / 2) + (i * 40));
+                const lineas = mensajeMostrado.split('\n');
+                lineas.forEach((l, i) => {
+                    ctx.fillText(l, canvas.width/2, (canvas.height/2) + (i*50));
                 });
             }
-
-            requestAnimationFrame(animar);
-        }
-
-        function activarEfectoCorazon() {
-            // Aquí integrarías tu código específico de fuegos artificiales
-            console.log("Iniciando Fuegos Artificiales y Corazón...");
+            requestAnimationFrame(update);
         }
     </script>
 </body>
