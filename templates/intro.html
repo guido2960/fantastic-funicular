@@ -5,22 +5,25 @@
     <title>Universo para mi Administradora</title>
     <style>
         body { margin: 0; background: black; color: white; font-family: 'Courier New', monospace; overflow: hidden; }
-        #canvasUniverso { position: absolute; top: 0; left: 0; }
-        #interfaz { position: relative; z-index: 10; width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        #btn-entrar { padding: 20px 40px; font-size: 20px; cursor: pointer; background: #ff4d94; border: none; color: white; border-radius: 50px; box-shadow: 0 0 20px #ff4d94; }
-        #texto-emocional { font-size: 26px; text-align: center; max-width: 80%; text-shadow: 0 0 10px #ff4d94; min-height: 1.5em; }
+        #canvasUniverso { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        #interfaz { position: relative; z-index: 10; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; }
+        #texto-emocional { font-size: 24px; text-align: center; text-shadow: 0 0 15px #ff4d94; max-width: 80%; }
+        #pantalla-inicio { position: fixed; width: 100%; height: 100%; background: black; z-index: 100; display: flex; justify-content: center; align-items: center; }
+        #btn-entrar { padding: 20px 40px; font-size: 20px; cursor: pointer; background: #ff4d94; border: none; color: white; border-radius: 50px; box-shadow: 0 0 20px #ff4d94; transition: 0.3s; }
+        #btn-entrar:hover { transform: scale(1.1); background: #ff3385; }
         .oculto { display: none !important; }
     </style>
 </head>
 <body>
 
-<div id="pantalla-inicio" style="position:fixed; width:100%; height:100%; background:black; z-index:100; display:flex; justify-content:center; align-items:center;">
-    <button id="btn-entrar" onclick="iniciarTodo()">Entrar al Universo de Mayda</button>
+<div id="pantalla-inicio">
+    <button id="btn-entrar" onclick="iniciarMagia()">Entrar al Universo de Mayda</button>
 </div>
 
 <div id="interfaz" class="oculto">
     <div id="texto-emocional"></div>
 </div>
+
 <canvas id="canvasUniverso"></canvas>
 
 <audio id="audioVoz" preload="auto">
@@ -28,74 +31,71 @@
 </audio>
 
 <script>
-    const textoElemento = document.getElementById('texto-emocional');
+    const textoDiv = document.getElementById('texto-emocional');
     const audio = document.getElementById('audioVoz');
-    const canvas = document.getElementById('canvasUniverso');
-    const ctx = canvas.getContext('2d');
-    
+    const pantallaInicio = document.getElementById('pantalla-inicio');
+    const interfaz = document.getElementById('interfaz');
+
+    // Variables para la animación de las 6 instrucciones
     let fase = "estrellas"; // estrellas -> abrazo -> corazon -> fuegos
-    let particulas = [];
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
 
-    const mensajes = [
-        "",
-        "Hola mi administradora favorita...", 
-        "Gracias por ser mi paz y mi norte...", 
-        "Escucha esto que tengo para ti...", 
-        "Te amo con todas mis capas, May ❤️",
-        "👩‍❤️‍💋‍👨" // Estructura 6: El beso
-    ];
-
-    function escribir(txt) {
-        let i = 0; textoElemento.innerHTML = "";
+    function escribir(mensaje) {
+        let i = 0;
+        textoDiv.innerHTML = "";
         const intervalo = setInterval(() => {
-            if(i < txt.length) { textoElemento.innerHTML += txt.charAt(i); i++; }
-            else clearInterval(intervalo);
-        }, 70);
+            if (i < mensaje.length) {
+                textoDiv.innerHTML += mensaje.charAt(i);
+                i++;
+            } else {
+                clearInterval(intervalo);
+            }
+        }, 70); // Velocidad de "máquina de escribir"
     }
 
-    function iniciarTodo() {
-        document.getElementById('pantalla-inicio').classList.add('oculto');
-        document.getElementById('interfaz').classList.remove('oculto');
+    function iniciarMagia() {
+        pantallaInicio.classList.add('oculto');
+        interfaz.classList.remove('oculto');
         
-        // --- 0s: Inicia la Paz (Estrellas subiendo) ---
-        animar(); 
+        // Estructura 1: Inicio (Las estrellas blancas de paz comienzan a subir)
+        console.log("Fase 1: Paz iniciada");
 
-        // --- 5s: Primer mensaje ---
-        setTimeout(() => escribir(mensajes[1]), 5000);
-
-        // --- 20s: Reflexión de las Capas ---
-        setTimeout(() => escribir(mensajes[2]), 20000);
-
-        // --- 45s: Tu Voz y "El Abrazo" (Las estrellas se juntan) ---
+        // Estructura 2: 5 segundos - Primer Mensaje
         setTimeout(() => {
-            escribir(mensajes[3]);
+            escribir("Hola mi administradora favorita...");
+        }, 5000);
+
+        // Estructura 3: 20 segundos - Reflexión de las Capas de Cebolla
+        setTimeout(() => {
+            escribir("Gracias por dejarme conocer cada capa de ti, mi cebollita... Eres mi norte.");
+        }, 20000);
+
+        // Estructura 4: 45 segundos - "El Abrazo" y Tu Voz
+        setTimeout(() => {
+            fase = "abrazo"; // Las estrellas se agrupan
+            escribir("Escucha esto que tengo para ti...");
             audio.play();
-            fase = "abrazo"; 
         }, 45000);
 
-        // --- 55s: El Corazón Rosa ---
+        // Estructura 5: 55 segundos - El Corazón Rosa
         setTimeout(() => {
-            fase = "corazon";
-            escribir(mensajes[4]);
+            fase = "corazon"; // Se forma el corazón rosa
+            escribir("Te amo con todo lo que soy, May ❤️");
         }, 55000);
 
-        // --- 58s: Explosión final, Beso y Bóveda ---
+        // Estructura 6: 58 segundos - Explosión de Fuegos, Beso y Salto a Bóveda
         setTimeout(() => {
-            fase = "fuegos";
-            escribir(mensajes[5]);
-            setTimeout(() => window.location.href = "/boveda", 5000);
+            fase = "fuegos"; // Explosiones de colores
+            escribir("👩‍❤️‍💋‍👨"); // El beso
+            
+            // GARANTÍA DE REDIRECCIÓN A PYTHON: Sin .html para evitar el error 404
+            setTimeout(() => {
+                window.location.href = "/boveda";
+            }, 5000);
         }, 58000);
     }
 
-    // Lógica básica de animación (Simplificada para que funcione de una)
-    function animar() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        // Aquí va tu lógica de dibujo de estrellas/corazón/explosión
-        // que ya tienes en tu versión anterior.
-        requestAnimationFrame(animar);
-    }
+    // Aquí conectarías tu código de Canvas (las funciones de dibujo)
+    // que ya tenías para que reaccionen a la variable 'fase'.
 </script>
 </body>
 </html>
