@@ -2,14 +2,15 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Para mi Administradora</title>
+    <title>Para mi Administradora - Mayda & Abel</title>
     <style>
-        body { margin: 0; background: black; color: white; font-family: 'Courier New', monospace; overflow: hidden; }
+        body { margin: 0; background: #000; color: white; font-family: 'Courier New', monospace; overflow: hidden; }
         #canvasUniverso { position: absolute; top: 0; left: 0; }
         #interfaz { position: relative; z-index: 10; width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; pointer-events: none; }
-        #texto-emocional { font-size: 26px; text-align: center; text-shadow: 0 0 15px #ff4d94; padding: 20px; }
+        #texto-emocional { font-size: 28px; text-align: center; text-shadow: 0 0 20px #ff4d94; padding: 20px; font-weight: bold; }
         #pantalla-inicio { position: fixed; width: 100%; height: 100%; background: black; z-index: 100; display: flex; justify-content: center; align-items: center; pointer-events: all; }
-        #btn-entrar { padding: 20px 40px; font-size: 22px; cursor: pointer; background: #ff4d94; border: none; color: white; border-radius: 50px; box-shadow: 0 0 25px #ff4d94; transition: 0.3s; }
+        #btn-entrar { padding: 20px 40px; font-size: 22px; cursor: pointer; background: #ff4d94; border: none; color: white; border-radius: 50px; box-shadow: 0 0 30px #ff4d94; transition: 0.3s; }
+        #btn-entrar:hover { transform: scale(1.1); }
     </style>
 </head>
 <body>
@@ -24,12 +25,8 @@
 
 <canvas id="canvasUniverso"></canvas>
 
-<audio id="musicaFondo" loop preload="auto">
-    <source src="{{ url_for('static', filename='musica_fondo.mp3') }}" type="audio/mpeg">
-</audio>
-<audio id="audioVoz" preload="auto">
-    <source src="{{ url_for('static', filename='mi_voz.mp3') }}" type="audio/mpeg">
-</audio>
+<audio id="musicaFondo" loop preload="auto"><source src="{{ url_for('static', filename='musica_fondo.mp3') }}" type="audio/mpeg"></audio>
+<audio id="audioVoz" preload="auto"><source src="{{ url_for('static', filename='mi_voz.mp3') }}" type="audio/mpeg"></audio>
 
 <script>
     const canvas = document.getElementById('canvasUniverso');
@@ -39,16 +36,26 @@
     const voz = document.getElementById('audioVoz');
     
     let particulas = [];
+    let estrellasFijas = []; 
     let fase = "paz"; 
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+
+    // Crear el fondo cósmico que nunca se apaga (como en la imagen)
+    for(let i=0; i<300; i++) {
+        estrellasFijas.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            opacidad: Math.random() * 0.4 + 0.1 // Muy sutiles
+        });
+    }
 
     class Particula {
         constructor() { this.reset(); }
         reset() {
             this.x = Math.random() * canvas.width;
             this.y = Math.random() * canvas.height;
-            this.vx = (Math.random() - 0.5) * 2.5;
+            this.vx = (Math.random() - 0.5) * 2;
             this.vy = -Math.random() * 1.5;
             this.color = "white";
             this.tamaño = Math.random() * 2 + 1;
@@ -64,12 +71,12 @@
                 this.x += (this.objetivoX - this.x) * 0.05;
                 this.y += (this.objetivoY - this.y) * 0.05;
             } else if (fase === "fuegos") {
-                this.x += this.vx * 7;
-                this.y += this.vy * 7;
-                this.opacidad -= 0.02;
+                this.x += this.vx * 6;
+                this.y += this.vy * 6;
+                this.opacidad -= 0.01;
             } else if (fase === "petalos") {
-                this.y += 1.5;
-                this.x += Math.sin(this.y * 0.02) * 1.5;
+                this.y += 1.3;
+                this.x += Math.sin(this.y * 0.03) * 1.5;
                 this.color = "rgba(255, 182, 193, " + this.opacidad + ")";
                 if (this.y > canvas.height) { this.y = -10; this.opacidad = Math.random(); }
                 this.opacidad -= 0.001;
@@ -84,13 +91,13 @@
         }
     }
 
-    for (let i = 0; i < 600; i++) particulas.push(new Particula());
+    for (let i = 0; i < 700; i++) particulas.push(new Particula());
 
     function escribir(txt) {
         let i = 0; textoDiv.innerHTML = "";
-        const t = setInterval(() => {
+        const intervalId = setInterval(() => {
             if(i < txt.length) { textoDiv.innerHTML += txt.charAt(i); i++; }
-            else clearInterval(t);
+            else clearInterval(intervalId);
         }, 70);
     }
 
@@ -100,12 +107,12 @@
             const t = i / particulas.length * Math.PI * 2;
             if (tipo === "corazon") {
                 p.color = "#ff4d94";
-                p.objetivoX = canvas.width/2 + 160 * Math.pow(Math.sin(t), 3);
-                p.objetivoY = canvas.height/2 - (130 * Math.cos(t) - 50 * Math.cos(2*t) - 20 * Math.cos(3*t) - 10 * Math.cos(4*t));
+                p.objetivoX = canvas.width/2 + 180 * Math.pow(Math.sin(t), 3);
+                p.objetivoY = canvas.height/2 - (150 * Math.cos(t) - 60 * Math.cos(2*t) - 30 * Math.cos(3*t) - 15 * Math.cos(4*t));
             } else if (tipo === "avion") {
                 p.color = "#87CEEB";
-                p.objetivoX = canvas.width/2 + (i%40 * 12) - 240;
-                p.objetivoY = canvas.height/2 + (Math.sin(i)*15);
+                p.objetivoX = canvas.width/2 + (i%50 * 10) - 250;
+                p.objetivoY = canvas.height/2 + (Math.sin(i*0.5)*20);
             }
         });
     }
@@ -113,12 +120,12 @@
     function iniciarHistoria() {
         document.getElementById('pantalla-inicio').style.display = 'none';
         
-        // REPRODUCCIÓN FORZADA
+        // REPRODUCCIÓN FORZADA (El botón libera el sonido)
         musica.volume = 0.2;
-        musica.play().catch(e => console.log("Revisar nombre de musica_fondo.mp3"));
-
+        musica.play().catch(e => console.log("Audio no cargado, revisa los nombres en static"));
+        
+        // LAS 6 ETAPAS SINCRONIZADAS
         escribir("Todo comenzó con esta paz que me diste...");
-
         setTimeout(() => escribir("Me permitiste conocer cada capa de tu alma..."), 10000);
 
         setTimeout(() => {
@@ -129,15 +136,15 @@
         setTimeout(() => {
             formarFigura("corazon");
             musica.volume = 0.05; 
-            voz.play().catch(e => console.log("Revisar nombre de mi_voz.mp3"));
+            voz.play();
             escribir("Escucha esto que tengo para ti...");
         }, 45000);
 
-        setTimeout(() => escribir("Eres el amor de mi vida, May."), 55000);
+        setTimeout(() => escribir("Eres el amor de mi vida, Mayda."), 55000);
 
         setTimeout(() => {
             fase = "fuegos";
-            escribir("👩‍❤️‍💋‍👨 TE AMO 👩‍❤️‍💋‍👨");
+            escribir("👩‍❤️‍💋‍👨 TE AMO, MI ADMINISTRADORA 👩‍❤️‍💋‍👨");
             setTimeout(() => {
                 fase = "petalos";
                 particulas.forEach(p => { p.opacidad = 1; p.tamaño = 3; });
@@ -145,14 +152,27 @@
             setTimeout(() => {
                 document.body.style.transition = "opacity 2s";
                 document.body.style.opacity = "0";
+                // REDIRECCIÓN ADAPTADA A PYTHON
                 setTimeout(() => { window.location.href = "/boveda"; }, 2000);
             }, 9000);
         }, 65000);
     }
 
     function animar() {
-        ctx.fillStyle = "black";
+        // FONDO DE NEBULOSA (Púrpura Profundo a Negro, como en la imagen)
+        let gradient = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, canvas.width);
+        gradient.addColorStop(0, "#0c001a"); 
+        gradient.addColorStop(1, "#000000"); 
+        ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // DIBUJAR ESTRELLAS FIJAS DE FONDO
+        ctx.fillStyle = "white";
+        estrellasFijas.forEach(ef => {
+            ctx.globalAlpha = ef.opacidad;
+            ctx.fillRect(ef.x, ef.y, 1, 1);
+        });
+
         particulas.forEach(p => { p.actualizar(); p.dibujar(); });
         requestAnimationFrame(animar);
     }
