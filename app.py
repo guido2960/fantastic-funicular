@@ -56,7 +56,8 @@ def inicializar_db():
         )''')
         cur.execute("INSERT INTO control_seguridad (id, session_version) SELECT 1, 1 WHERE NOT EXISTS (SELECT 1 FROM control_seguridad WHERE id = 1)")
         conn.commit()
-        cur.close(); conn.close()
+        cur.close()
+        conn.close()
         print("✅ Tablas verificadas/creadas.")
 
 # EJECUTAR AL ARRANCAR (Para evitar el Error 500 en Render)
@@ -78,12 +79,14 @@ def portero_seguridad():
     # Verificamos si la tabla existe antes de consultar para evitar Error 500
     cur.execute("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'autorizaciones')")
     if not cur.fetchone()[0]:
-        cur.close(); conn.close()
+        cur.close()
+        conn.close()
         return "Base de datos no lista. Por favor, refresca."
 
     cur.execute("SELECT autorizado, es_admin FROM autorizaciones WHERE dispositivo_id = %s", (huella,))
     usuario = cur.fetchone()
-    cur.close(); conn.close()
+    cur.close()
+    conn.close()
 
     if not usuario or (not usuario[0] and not usuario[1]):
         if not usuario:
@@ -92,7 +95,8 @@ def portero_seguridad():
             cur = conn.cursor()
             cur.execute("INSERT INTO autorizaciones (dispositivo_id, nombre_equipo) VALUES (%s, %s) ON CONFLICT DO NOTHING", (huella, agente))
             conn.commit()
-            cur.close(); conn.close()
+            cur.close()
+            conn.close()
         return render_template('sala_espera.html')
 
 # --- 4. RUTAS DE MANDO ---
@@ -113,7 +117,8 @@ def registro_jefe():
         ON CONFLICT (dispositivo_id) DO UPDATE SET es_admin = True, autorizado = True
     """, (huella,))
     conn.commit()
-    cur.close(); conn.close()
+    cur.close()
+    conn.close()
     return "<h1>¡Identificado!</h1><p>Control total activado.</p><a href='/boveda'>Ir a la Bóveda</a>"
 
 @app.route('/check_autorizacion')
@@ -123,7 +128,8 @@ def check_autorizacion():
     cur = conn.cursor()
     cur.execute("SELECT autorizado FROM autorizaciones WHERE dispositivo_id = %s", (huella,))
     row = cur.fetchone()
-    cur.close(); conn.close()
+    cur.close()
+    conn.close()
     if row and row[0]:
         return jsonify({"autorizado": True}), 200
     return jsonify({"autorizado": False}), 401
@@ -140,12 +146,14 @@ def panel_admin():
     cur.execute("SELECT es_admin FROM autorizaciones WHERE dispositivo_id = %s", (huella,))
     es_jefe = cur.fetchone()
     if not es_jefe or not es_jefe[0]:
-        cur.close(); conn.close()
+        cur.close()
+        conn.close()
         return "Acceso Denegado", 403
     
     cur.execute("SELECT id, nombre_equipo, autorizado FROM autorizaciones WHERE es_admin = False")
     lista = cur.fetchall()
-    cur.close(); conn.close()
+    cur.close()
+    conn.close()
     return render_template('admin_norte.html', dispositivos=lista)
 
 @app.route('/autorizar_dispositivo/<int:id>')
@@ -154,8 +162,16 @@ def autorizar_dispositivo(id):
     cur = conn.cursor()
     cur.execute("UPDATE autorizaciones SET autorizado = True WHERE id = %s", (id,))
     conn.commit()
-    cur.close(); conn.close()
+    cur.close()
+    conn.close()
     return redirect(url_for('panel_admin'))
+
+# --- RUTA NUEVA: EL UNIVERSO DE MAYDA (INTRO) ---
+@app.route('/intro')
+def intro():
+    if 'user_email' not in session:
+        return redirect(url_for('login'))
+    return render_template('intro.html')
 
 # --- 5. RUTAS ORIGINALES ---
 
@@ -172,10 +188,12 @@ def verificar():
         cur = conn.cursor()
         cur.execute('SELECT session_version FROM control_seguridad WHERE id = 1')
         version = cur.fetchone()[0]
-        cur.close(); conn.close()
+        cur.close()
+        conn.close()
         session['user_email'] = entrada_email
         session['session_version'] = version
-        return redirect(url_for('boveda'))
+        # CAMBIO: Ahora redirigimos al Intro antes de la Bóveda
+        return redirect(url_for('intro'))
     return "🔐 Acceso denegado.", 403
 
 @app.route('/cierre_global', methods=['POST'])
@@ -187,7 +205,8 @@ def cierre_global():
         cur.execute('UPDATE control_seguridad SET session_version = session_version + 1 WHERE id = 1')
         cur.execute('DELETE FROM autorizaciones WHERE es_admin = False')
         conn.commit()
-        cur.close(); conn.close()
+        cur.close()
+        conn.close()
         session.clear() 
         return redirect(url_for('login'))
     return "PIN Incorrecto", 403
@@ -202,28 +221,37 @@ def boveda():
     fotos_db = cur.fetchall()
     cur.execute("SELECT autor, contenido, TO_CHAR(fecha, 'DD/MM HH:MI AM'), categoria, id FROM notas_amor ORDER BY fecha DESC")
     notas_db = cur.fetchall()
-    cur.close(); conn.close()
+    cur.close()
+    conn.close()
     return render_template('index.html', fotos=fotos_db, notas=notas_db)
 
 @app.route('/nueva_nota', methods=['POST'])
 def nueva_nota():
-    autor = request.form.get('autor_nombre'); contenido = request.form.get('contenido_nota'); modo = request.form.get('modo_nota', 'General')
+    autor = request.form.get('autor_nombre')
+    contenido = request.form.get('contenido_nota')
+    modo = request.form.get('modo_nota', 'General')
     if contenido and autor:
         conn = get_db_connection()
         cur = conn.cursor()
         cur.execute('INSERT INTO notas_amor (autor, contenido, categoria) VALUES (%s, %s, %s)', (autor, contenido, modo))
-        conn.commit(); cur.close(); conn.close()
+        conn.commit()
+        cur.close()
+        conn.close()
     return redirect(url_for('boveda'))
 
 @app.route('/subir', methods=['POST'])
 def subir():
-    archivo = request.files.get('foto_usuario'); mensaje = request.form.get('mensaje_usuario', '') 
+    archivo = request.files.get('foto_usuario')
+    mensaje = request.form.get('mensaje_usuario', '') 
     if archivo:
-        res = cloudinary.uploader.upload(archivo); url_nube = res['secure_url'] 
+        res = cloudinary.uploader.upload(archivo)
+        url_nube = res['secure_url'] 
         conn = get_db_connection()
         cur = conn.cursor()
         cur.execute('INSERT INTO galeria (archivo, mensaje) VALUES (%s, %s)', (url_nube, mensaje))
-        conn.commit(); cur.close(); conn.close()
+        conn.commit()
+        cur.close()
+        conn.close()
     return redirect(url_for('boveda'))
 
 @app.route('/eliminar_nota/<int:id>', methods=['POST'])
@@ -231,7 +259,9 @@ def eliminar_nota(id):
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute('DELETE FROM notas_amor WHERE id = %s', (id,))
-    conn.commit(); cur.close(); conn.close()
+    conn.commit()
+    cur.close()
+    conn.close()
     return redirect(url_for('boveda'))
 
 @app.route('/eliminar/<int:id>', methods=['POST'])
@@ -239,7 +269,9 @@ def eliminar(id):
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute('DELETE FROM galeria WHERE id = %s', (id,))
-    conn.commit(); cur.close(); conn.close()
+    conn.commit()
+    cur.close()
+    conn.close()
     return redirect(url_for('boveda'))
 
 if __name__ == '__main__':
