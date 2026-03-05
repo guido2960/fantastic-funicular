@@ -2,100 +2,165 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Universo para mi Administradora</title>
+    <title>Para mi Administradora</title>
     <style>
         body { margin: 0; background: black; color: white; font-family: 'Courier New', monospace; overflow: hidden; }
-        #canvasUniverso { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-        #interfaz { position: relative; z-index: 10; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; }
-        #texto-emocional { font-size: 24px; text-align: center; text-shadow: 0 0 15px #ff4d94; max-width: 80%; }
-        #pantalla-inicio { position: fixed; width: 100%; height: 100%; background: black; z-index: 100; display: flex; justify-content: center; align-items: center; }
-        #btn-entrar { padding: 20px 40px; font-size: 20px; cursor: pointer; background: #ff4d94; border: none; color: white; border-radius: 50px; box-shadow: 0 0 20px #ff4d94; transition: 0.3s; }
-        #btn-entrar:hover { transform: scale(1.1); background: #ff3385; }
-        .oculto { display: none !important; }
+        #canvasUniverso { position: absolute; top: 0; left: 0; }
+        #interfaz { position: relative; z-index: 10; width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; pointer-events: none; }
+        #texto-emocional { font-size: 26px; text-align: center; text-shadow: 0 0 15px #ff4d94; padding: 20px; }
+        #pantalla-inicio { position: fixed; width: 100%; height: 100%; background: black; z-index: 100; display: flex; justify-content: center; align-items: center; pointer-events: all; }
+        #btn-entrar { padding: 20px 40px; font-size: 22px; cursor: pointer; background: #ff4d94; border: none; color: white; border-radius: 50px; box-shadow: 0 0 25px #ff4d94; transition: 0.3s; }
+        #btn-entrar:hover { transform: scale(1.1); }
     </style>
 </head>
 <body>
 
 <div id="pantalla-inicio">
-    <button id="btn-entrar" onclick="iniciarMagia()">Entrar al Universo de Mayda</button>
+    <button id="btn-entrar" onclick="iniciarHistoria()">Entrar a nuestra historia</button>
 </div>
 
-<div id="interfaz" class="oculto">
+<div id="interfaz">
     <div id="texto-emocional"></div>
 </div>
 
 <canvas id="canvasUniverso"></canvas>
 
-<audio id="audioVoz" preload="auto">
-    <source src="TU_URL_DE_CLOUDINARY_AQUÍ" type="audio/mpeg">
-</audio>
+<audio id="musicaFondo" loop><source src="TU_LINK_DE_MUSICA_AQUI" type="audio/mpeg"></audio>
+<audio id="audioVoz"><source src="TU_LINK_DE_VOZ_AQUI" type="audio/mpeg"></audio>
 
 <script>
+    const canvas = document.getElementById('canvasUniverso');
+    const ctx = canvas.getContext('2d');
     const textoDiv = document.getElementById('texto-emocional');
-    const audio = document.getElementById('audioVoz');
-    const pantallaInicio = document.getElementById('pantalla-inicio');
-    const interfaz = document.getElementById('interfaz');
+    const musica = document.getElementById('musicaFondo');
+    const voz = document.getElementById('audioVoz');
+    
+    let particulas = [];
+    let fase = "paz"; 
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-    // Variables para la animación de las 6 instrucciones
-    let fase = "estrellas"; // estrellas -> abrazo -> corazon -> fuegos
-
-    function escribir(mensaje) {
-        let i = 0;
-        textoDiv.innerHTML = "";
-        const intervalo = setInterval(() => {
-            if (i < mensaje.length) {
-                textoDiv.innerHTML += mensaje.charAt(i);
-                i++;
-            } else {
-                clearInterval(intervalo);
+    class Particula {
+        constructor() {
+            this.reset();
+        }
+        reset() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.vx = (Math.random() - 0.5) * 2;
+            this.vy = -Math.random() * 1.5;
+            this.color = "white";
+            this.tamaño = Math.random() * 2 + 1;
+            this.opacidad = 1;
+            this.objetivoX = null;
+            this.objetivoY = null;
+        }
+        actualizar() {
+            if (fase === "paz") {
+                this.y += this.vy;
+                if (this.y < 0) this.y = canvas.height;
+            } else if (fase === "avion" || fase === "corazon") {
+                this.x += (this.objetivoX - this.x) * 0.05;
+                this.y += (this.objetivoY - this.y) * 0.05;
+            } else if (fase === "fuegos") {
+                this.x += this.vx * 6;
+                this.y += this.vy * 6;
+                this.opacidad -= 0.015;
+            } else if (fase === "petalos") {
+                this.y += 1.2;
+                this.x += Math.sin(this.y * 0.02) * 1.2;
+                this.color = "rgba(255, 182, 193, " + this.opacidad + ")";
+                if (this.y > canvas.height) { this.y = -10; this.opacidad = Math.random(); }
+                this.opacidad -= 0.001;
             }
-        }, 70); // Velocidad de "máquina de escribir"
+        }
+        dibujar() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.tamaño, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.globalAlpha = Math.max(0, this.opacidad);
+            ctx.fill();
+        }
     }
 
-    function iniciarMagia() {
-        pantallaInicio.classList.add('oculto');
-        interfaz.classList.remove('oculto');
-        
-        // Estructura 1: Inicio (Las estrellas blancas de paz comienzan a subir)
-        console.log("Fase 1: Paz iniciada");
+    for (let i = 0; i < 600; i++) particulas.push(new Particula());
 
-        // Estructura 2: 5 segundos - Primer Mensaje
-        setTimeout(() => {
-            escribir("Hola mi administradora favorita...");
-        }, 5000);
+    function escribir(txt) {
+        let i = 0; textoDiv.innerHTML = "";
+        const t = setInterval(() => {
+            if(i < txt.length) { textoDiv.innerHTML += txt.charAt(i); i++; }
+            else clearInterval(t);
+        }, 70);
+    }
 
-        // Estructura 3: 20 segundos - Reflexión de las Capas de Cebolla
-        setTimeout(() => {
-            escribir("Gracias por dejarme conocer cada capa de ti, mi cebollita... Eres mi norte.");
-        }, 20000);
+    function formarFigura(tipo) {
+        fase = tipo;
+        particulas.forEach((p, i) => {
+            const t = i / particulas.length * Math.PI * 2;
+            if (tipo === "corazon") {
+                p.color = "#ff4d94";
+                p.objetivoX = canvas.width/2 + 160 * Math.pow(Math.sin(t), 3);
+                p.objetivoY = canvas.height/2 - (130 * Math.cos(t) - 50 * Math.cos(2*t) - 20 * Math.cos(3*t) - 10 * Math.cos(4*t));
+            } else if (tipo === "avion") {
+                p.color = "#87CEEB";
+                p.objetivoX = canvas.width/2 + (i%40 * 12) - 240;
+                p.objetivoY = canvas.height/2 + (Math.sin(i)*15);
+            }
+        });
+    }
 
-        // Estructura 4: 45 segundos - "El Abrazo" y Tu Voz
+    function iniciarHistoria() {
+        document.getElementById('pantalla-inicio').style.display = 'none';
+        musica.volume = 0.2; musica.play();
+
+        // PASO 1: PAZ
+        escribir("Todo comenzó con esta paz que me diste...");
+
+        // PASO 2: CAPAS
+        setTimeout(() => escribir("Me permitiste conocer cada capa de tu alma..."), 10000);
+
+        // PASO 3: AVION
         setTimeout(() => {
-            fase = "abrazo"; // Las estrellas se agrupan
+            formarFigura("avion");
+            escribir("Y empezamos a volar hacia un mismo norte.");
+        }, 25000);
+
+        // PASO 4: ABRAZO Y VOZ
+        setTimeout(() => {
+            formarFigura("corazon");
+            musica.volume = 0.05; voz.play();
             escribir("Escucha esto que tengo para ti...");
-            audio.play();
         }, 45000);
 
-        // Estructura 5: 55 segundos - El Corazón Rosa
-        setTimeout(() => {
-            fase = "corazon"; // Se forma el corazón rosa
-            escribir("Te amo con todo lo que soy, May ❤️");
-        }, 55000);
+        // PASO 5: AMOR
+        setTimeout(() => escribir("Eres el amor de mi vida, May."), 55000);
 
-        // Estructura 6: 58 segundos - Explosión de Fuegos, Beso y Salto a Bóveda
+        // PASO 6: FINAL (FUEGOS + PETALOS + SALTO)
         setTimeout(() => {
-            fase = "fuegos"; // Explosiones de colores
-            escribir("👩‍❤️‍💋‍👨"); // El beso
+            fase = "fuegos";
+            escribir("👩‍❤️‍💋‍👨 TE AMO 👩‍❤️‍💋‍👨");
             
-            // GARANTÍA DE REDIRECCIÓN A PYTHON: Sin .html para evitar el error 404
             setTimeout(() => {
-                window.location.href = "/boveda";
-            }, 5000);
-        }, 58000);
+                fase = "petalos";
+                particulas.forEach(p => { p.opacidad = 1; p.vx = (Math.random()-0.5); p.tamaño = 3; });
+            }, 3000);
+
+            // Redirección adaptada al Python (usa /boveda)
+            setTimeout(() => {
+                document.body.style.transition = "opacity 2s";
+                document.body.style.opacity = "0";
+                setTimeout(() => { window.location.href = "/boveda"; }, 2000);
+            }, 9000);
+        }, 65000);
     }
 
-    // Aquí conectarías tu código de Canvas (las funciones de dibujo)
-    // que ya tenías para que reaccionen a la variable 'fase'.
+    function animar() {
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        particulas.forEach(p => { p.actualizar(); p.dibujar(); });
+        requestAnimationFrame(animar);
+    }
+    animar();
 </script>
 </body>
 </html>
