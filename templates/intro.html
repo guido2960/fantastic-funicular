@@ -2,28 +2,28 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Para mi Administradora</title>
     <style>
-        body, html { margin: 0; padding: 0; overflow: hidden; background: #000; font-family: 'Courier New', Courier, monospace; }
-        canvas { display: block; }
+        body, html { margin: 0; padding: 0; overflow: hidden; background: #000; font-family: 'Courier New', monospace; }
+        canvas { display: block; position: absolute; top: 0; left: 0; z-index: 1; }
         #overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            background: #000; z-index: 100; transition: opacity 1s;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            background: #000; z-index: 100; opacity: 1; transition: opacity 0.8s;
         }
-        button {
-            padding: 15px 40px; font-size: 18px; cursor: pointer;
-            background: transparent; color: #fff; border: 2px solid #fff;
-            border-radius: 50px; transition: 0.5s; text-transform: uppercase; letter-spacing: 2px;
+        #btnEntrar {
+            padding: 20px 40px; font-size: 20px; cursor: pointer;
+            background: #fff; color: #000; border: none;
+            border-radius: 50px; font-weight: bold; text-transform: uppercase;
+            box-shadow: 0 0 20px rgba(255,255,255,0.5); z-index: 101;
         }
-        button:hover { background: #fff; color: #000; box-shadow: 0 0 30px #fff; }
     </style>
 </head>
 <body>
 
     <div id="overlay">
-        <button id="btnEntrar">Entrar a nuestro universo</button>
+        <button id="btnEntrar" onclick="iniciarTodo()">Entrar a nuestro universo</button>
     </div>
 
     <canvas id="canvas"></canvas>
@@ -34,15 +34,14 @@
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        const btn = document.getElementById('btnEntrar');
-        const overlay = document.getElementById('overlay');
         const musica = document.getElementById('musicaFondo');
         const voz = document.getElementById('miVoz');
+        const overlay = document.getElementById('overlay');
 
         let estrellas = [];
-        let mensajeMostrado = "";
-        let modoMagia = "normal"; 
-        let animando = false;
+        let mensaje = "";
+        let modo = "normal";
+        let activo = false;
 
         function resize() {
             canvas.width = window.innerWidth;
@@ -51,60 +50,61 @@
         window.addEventListener('resize', resize);
         resize();
 
-        // CONTROLADOR DEL CLIC (LA LLAVE)
-        btn.addEventListener('click', () => {
+        // LA FUNCIÓN DEFINITIVA
+        function iniciarTodo() {
+            // 1. Quitar el bloqueo visual de inmediato
             overlay.style.opacity = '0';
-            setTimeout(() => overlay.style.display = 'none', 1000);
+            setTimeout(() => { overlay.style.display = 'none'; }, 800);
+
+            // 2. Forzar reproducción de audios (esto desbloquea el navegador)
+            musica.play().catch(err => console.log("Audio fail", err));
             musica.volume = 0.4;
-            musica.play();
-            animando = true;
-            crearEstrellas();
-            update();
-            iniciarTimeline();
-        });
-
-        function iniciarTimeline() {
-            // PASO 1 y 2: Saludo (5s)
-            setTimeout(() => escribirTexto("Hola mi administradora favorita...", 0), 5000);
-
-            // PASO 3: Capas (20s)
-            setTimeout(() => escribirTexto("Gracias por ser mi paz.\nAmo conocer cada capa de ti.", 0), 20000);
-
-            // PASO 4: TU VOZ Y FUEGOS (45s)
-            setTimeout(() => {
-                mensajeMostrado = ""; 
-                musica.volume = 0.1;
-                voz.play();
-                modoMagia = "fuego"; 
-            }, 45000);
-
-            // PASO 5: ABRAZO (55s)
-            setTimeout(() => {
-                modoMagia = "abrazo";
-                mensajeMostrado = "👨‍💻       👩‍💼"; 
-                setTimeout(() => { mensajeMostrado = "🫂\nNuestra Unión"; }, 2000);
-            }, 55000);
-
-            // PASO 6: EL BESO (58s)
-            setTimeout(() => {
-                mensajeMostrado = "👩‍❤️‍💋‍👨\nTe amo, May";
-            }, 58000);
-
-            // FINAL: SALTO A BÓVEDA (62s)
-            setTimeout(() => {
-                window.location.href = "/boveda";
-            }, 62000);
+            
+            // 3. Activar animación
+            activo = true;
+            generarEstrellas();
+            animar();
+            
+            // 4. Iniciar los 6 pasos cronometrados
+            comenzarPasos();
         }
 
-        function escribirTexto(texto, index) {
-            if (index === 0) mensajeMostrado = "";
-            if (index < texto.length) {
-                mensajeMostrado += texto.charAt(index);
-                setTimeout(() => escribirTexto(texto, index + 1), 70);
+        function comenzarPasos() {
+            setTimeout(() => escribir("Hola mi administradora favorita...", 0), 3000);
+            setTimeout(() => escribir("Gracias por ser mi paz.\nAmo conocer cada capa de ti.", 0), 15000);
+            
+            // Paso 4: Tu voz y fuegos
+            setTimeout(() => {
+                mensaje = "";
+                musica.volume = 0.1;
+                voz.play();
+                modo = "fuego";
+            }, 45000);
+
+            // Paso 5: Abrazo y Corazón
+            setTimeout(() => {
+                modo = "corazon";
+                escribir("🫂\nNuestra Unión", 0);
+            }, 55000);
+
+            // Paso 6: Beso Final
+            setTimeout(() => {
+                escribir("👩‍❤️‍💋‍👨\nTe amo, May", 0);
+            }, 58000);
+
+            // Redirección
+            setTimeout(() => { window.location.href = "/boveda"; }, 63000);
+        }
+
+        function escribir(txt, i) {
+            if (i === 0) mensaje = "";
+            if (i < txt.length) {
+                mensaje += txt.charAt(i);
+                setTimeout(() => escribir(txt, i + 1), 70);
             }
         }
 
-        function crearEstrellas() {
+        function generarEstrellas() {
             for(let i=0; i<250; i++) {
                 const t = (i / 250) * 2 * Math.PI;
                 estrellas.push({
@@ -112,42 +112,44 @@
                     y: Math.random() * canvas.height,
                     vx: (Math.random() - 0.5) * 4,
                     vy: (Math.random() - 0.5) * 4,
-                    tx: (16 * Math.sin(t) ** 3) * 12 + canvas.width/2,
-                    ty: (- (13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t))) * 12 + canvas.height/2,
+                    // Coordenadas para el corazón (Fórmula matemática)
+                    tx: (16 * Math.sin(t)**3) * 13 + canvas.width/2,
+                    ty: (-(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t))) * 13 + canvas.height/2,
                     r: Math.random() * 2,
-                    color: 'white'
+                    c: '#fff'
                 });
             }
         }
 
-        function update() {
-            if(!animando) return;
+        function animar() {
+            if(!activo) return;
             ctx.fillStyle = 'black';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             estrellas.forEach(e => {
-                if (modoMagia === "normal") {
-                    e.y -= 0.5; if(e.y < 0) e.y = canvas.height;
-                } else if (modoMagia === "fuego") {
+                if(modo === "normal") {
+                    e.y -= 0.8; if(e.y < 0) e.y = canvas.height;
+                } else if(modo === "fuego") {
                     e.x += e.vx; e.y += e.vy;
-                    e.color = hsl(${Math.random() * 360}, 100%, 70%);
-                } else if (modoMagia === "abrazo") {
-                    e.x += (e.tx - e.x) * 0.05; e.y += (e.ty - e.y) * 0.05;
-                    e.color = "#ff4d6d";
+                    e.c = hsl(${Math.random()*360}, 100%, 70%);
+                } else if(modo === "corazon") {
+                    e.x += (e.tx - e.x) * 0.06;
+                    e.y += (e.ty - e.y) * 0.06;
+                    e.c = "#ff4d6d";
                 }
-                ctx.fillStyle = e.color;
+                ctx.fillStyle = e.c;
                 ctx.beginPath(); ctx.arc(e.x, e.y, e.r, 0, Math.PI*2); ctx.fill();
             });
 
-            if(mensajeMostrado) {
+            if(mensaje) {
                 ctx.fillStyle = "white";
-                ctx.font = "20px 'Courier New'";
+                ctx.font = "22px 'Courier New'";
                 ctx.textAlign = "center";
-                const lineas = mensajeMostrado.split('\n');
-                lineas.forEach((l, i) => ctx.fillText(l, canvas.width/2, (canvas.height/2) + (i*50)));
+                const lines = mensaje.split('\n');
+                lines.forEach((l, i) => ctx.fillText(l, canvas.width/2, canvas.height/2 + (i*40)));
             }
-            requestAnimationFrame(update);
+            requestAnimationFrame(animar);
         }
     </script>
 </body>
-</html>
+</html
