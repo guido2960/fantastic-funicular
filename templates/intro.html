@@ -5,151 +5,124 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Para mi Administradora</title>
     <style>
-        body, html { margin: 0; padding: 0; overflow: hidden; background: #000; font-family: 'Courier New', monospace; }
-        canvas { display: block; position: absolute; top: 0; left: 0; }
-        #overlay {
+        body, html { margin: 0; padding: 0; overflow: hidden; background: #000; font-family: sans-serif; }
+        canvas { display: block; position: absolute; top: 0; left: 0; z-index: 1; }
+        #capaInicio {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; justify-content: center; align-items: center;
-            background: #000; z-index: 9999;
+            background: #000; z-index: 999;
         }
-        /* ESTE ES TU BOTÓN ORIGINAL, EL QUE SÍ FUNCIONABA */
-        .btn-magico {
-            padding: 20px 50px; font-size: 22px; cursor: pointer;
-            background: none; color: white; border: 2px solid white;
-            border-radius: 50px; text-transform: uppercase; letter-spacing: 4px;
-            transition: all 0.5s ease;
+        .boton {
+            padding: 20px 40px; font-size: 20px; color: white;
+            border: 2px solid white; background: none; border-radius: 50px;
+            cursor: pointer; text-transform: uppercase; letter-spacing: 2px;
         }
-        .btn-magico:hover { background: white; color: black; box-shadow: 0 0 40px white; }
     </style>
 </head>
 <body>
 
-    <div id="overlay">
-        <button class="btn-magico" id="btnEntrar">Entrar al Universo</button>
+    <div id="capaInicio">
+        <button class="boton" onclick="comenzarTodo()">Entrar al Universo</button>
     </div>
 
     <canvas id="canvas"></canvas>
 
-    <audio id="musicaFondo" src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772691824/musica_de_fondo_fuo3r2.m4a" loop></audio>
-    <audio id="miVoz" src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772691824/mi_audio_e07s2p.mp4"></audio>
+    <audio id="musica" src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772691824/musica_de_fondo_fuo3r2.m4a" loop></audio>
+    <audio id="voz" src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772691824/mi_audio_e07s2p.mp4"></audio>
 
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        const btn = document.getElementById('btnEntrar');
-        const overlay = document.getElementById('overlay');
-        const musica = document.getElementById('musicaFondo');
-        const voz = document.getElementById('miVoz');
+        const musica = document.getElementById('musica');
+        const voz = document.getElementById('voz');
+        const capa = document.getElementById('capaInicio');
 
         let estrellas = [];
-        let mensaje = "";
-        let modo = "paz"; 
-        let animando = false;
+        let textoActual = "";
+        let fase = "paz";
+        let activo = false;
 
         function resize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         }
-        window.addEventListener('resize', resize);
+        window.onresize = resize;
         resize();
 
-        // --- LA LÓGICA DEL PRIMER BOTÓN (VUELTA A LO QUE FUNCIONA) ---
-        btn.onclick = function() {
-            // Desaparecer overlay de inmediato como la primera vez
-            overlay.style.display = 'none';
+        function comenzarTodo() {
+            // ELIMINAR CAPA AL INSTANTE (COMO EL PRIMERO)
+            capa.style.display = 'none';
             
-            // Arrancar audios con prioridad absoluta
+            // FORZAR AUDIOS
             musica.volume = 0.4;
             musica.play();
             
-            animando = true;
-            iniciarEstrellas();
-            buclePrincipal();
-            cronogramaMagico();
-        };
+            activo = true;
+            crearEstrellas();
+            animar();
+            iniciarReloj();
+        }
 
-        function cronogramaMagico() {
-            // Paso 1 y 2: Saludo (5s)
-            setTimeout(() => escribir("Hola mi administradora favorita...", 0), 5000);
-
-            // Paso 3: Capas (20s)
-            setTimeout(() => escribir("Gracias por ser mi paz.\nAmo conocer cada capa de ti.", 0), 20000);
-
-            // Paso 4: Tu voz y fuegos (45s)
-            setTimeout(() => {
-                mensaje = "";
-                musica.volume = 0.1;
-                voz.play();
-                modo = "fuego";
+        function iniciarReloj() {
+            // Las 6 Guías que tanto te gustaron
+            setTimeout(() => { textoActual = "Hola mi administradora favorita..."; }, 5000);
+            setTimeout(() => { textoActual = "Gracias por ser mi paz.\nAmo conocer cada capa de ti."; }, 20000);
+            
+            setTimeout(() => { 
+                textoActual = ""; 
+                musica.volume = 0.1; 
+                voz.play(); 
+                fase = "fuego"; 
             }, 45000);
 
-            // Paso 5: El Corazón de Estrellas (55s)
-            setTimeout(() => {
-                modo = "corazon";
-                escribir("🫂\nNuestra Unión", 0);
-            }, 55000);
-
-            // Paso 6: El Beso Final (58s)
-            setTimeout(() => {
-                escribir("👩‍❤️‍💋‍👨\nTe amo, May", 0);
-            }, 58000);
-
-            // Salto final (63s)
+            setTimeout(() => { fase = "corazon"; textoActual = "🫂\nNuestra Unión"; }, 55000);
+            setTimeout(() => { textoActual = "👩‍❤️‍💋‍👨\nTe amo, May"; }, 58000);
             setTimeout(() => { window.location.href = "/boveda"; }, 63000);
         }
 
-        function escribir(t, i) {
-            if (i === 0) mensaje = "";
-            if (i < t.length) {
-                mensaje += t.charAt(i);
-                setTimeout(() => escribir(t, i + 1), 70);
-            }
-        }
-
-        function iniciarEstrellas() {
-            for(let i=0; i<250; i++) {
-                const t = (i / 250) * 2 * Math.PI;
+        function crearEstrellas() {
+            for(let i=0; i<200; i++) {
+                const t = (i / 200) * 2 * Math.PI;
                 estrellas.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
-                    vx: (Math.random() - 0.5) * 5,
-                    vy: (Math.random() - 0.5) * 5,
-                    tx: (16 * Math.sin(t)**3) * 13 + canvas.width/2,
-                    ty: (-(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t))) * 13 + canvas.height/2,
+                    vx: (Math.random() - 0.5) * 4,
+                    vy: (Math.random() - 0.5) * 4,
+                    tx: (16 * Math.sin(t)**3) * 12 + canvas.width/2,
+                    ty: (-(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t))) * 12 + canvas.height/2,
                     r: Math.random() * 2,
-                    color: 'white'
+                    c: '#fff'
                 });
             }
         }
 
-        function buclePrincipal() {
-            if(!animando) return;
+        function animar() {
+            if(!activo) return;
             ctx.fillStyle = 'black';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             estrellas.forEach(e => {
-                if(modo === "paz") {
-                    e.y -= 0.7; if(e.y < 0) e.y = canvas.height;
-                } else if(modo === "fuego") {
+                if(fase === "paz") {
+                    e.y -= 0.5; if(e.y < 0) e.y = canvas.height;
+                } else if(fase === "fuego") {
                     e.x += e.vx; e.y += e.vy;
-                    e.color = hsl(${Math.random()*360}, 100%, 75%);
-                } else if(modo === "corazon") {
-                    e.x += (e.tx - e.x) * 0.05;
-                    e.y += (e.ty - e.y) * 0.05;
-                    e.color = "#ff4d6d";
+                    e.c = hsl(${Math.random()*360}, 100%, 75%);
+                } else if(fase === "corazon") {
+                    e.x += (e.tx - e.x) * 0.05; e.y += (e.ty - e.y) * 0.05;
+                    e.c = "#ff4d6d";
                 }
-                ctx.fillStyle = e.color;
+                ctx.fillStyle = e.c;
                 ctx.beginPath(); ctx.arc(e.x, e.y, e.r, 0, Math.PI*2); ctx.fill();
             });
 
-            if(mensaje) {
+            if(textoActual) {
                 ctx.fillStyle = "white";
-                ctx.font = "22px 'Courier New'";
+                ctx.font = "20px monospace";
                 ctx.textAlign = "center";
-                const lineas = mensaje.split('\n');
-                lineas.forEach((l, i) => ctx.fillText(l, canvas.width/2, canvas.height/2 + (i*45)));
+                const lineas = textoActual.split('\n');
+                lineas.forEach((l, i) => ctx.fillText(l, canvas.width/2, canvas.height/2 + (i*40)));
             }
-            requestAnimationFrame(buclePrincipal);
+            requestAnimationFrame(animar);
         }
     </script>
 </body>
