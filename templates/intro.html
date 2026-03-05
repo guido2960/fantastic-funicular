@@ -10,7 +10,6 @@
         #texto-emocional { font-size: 26px; text-align: center; text-shadow: 0 0 15px #ff4d94; padding: 20px; }
         #pantalla-inicio { position: fixed; width: 100%; height: 100%; background: black; z-index: 100; display: flex; justify-content: center; align-items: center; pointer-events: all; }
         #btn-entrar { padding: 20px 40px; font-size: 22px; cursor: pointer; background: #ff4d94; border: none; color: white; border-radius: 50px; box-shadow: 0 0 25px #ff4d94; transition: 0.3s; }
-        #btn-entrar:hover { transform: scale(1.1); }
     </style>
 </head>
 <body>
@@ -25,8 +24,12 @@
 
 <canvas id="canvasUniverso"></canvas>
 
-<audio id="musicaFondo" loop><source src="TU_LINK_DE_MUSICA_AQUI" type="audio/mpeg"></audio>
-<audio id="audioVoz"><source src="TU_LINK_DE_VOZ_AQUI" type="audio/mpeg"></audio>
+<audio id="musicaFondo" loop preload="auto">
+    <source src="{{ url_for('static', filename='musica_fondo.mp3') }}" type="audio/mpeg">
+</audio>
+<audio id="audioVoz" preload="auto">
+    <source src="{{ url_for('static', filename='mi_voz.mp3') }}" type="audio/mpeg">
+</audio>
 
 <script>
     const canvas = document.getElementById('canvasUniverso');
@@ -41,13 +44,11 @@
     canvas.height = window.innerHeight;
 
     class Particula {
-        constructor() {
-            this.reset();
-        }
+        constructor() { this.reset(); }
         reset() {
             this.x = Math.random() * canvas.width;
             this.y = Math.random() * canvas.height;
-            this.vx = (Math.random() - 0.5) * 2;
+            this.vx = (Math.random() - 0.5) * 2.5;
             this.vy = -Math.random() * 1.5;
             this.color = "white";
             this.tamaño = Math.random() * 2 + 1;
@@ -63,12 +64,12 @@
                 this.x += (this.objetivoX - this.x) * 0.05;
                 this.y += (this.objetivoY - this.y) * 0.05;
             } else if (fase === "fuegos") {
-                this.x += this.vx * 6;
-                this.y += this.vy * 6;
-                this.opacidad -= 0.015;
+                this.x += this.vx * 7;
+                this.y += this.vy * 7;
+                this.opacidad -= 0.02;
             } else if (fase === "petalos") {
-                this.y += 1.2;
-                this.x += Math.sin(this.y * 0.02) * 1.2;
+                this.y += 1.5;
+                this.x += Math.sin(this.y * 0.02) * 1.5;
                 this.color = "rgba(255, 182, 193, " + this.opacidad + ")";
                 if (this.y > canvas.height) { this.y = -10; this.opacidad = Math.random(); }
                 this.opacidad -= 0.001;
@@ -111,41 +112,36 @@
 
     function iniciarHistoria() {
         document.getElementById('pantalla-inicio').style.display = 'none';
-        musica.volume = 0.2; musica.play();
+        
+        // REPRODUCCIÓN FORZADA
+        musica.volume = 0.2;
+        musica.play().catch(e => console.log("Revisar nombre de musica_fondo.mp3"));
 
-        // PASO 1: PAZ
         escribir("Todo comenzó con esta paz que me diste...");
 
-        // PASO 2: CAPAS
         setTimeout(() => escribir("Me permitiste conocer cada capa de tu alma..."), 10000);
 
-        // PASO 3: AVION
         setTimeout(() => {
             formarFigura("avion");
             escribir("Y empezamos a volar hacia un mismo norte.");
         }, 25000);
 
-        // PASO 4: ABRAZO Y VOZ
         setTimeout(() => {
             formarFigura("corazon");
-            musica.volume = 0.05; voz.play();
+            musica.volume = 0.05; 
+            voz.play().catch(e => console.log("Revisar nombre de mi_voz.mp3"));
             escribir("Escucha esto que tengo para ti...");
         }, 45000);
 
-        // PASO 5: AMOR
         setTimeout(() => escribir("Eres el amor de mi vida, May."), 55000);
 
-        // PASO 6: FINAL (FUEGOS + PETALOS + SALTO)
         setTimeout(() => {
             fase = "fuegos";
             escribir("👩‍❤️‍💋‍👨 TE AMO 👩‍❤️‍💋‍👨");
-            
             setTimeout(() => {
                 fase = "petalos";
-                particulas.forEach(p => { p.opacidad = 1; p.vx = (Math.random()-0.5); p.tamaño = 3; });
+                particulas.forEach(p => { p.opacidad = 1; p.tamaño = 3; });
             }, 3000);
-
-            // Redirección adaptada al Python (usa /boveda)
             setTimeout(() => {
                 document.body.style.transition = "opacity 2s";
                 document.body.style.opacity = "0";
