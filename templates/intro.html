@@ -16,7 +16,7 @@
         #btn-entrar { 
             padding: 18px 45px; font-size: 20px; cursor: pointer; background: transparent; 
             border: 2px solid #ff4d94; color: white; border-radius: 50px; 
-            box-shadow: 0 0 20px #ff4d94; transition: 0.5s; letter-spacing: 3px;
+            box-shadow: 0 0 20px #ff4d94; transition: 0.5s; letter-spacing: 3px; font-weight: bold;
         }
         #btn-entrar:hover { background: #ff4d94; transform: scale(1.05); }
     </style>
@@ -44,7 +44,7 @@
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    // Fondo cinematográfico del código que te gusta
+    // Estrellas de fondo (Efecto Cine Profundo)
     for(let i=0; i<400; i++) {
         estrellasCine.push({
             x: Math.random() * canvas.width, y: Math.random() * canvas.height,
@@ -60,7 +60,7 @@
             this.targetX = this.x; this.targetY = this.y;
             this.color = "255, 255, 255";
             this.size = Math.random() * 2 + 0.5;
-            this.speed = 0.07;
+            this.speed = 0.08;
         }
         update() {
             if (fase === "paz") {
@@ -80,7 +80,6 @@
 
     for (let i = 0; i < 2000; i++) particulas.push(new Particula());
 
-    // Sincronización de tecleo y figuras
     function escribir(txt, callback) {
         let i = 0; textoDiv.innerHTML = "";
         const intervalId = setInterval(() => {
@@ -116,7 +115,7 @@
     function iniciarHistoria() {
         document.getElementById('pantalla-inicio').style.display = 'none';
         musica.volume = 0.3; 
-        musica.play().catch(e => console.log("Audio bloqueado"));
+        musica.play().catch(e => console.log("Permiso de audio requerido"));
 
         escribir("Todo comenzó con esta paz que me diste, mi Administradora favorita.", () => {
             formarFigura("arbol");
@@ -129,14 +128,17 @@
                         escribir("Tomo tan en serio cada mensaje que me mandas... me encanta cómo eres.", () => {
                             formarFigura("corazon");
                             musica.volume = 0.12; 
-                            voz.play().catch(e => console.log("Voz bloqueada"));
+                            voz.play().catch(e => console.log("Audio de voz requerido"));
                             escribir("Escucha esto que guardé solo para ti...", () => {
                                 escribir("👩‍❤️‍💋‍👨 TE AMO PARA SIEMPRE, MAYDA 👩‍❤️‍💋‍👨", () => {
                                     setTimeout(() => { 
-                                        document.body.style.transition = "opacity 6s"; 
+                                        document.body.style.transition = "opacity 4s"; 
                                         document.body.style.opacity = "0"; 
-                                        setTimeout(() => { window.location.href = "/boveda"; }, 6000); 
-                                    }, 15000);
+                                        // REDIRECCIÓN ADAPTADA A PYTHON/FLASK
+                                        setTimeout(() => { 
+                                            window.location.href = window.location.origin + "/boveda"; 
+                                        }, 4000); 
+                                    }, 12000);
                                 });
                             });
                         });
@@ -147,7 +149,6 @@
     }
 
     function animar() {
-        // Estela de luz (Trail) para el efecto video
         ctx.fillStyle = "rgba(0, 0, 0, 0.08)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.globalCompositeOperation = "lighter";
 
