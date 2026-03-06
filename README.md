@@ -1,6 +1,11 @@
 Bóveda Digital Privada (Norte)
 Un ecosistema de comunicación y almacenamiento seguro para parejas.
 Este proyecto es una Aplicación Web Full-Stack diseñada para gestionar de forma privada y segura recuerdos multimedia, notas personales y una agenda compartida. Desarrollada con un enfoque en la privacidad total y la experiencia de usuario personalizada.
+
+
+
+
+
 🚀 Capacidades Técnicas
 La aplicación integra las tecnologías más robustas del desarrollo web moderno:
 Backend: Desarrollado en Python utilizando el framework Flask para una gestión eficiente de rutas y lógica de servidor.
@@ -17,11 +22,13 @@ Despliegue Profesional: Configurada para integración continua (CI/CD) mediante 
 
 
 
+
 ├── app.py              # Lógica central y rutas del servidor Flask
 ├── database.db         # Esquema de base de datos SQL
 ├── requirements.txt    # Dependencias del sistema (Flask, Cloudinary, etc.)
 ├── static/             # Archivos de diseño (CSS, JS, Imágenes, Música)
 └── templates/          # Estructura de las páginas web (HTML)
+
 
 
 Visión del Desarrollador
