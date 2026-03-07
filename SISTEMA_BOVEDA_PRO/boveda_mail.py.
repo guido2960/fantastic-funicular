@@ -1,0 +1,39 @@
+import os
+from flask import Flask, render_template, session, redirect, url_for, request
+# Importamos las herramientas de tus otros archivos
+from database import get_db_connection
+from seguridad import obtener_huella, portero_seguridad
+
+app = Flask(_name_, static_folder='static', static_url_path='/static')
+app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'llave_secreta_para_sesiones_2601')
+
+# --- REGISTRO DE RUTAS QUE FALTABAN ---
+
+@app.route('/')
+def login():
+    return render_template('login.html')
+
+@app.route('/boveda')
+def boveda():
+    if 'user_email' not in session: 
+        return redirect(url_for('login'))
+    
+    conn = get_db_connection()
+    cur = conn.cursor()
+    # Traer fotos
+    cur.execute('SELECT archivo, mensaje, id FROM galeria ORDER BY id DESC')
+    fotos = cur.fetchall()
+    # Traer notas (con el formato de fecha que te gusta)
+    cur.execute("SELECT autor, contenido, TO_CHAR(fecha, 'DD/MM HH:MI AM'), categoria, id FROM notas_amor ORDER BY fecha DESC")
+    notas = cur.fetchall()
+    cur.close()
+    conn.close()
+    return render_template('index.html', fotos=fotos, notas=notas)
+
+# --- IMPORTANTE: Aquí puedes importar las rutas de notas.py o galeria.py ---
+# Si no usas Blueprints, asegúrate de que las funciones de subir/eliminar 
+# estén bien referenciadas aquí.
+
+if _name_ == '_main_':
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port)
