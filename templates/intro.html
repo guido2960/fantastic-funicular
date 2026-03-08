@@ -3,113 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universo Abel & Mayda</title>
+    <title>Para Mi Norte - Mayda</title>
     <style>
-        body { margin: 0; background: #000; color: white; font-family: 'Courier New', monospace; overflow: hidden; }
-        canvas { position: absolute; top: 0; left: 0; display: none; }
-        #pantalla-inicio { 
-            position: fixed; inset: 0; background: #000; z-index: 9999; 
-            display: flex; justify-content: center; align-items: center; 
+        body { margin: 0; background: #050505; color: white; font-family: 'Courier New', monospace; overflow: hidden; }
+        canvas { display: block; }
+        .capa-cebolla { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, transparent 30%, #050505 90%); z-index: 5; pointer-events: none; }
+        
+        .interfaz {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            text-align: center; z-index: 10; width: 85%; pointer-events: none;
         }
-        #btn-entrar { 
-            padding: 20px 50px; font-size: 22px; cursor: pointer; background: transparent; 
-            border: 2px solid #ff4d94; color: white; border-radius: 50px; 
-            box-shadow: 0 0 20px #ff4d94; font-weight: bold;
+
+        #mensaje-dinamico {
+            font-size: 1.5rem;
+            text-shadow: 0 0 15px #bc13fe;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+            line-height: 1.6;
+            font-style: italic;
         }
-        #texto-emocional { 
-            position: relative; z-index: 10; font-size: 24px; text-align: center; 
-            text-shadow: 0 0 15px #ff4d94; padding: 20px; font-weight: bold;
+
+        .btn-inicio {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.98); cursor: pointer; z-index: 100;
+            text-transform: uppercase; letter-spacing: 4px; text-align: center;
+            font-weight: bold;
+        }
+
+        #btn-boveda {
+            margin-top: 20px; padding: 10px 20px; background: transparent;
+            border: 1px solid #bc13fe; color: #bc13fe; cursor: pointer;
+            pointer-events: auto; display: none; text-decoration: none;
         }
     </style>
 </head>
 <body>
 
-<div id="pantalla-inicio">
-    <button id="btn-entrar" onclick="iniciar()">ENTRAR AL UNIVERSO</button>
-</div>
+    <div class="btn-inicio" id="overlay"><span>[ CLIC PARA ESCUCHAR EL HOMENAJE DE ABEL ]</span></div>
+    <div class="capa-cebolla"></div>
+    
+    <div class="interfaz">
+        <h1 style="color: #bc13fe; letter-spacing: 8px; margin-bottom: 20px;">DÍA DE LA MUJER</h1>
+        <p id="mensaje-dinamico"></p>
+        <a href="/boveda" id="btn-boveda">ENTRAR A NUESTRA BÓVEDA</a>
+    </div>
 
-<div id="interfaz" style="display:flex; justify-content:center; align-items:center; height:100vh;">
-    <div id="texto-emocional"></div>
-</div>
-<canvas id="canvasUniverso"></canvas>
+    <canvas id="escena"></canvas>
 
-<audio id="musicaFondo" loop><source src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772691824/musica_de_fondo_fuo3r2.m4a" type="audio/mp4"></audio>
-<audio id="audioVoz"><source src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772691824/mi_audio_e07s2p.mp4" type="audio/mp4"></audio>
+    <audio id="audioFondo" loop src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772983408/para_ti_Mayda_xkgwz4.mp3"></audio>
 
-<script>
-    const canvas = document.getElementById('canvasUniverso');
-    const ctx = canvas.getContext('2d');
-    const textoDiv = document.getElementById('texto-emocional');
-    let fase = "paz", particulas = [];
-
-    function iniciar() {
-        document.getElementById('pantalla-inicio').style.display = 'none';
-        canvas.style.display = 'block';
-        
-        // Carga de audio inmediata al clic
-        document.getElementById('musicaFondo').play();
-        
-        // Iniciar motor visual solo después del clic
+    <script>
+        const canvas = document.getElementById('escena');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-        for (let i = 0; i < 1500; i++) particulas.push(new Particula());
-        
-        animar();
-        correrHistoria();
-    }
 
-    class Particula {
-        constructor() {
-            this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height;
-            this.targetX = this.x; this.targetY = this.y;
-            this.color = "255, 255, 255";
-            this.size = 1.5;
+        // Narrativa completa que Abel dedica a Mayda
+        const narrativa = [
+            "A veces tengo ganas de ser cursi para decirle: La amo a usted con locura.",
+            "A veces tengo ganas de ser tonto para gritar: ¡La quiero tanto!",
+            "A veces tengo ganas de ser niño para llorar acurrucado en tu seno.",
+            "A veces tengo ganas de estar muerto para sentir bajo la tierra la humedad.",
+            "Y que de mis jugos me crezca una flor rompiendo el pecho. Y decir: Esta flor para usted.",
+            "Mayda, admiro tu sacrificio trabajando en la cevichería para pagar tu carrera.",
+            "Hoy sigues luchando por convertirte en lo que sueñas, y quiero que sepas algo...",
+            "Estamos unidos en esto. No te voy a abandonar nunca, estoy contigo en cada paso.",
+            "Somos un equipo, mi Norte. Tu Abel estará siempre aquí. Te amo profundamente."
+        ];
+
+        function hablar(texto) {
+            const mensaje = new SpeechSynthesisUtterance(texto);
+            mensaje.lang = 'es-ES';
+            mensaje.rate = 0.85; 
+            mensaje.pitch = 0.9; 
+            window.speechSynthesis.speak(mensaje);
         }
-        update() {
-            if (fase === "paz") { this.y -= 0.5; if (this.y < 0) this.y = canvas.height; }
-            else {
-                this.x += (this.targetX - this.x) * 0.1;
-                this.y += (this.targetY - this.y) * 0.1;
+
+        function secuencia(index) {
+            if (index < narrativa.length) {
+                const el = document.getElementById('mensaje-dinamico');
+                el.innerText = narrativa[index];
+                el.style.opacity = 1;
+                hablar(narrativa[index]);
+
+                setTimeout(() => {
+                    el.style.opacity = 0;
+                    setTimeout(() => secuencia(index + 1), 1500);
+                }, 8500); 
+            } else {
+                // Al terminar, muestra el botón para ir a la Bóveda
+                document.getElementById('btn-boveda').style.display = 'inline-block';
             }
         }
-        draw() {
-            ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
-            ctx.fillStyle = `rgb(${this.color})`; ctx.fill();
+
+        class Particula {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = canvas.width / 2;
+                this.y = canvas.height / 2;
+                this.size = Math.random() * 3 + 1;
+                this.angle = Math.random() * Math.PI * 2;
+                this.velocity = Math.random() * 3 + 1;
+                this.color = '#bc13fe';
+                this.alpha = 1;
+            }
+            update() {
+                this.x += Math.cos(this.angle) * this.velocity;
+                this.y += Math.sin(this.angle) * this.velocity;
+                this.alpha -= 0.003;
+                if (this.alpha <= 0) this.reset();
+            }
+            draw() {
+                ctx.save(); ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill(); ctx.restore();
+            }
         }
-    }
 
-    function escribir(t, cb) {
-        let i = 0; textoDiv.innerHTML = "";
-        let it = setInterval(() => {
-            if(i < t.length) { textoDiv.innerHTML += t.charAt(i); i++; }
-            else { clearInterval(it); setTimeout(cb, 2500); }
-        }, 60);
-    }
+        function animar() {
+            ctx.fillStyle = 'rgba(5, 5, 5, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animar);
+        }
 
-    function correrHistoria() {
-        escribir("Todo comenzó con esta paz que me diste...", () => {
-            fase = "corazon";
-            particulas.forEach((p, i) => {
-                const a = (i / particulas.length) * Math.PI * 2;
-                p.color = "255, 77, 148";
-                p.targetX = canvas.width/2 + 250 * Math.pow(Math.sin(a), 3);
-                p.targetY = canvas.height/2 - (200 * Math.cos(a) - 80 * Math.cos(2*a) - 40 * Math.cos(3*a) - 15 * Math.cos(4*a));
-            });
-            escribir("TE AMO PARA SIEMPRE, MAYDA", () => {
-                document.body.style.transition = "opacity 3s";
-                document.body.style.opacity = "0";
-                setTimeout(() => { window.location.href = "/boveda"; }, 3000);
-            });
-        });
-    }
-
-    function animar() {
-        ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        particulas.forEach(p => { p.update(); p.draw(); });
-        requestAnimationFrame(animar);
-    }
-</script>
+        document.getElementById('overlay').onclick = function() {
+            this.style.display = 'none';
+            document.getElementById('audioFondo').play();
+            for(let i=0; i<200; i++) particles.push(new Particula());
+            animar();
+            secuencia(0);
+        };
+    </script>
 </body>
-</html>
+</html
