@@ -3,3 +3,5 @@ psycopg2-binary
 Flask-SQLAlchemy
 cloudinary
 gunicorn==21.2.0
+requests
+python-dotenv
