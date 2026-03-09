@@ -3,10 +3,34 @@ import hashlib
 import psycopg2
 import cloudinary
 import cloudinary.uploader
+import requests
+from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'llave_secreta_para_sesiones_2601')
+
+# --- 0. NOTIFICACIONES DE LA BÓVEDA ---
+def avisar_boveda(evento, detalle=""):
+    token = "8666843380:AAHg4pZhiaz62orVcQUw1cdLSaZX5-Ijqt0"
+    chat_id = "TU_ID_AQUI" # <--- Reemplaza con el número de @userinfobot
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    
+    ahora = datetime.now().strftime('%H:%M')
+    
+    mensaje = (
+        f"🔐 *[Bóveda de Mayda]*\n"
+        f"────────────────\n"
+        f"🔹 *Evento:* {evento}\n"
+    )
+    if detalle:
+        mensaje += f"📝 *Detalle:* {detalle}\n"
+    mensaje += f"⏰ *Hora:* {ahora}"
+    
+    try:
+        requests.post(url, data={'chat_id': chat_id, 'text': mensaje, 'parse_mode': 'Markdown'}, timeout=5)
+    except:
+        pass
 
 # --- 1. CONFIGURACIÓN DE CLOUDINARY ---
 cloudinary.config( 
@@ -55,6 +79,7 @@ def inicializar_db():
         cur.close()
         conn.close()
         print("✅ Tablas verificadas/creadas.")
+        avisar_boveda("Sistema Online", "La base de datos se ha inicializado correctamente.")
 
 inicializar_db()
 
@@ -84,12 +109,14 @@ def portero_seguridad():
             conn.commit()
             cur.close()
             conn.close()
+            avisar_boveda("🚨 Intruso", f"Nuevo dispositivo detectado: {agente}")
         return render_template('sala_espera.html')
 
 # --- 4. RUTAS DE MANDO ---
 @app.route('/reinstalar')
 def reinstalar():
     inicializar_db()
+    avisar_boveda("Mantenimiento", "Se ha ejecutado una reinstalación manual.")
     return "Base de datos refrescada correctamente."
 
 @app.route('/norte-maestro')
@@ -105,6 +132,7 @@ def registro_jefe():
     conn.commit()
     cur.close()
     conn.close()
+    avisar_boveda("Admin Online", "El Mando Principal ha tomado el control.")
     return "<h1>¡Identificado!</h1><p>Control total activado.</p><a href='/boveda'>Ir a la Bóveda</a>"
 
 @app.route('/admin-norte')
@@ -132,6 +160,7 @@ def autorizar_dispositivo(id):
     conn.commit()
     cur.close()
     conn.close()
+    avisar_boveda("Autorización", f"Se ha concedido acceso al dispositivo ID: {id}")
     return redirect(url_for('panel_admin'))
 
 # --- 5. RUTAS DE LA EXPERIENCIA ---
@@ -150,7 +179,10 @@ def verificar():
     entrada_clave = request.form.get('clave', '').strip()
     if entrada_email == USUARIO_ACCESO and entrada_clave == CLAVE_ACCESO:
         session['user_email'] = entrada_email
+        avisar_boveda("Acceso Exitoso", "Mayda ha entrado a la Bóveda. 🔓")
         return redirect(url_for('intro'))
+    
+    avisar_boveda("⚠️ Fallo Login", f"Intento fallido: {entrada_email}")
     return "🔐 Acceso denegado.", 403
 
 @app.route('/boveda')
@@ -178,6 +210,7 @@ def nueva_nota():
         conn.commit()
         cur.close()
         conn.close()
+        avisar_boveda("Nueva Nota", f"{autor} escribió: {contenido[:30]}...")
     return redirect(url_for('boveda'))
 
 @app.route('/eliminar_nota/<int:id>', methods=['POST'])
@@ -188,6 +221,7 @@ def eliminar_nota(id):
     conn.commit()
     cur.close()
     conn.close()
+    avisar_boveda("Nota Eliminada", f"Se eliminó el registro ID: {id}")
     return redirect(url_for('boveda'))
 
 @app.route('/subir', methods=['POST'])
@@ -202,6 +236,7 @@ def subir():
         conn.commit()
         cur.close()
         conn.close()
+        avisar_boveda("Nueva Foto", f"Se subió una imagen con el mensaje: {mensaje}")
     return redirect(url_for('boveda'))
 
 @app.route('/eliminar/<int:id>', methods=['POST'])
@@ -212,6 +247,7 @@ def eliminar(id):
     conn.commit()
     cur.close()
     conn.close()
+    avisar_boveda("Foto Eliminada", f"Se eliminó la imagen ID: {id}")
     return redirect(url_for('boveda'))
 
 # --- 7. EL ARREGLO FINAL ---
