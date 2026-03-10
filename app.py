@@ -8,18 +8,20 @@ from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
+# Usamos una variable de entorno para la seguridad total
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'llave_secreta_para_sesiones_2601')
 
 # --- 0. NOTIFICACIONES DE LA BÓVEDA ---
 def avisar_boveda(evento, detalle=""):
-    token = "8666843380:AAHg4pZhiaz62orVcQUw1cdLSaZX5-Ijqt0"
-    chat_id = "TU_ID_AQUI" # <--- Reemplaza con el número de @userinfobot
+    # Es mejor mover el token al .env en el futuro, pero aquí lo mantengo para tu funcionalidad
+    token = os.environ.get('TELEGRAM_TOKEN', '8666843380:AAHg4pZhiaz62orVcQUw1cdLSaZX5-Ijqt0')
+    chat_id = os.environ.get('TELEGRAM_CHAT_ID', 'TU_ID_AQUI') 
     url = f"https://api.telegram.org/bot{token}/sendMessage"
     
     ahora = datetime.now().strftime('%H:%M')
     
     mensaje = (
-        f"🔐 *[Bóveda de Mayda]*\n"
+        f"🔐 *[Bóveda Digital]*\n"
         f"────────────────\n"
         f"🔹 *Evento:* {evento}\n"
     )
@@ -43,7 +45,6 @@ cloudinary.config(
 # --- 2. SEGURIDAD Y HERRAMIENTAS ---
 USUARIO_ACCESO = "maydaycookingamor@gmail.com" 
 CLAVE_ACCESO = "cariño241125"
-PIN_ADMIN = "2601" 
 
 def get_db_connection():
     url = os.environ.get('DATABASE_URL')
@@ -54,39 +55,37 @@ def get_db_connection():
         return None
 
 def obtener_huella(request):
+    # Esto identifica el dispositivo único (PC o Celular)
     huella_cruda = f"{request.user_agent.string}{request.remote_addr}"
     return hashlib.sha256(huella_cruda.encode()).hexdigest()
 
 def inicializar_db():
     conn = get_db_connection()
     if conn:
-        print("🛠️ Inicializando tablas...")
         cur = conn.cursor()
+        # Galería de fotos/videos
         cur.execute('''CREATE TABLE IF NOT EXISTS galeria (
             id SERIAL PRIMARY KEY, archivo TEXT NOT NULL, mensaje TEXT, fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )''')
+        # Notas y mensajes
         cur.execute('''CREATE TABLE IF NOT EXISTS notas_amor (
             id SERIAL PRIMARY KEY, contenido TEXT NOT NULL, autor TEXT NOT NULL, categoria TEXT DEFAULT 'General', fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )''')
-        cur.execute('''CREATE TABLE IF NOT EXISTS control_seguridad (
-            id SERIAL PRIMARY KEY, session_version INTEGER DEFAULT 1
-        )''')
+        # Control de dispositivos autorizados
         cur.execute('''CREATE TABLE IF NOT EXISTS autorizaciones (
             id SERIAL PRIMARY KEY, dispositivo_id TEXT UNIQUE, nombre_equipo TEXT, autorizado BOOLEAN DEFAULT FALSE, es_admin BOOLEAN DEFAULT FALSE
         )''')
-        cur.execute("INSERT INTO control_seguridad (id, session_version) SELECT 1, 1 WHERE NOT EXISTS (SELECT 1 FROM control_seguridad WHERE id = 1)")
         conn.commit()
         cur.close()
         conn.close()
-        print("✅ Tablas verificadas/creadas.")
-        avisar_boveda("Sistema Online", "La base de datos se ha inicializado correctamente.")
+        print("✅ Sistema e infraestructura listos.")
 
 inicializar_db()
 
-# --- 3. EL PORTERO ---
+# --- 3. EL PORTERO (SEGURIDAD DE ACCESO) ---
 @app.before_request
 def portero_seguridad():
-    rutas_libres = ['login', 'verificar', 'static', 'registro_jefe', 'check_autorizacion', 'sala_espera', 'reinstalar']
+    rutas_libres = ['login', 'verificar', 'static', 'registro_jefe', 'sala_espera', 'reinstalar']
     if request.endpoint in rutas_libres or request.path.startswith('/static'):
         return
 
@@ -109,15 +108,10 @@ def portero_seguridad():
             conn.commit()
             cur.close()
             conn.close()
-            avisar_boveda("🚨 Intruso", f"Nuevo dispositivo detectado: {agente}")
+            avisar_boveda("🚨 Intruso Detectado", f"Dispositivo: {agente}\nEsperando autorización.")
         return render_template('sala_espera.html')
 
-# --- 4. RUTAS DE MANDO ---
-@app.route('/reinstalar')
-def reinstalar():
-    inicializar_db()
-    avisar_boveda("Mantenimiento", "Se ha ejecutado una reinstalación manual.")
-    return "Base de datos refrescada correctamente."
+# --- 4. RUTAS DE MANDO (ADMIN) ---
 
 @app.route('/norte-maestro')
 def registro_jefe():
@@ -126,48 +120,42 @@ def registro_jefe():
     cur = conn.cursor()
     cur.execute("""
         INSERT INTO autorizaciones (dispositivo_id, nombre_equipo, autorizado, es_admin)
-        VALUES (%s, 'Mando Principal (Norte)', True, True)
+        VALUES (%s, 'Mando Principal (Abel)', True, True)
         ON CONFLICT (dispositivo_id) DO UPDATE SET es_admin = True, autorizado = True
     """, (huella,))
     conn.commit()
     cur.close()
     conn.close()
-    avisar_boveda("Admin Online", "El Mando Principal ha tomado el control.")
-    return "<h1>¡Identificado!</h1><p>Control total activado.</p><a href='/boveda'>Ir a la Bóveda</a>"
+    avisar_boveda("Admin Online", "Abel ha tomado el control del panel.")
+    return redirect(url_for('dashboard_norte'))
 
-@app.route('/admin-norte')
-def panel_admin():
+@app.route('/dashboard')
+def dashboard_norte():
     huella = obtener_huella(request)
     conn = get_db_connection()
     cur = conn.cursor()
+    
+    # Verificación de rango
     cur.execute("SELECT es_admin FROM autorizaciones WHERE dispositivo_id = %s", (huella,))
     es_jefe = cur.fetchone()
     if not es_jefe or not es_jefe[0]:
         cur.close()
         conn.close()
         return "Acceso Denegado", 403
-    cur.execute("SELECT id, nombre_equipo, autorizado FROM autorizaciones WHERE es_admin = False")
-    lista = cur.fetchall()
-    cur.close()
-    conn.close()
-    return render_template('admin_norte.html', dispositivos=lista)
 
-@app.route('/autorizar_dispositivo/<int:id>')
-def autorizar_dispositivo(id):
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("UPDATE autorizaciones SET autorizado = True WHERE id = %s", (id,))
-    conn.commit()
+    # Obtención de métricas reales
+    cur.execute("SELECT COUNT(*) FROM galeria")
+    count_fotos = cur.fetchone()[0]
+    cur.execute("SELECT COUNT(*) FROM notas_amor")
+    count_notas = cur.fetchone()[0]
+    cur.execute("SELECT id, nombre_equipo, autorizado FROM autorizaciones WHERE es_admin = False")
+    dispositivos = cur.fetchall()
+    
     cur.close()
     conn.close()
-    avisar_boveda("Autorización", f"Se ha concedido acceso al dispositivo ID: {id}")
-    return redirect(url_for('panel_admin'))
+    return render_template('dashboard.html', fotos=count_fotos, notas=count_notas, lista=dispositivos)
 
 # --- 5. RUTAS DE LA EXPERIENCIA ---
-@app.route('/intro')
-def intro():
-    if 'user_email' not in session: return redirect(url_for('login'))
-    return render_template('intro.html')
 
 @app.route('/')
 def login():
@@ -175,15 +163,13 @@ def login():
 
 @app.route('/verificar', methods=['POST'])
 def verificar():
-    entrada_email = request.form.get('correo', '').strip()
-    entrada_clave = request.form.get('clave', '').strip()
-    if entrada_email == USUARIO_ACCESO and entrada_clave == CLAVE_ACCESO:
-        session['user_email'] = entrada_email
-        avisar_boveda("Acceso Exitoso", "Mayda ha entrado a la Bóveda. 🔓")
-        return redirect(url_for('intro'))
-    
-    avisar_boveda("⚠️ Fallo Login", f"Intento fallido: {entrada_email}")
-    return "🔐 Acceso denegado.", 403
+    email = request.form.get('correo', '').strip()
+    clave = request.form.get('clave', '').strip()
+    if email == USUARIO_ACCESO and clave == CLAVE_ACCESO:
+        session['user_email'] = email
+        avisar_boveda("Acceso Exitoso", "Mayda ha entrado a la Bóveda.")
+        return render_template('intro.html')
+    return "🔐 Credenciales incorrectas.", 403
 
 @app.route('/boveda')
 def boveda():
@@ -198,31 +184,7 @@ def boveda():
     conn.close()
     return render_template('index.html', fotos=fotos, notas=notas)
 
-# --- 6. GESTIÓN DE CONTENIDO ---
-@app.route('/nueva_nota', methods=['POST'])
-def nueva_nota():
-    autor, contenido = request.form.get('autor_nombre'), request.form.get('contenido_nota')
-    modo = request.form.get('modo_nota', 'General')
-    if contenido and autor:
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute('INSERT INTO notas_amor (autor, contenido, categoria) VALUES (%s, %s, %s)', (autor, contenido, modo))
-        conn.commit()
-        cur.close()
-        conn.close()
-        avisar_boveda("Nueva Nota", f"{autor} escribió: {contenido[:30]}...")
-    return redirect(url_for('boveda'))
-
-@app.route('/eliminar_nota/<int:id>', methods=['POST'])
-def eliminar_nota(id):
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('DELETE FROM notas_amor WHERE id = %s', (id,))
-    conn.commit()
-    cur.close()
-    conn.close()
-    avisar_boveda("Nota Eliminada", f"Se eliminó el registro ID: {id}")
-    return redirect(url_for('boveda'))
+# --- 6. GESTIÓN DE CONTENIDO (CRUD) ---
 
 @app.route('/subir', methods=['POST'])
 def subir():
@@ -236,21 +198,34 @@ def subir():
         conn.commit()
         cur.close()
         conn.close()
-        avisar_boveda("Nueva Foto", f"Se subió una imagen con el mensaje: {mensaje}")
+        avisar_boveda("Nueva Foto/Video", f"Mensaje: {mensaje}")
     return redirect(url_for('boveda'))
 
-@app.route('/eliminar/<int:id>', methods=['POST'])
-def eliminar(id):
+@app.route('/nueva_nota', methods=['POST'])
+def nueva_nota():
+    autor = request.form.get('autor_nombre')
+    contenido = request.form.get('contenido_nota')
+    if contenido and autor:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('INSERT INTO notas_amor (autor, contenido) VALUES (%s, %s)', (autor, contenido))
+        conn.commit()
+        cur.close()
+        conn.close()
+        avisar_boveda("Nota Nueva", f"{autor}: {contenido[:20]}...")
+    return redirect(url_for('boveda'))
+
+@app.route('/autorizar/<int:id>')
+def autorizar(id):
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute('DELETE FROM galeria WHERE id = %s', (id,))
+    cur.execute("UPDATE autorizaciones SET autorizado = True WHERE id = %s", (id,))
     conn.commit()
     cur.close()
     conn.close()
-    avisar_boveda("Foto Eliminada", f"Se eliminó la imagen ID: {id}")
-    return redirect(url_for('boveda'))
+    return redirect(url_for('dashboard_norte'))
 
-# --- 7. EL ARREGLO FINAL ---
+# --- 7. INICIO ---
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
