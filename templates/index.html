@@ -312,14 +312,16 @@
         </form>
     </div>
 
-    <div class="tarjeta" style="border: 2px dashed #ff4d6d; background: #fffafb; opacity: 0.8; margin-top: 40px;">
-        <h3 style="color: #c9184a; font-size: 0.9rem;">🧭 Panel de Seguridad</h3>
-        <form action="/cierre_global" method="POST" onsubmit="return confirm('¿Ejecutar Cierre Maestro?');">
-            <input type="password" name="pin_admin" placeholder="Introduce el PIN Maestro" 
-                   style="width: 80%; padding: 8px; border-radius: 10px; border: 1px solid #ff4d6d; text-align: center; margin-bottom: 10px;">
-            <button type="submit" style="background: #000; font-size: 0.8rem;">🚨 CERRAR TODO</button>
+    <div class="tarjeta" style="border: 2px dashed #000; background: #fffafb; opacity: 0.9; margin-top: 40px;">
+        <h3 style="color: #000; font-size: 1rem;">🔐 Control Maestro del Norte</h3>
+        
+        <form action="/cerrar-todo" method="GET" onsubmit="return confirm('⚠️ ATENCIÓN: Abel, esto cerrará la sesión en TODOS los dispositivos, incluido este. ¿Ejecutar apagón total?');">
+            <button type="submit" style="background: #000; color: white; border: none; padding: 15px; border-radius: 15px; cursor: pointer; font-weight: bold; width: 100%; font-size: 0.9rem;">
+                🚨 EJECUTAR CIERRE MAESTRO
+            </button>
         </form>
-        <a href="/logout" style="text-decoration:none; color:#ff4d6d; font-size:0.7rem; font-weight:bold; display:block; margin-top:10px;">Cerrar sesión actual</a>
+
+        <a href="/logout" style="text-decoration:none; color:#ff4d6d; font-size:0.75rem; font-weight:bold; display:block; margin-top:15px;">Cerrar solo mi sesión actual</a>
     </div>
 
     <script>
@@ -327,14 +329,10 @@
            NUEVAS FUNCIONES DE SEGURIDAD (INTEGRADAS)
            ======================================================== */
         setInterval(function() {
-            // Revisa si el Jefe cerró la sesión global o te quitó permiso
             fetch('/check_session').then(res => { if (res.status === 401) window.location.href = '/'; });
             fetch('/check_autorizacion').then(res => { if (res.status === 401) window.location.href = '/'; });
         }, 3000);
 
-        /* ========================================================
-           TUS FUNCIONES ORIGINALES (INTACTAS)
-           ======================================================== */
         function editarNota(id, texto) {
             const nuevo = prompt("Edita tu mensaje:", texto);
             if (nuevo) {
