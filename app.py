@@ -12,10 +12,10 @@ app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'llave_secreta_para_sesiones
 
 # --- 1. CONFIGURACIÓN DE CLOUDINARY ---
 cloudinary.config( 
-  cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME'), 
-  api_key = os.environ.get('CLOUDINARY_API_KEY'), 
-  api_secret = os.environ.get('CLOUDINARY_API_SECRET'),
-  secure = True
+    cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME'), 
+    api_key = os.environ.get('CLOUDINARY_API_KEY'), 
+    api_secret = os.environ.get('CLOUDINARY_API_SECRET'),
+    secure = True
 )
 
 # --- 2. SEGURIDAD, HERRAMIENTAS Y NOTIFICACIONES ---
@@ -25,8 +25,8 @@ PIN_ADMIN = "2601"
 
 def avisar_boveda(evento, detalle=""):
     """Función para que el Norte reciba alertas en Telegram"""
-     TOKEN = "8666843380:AAHg4pZhiaz62orVcQUw1cdLSaZX5-Ijqt0"
-     CHAT_ID = "7595418604" # ID de Telegram de Abel
+    token = "8666843380:AAHg4pZhiaz62orVcQUw1cdLSaZX5-Ijqt0"
+    chat_id = "7595418604" # ID de Telegram de Abel
     url = f"https://api.telegram.org/bot{token}/sendMessage"
     ahora = datetime.now().strftime('%H:%M')
     mensaje = (
@@ -81,14 +81,14 @@ inicializar_db()
 # --- 3. EL PORTERO ---
 @app.before_request
 def portero_seguridad():
-    # Añadimos 'cerrar_todo' y 'dashboard_norte' a rutas libres para evitar el error 404 al usarlas
     rutas_libres = ['login', 'verificar', 'static', 'registro_jefe', 'check_autorizacion', 'sala_espera', 'reinstalar', 'cerrar_todo']
     if request.endpoint in rutas_libres or request.path.startswith('/static'):
         return
 
     huella = obtener_huella(request)
     conn = get_db_connection()
-    if not conn: return 
+    if not conn: 
+        return 
     
     cur = conn.cursor()
     cur.execute("SELECT autorizado, es_admin FROM autorizaciones WHERE dispositivo_id = %s", (huella,))
@@ -142,7 +142,6 @@ def dashboard_norte():
         conn.close()
         return "Acceso Denegado", 403
 
-    # CONTEO HISTÓRICO PARA LAS 3 FUNCIONES
     cur.execute("SELECT COUNT(*) FROM galeria")
     total_fotos = cur.fetchone()[0]
     
@@ -158,7 +157,6 @@ def dashboard_norte():
 
 @app.route('/cerrar-todo')
 def cerrar_todo():
-    """BOTÓN DE PÁNICO: Cierra todo el panorama"""
     session.clear()
     avisar_boveda("⚠️ BOTÓN DE PÁNICO", "Se ha cerrado la sesión y limpiado el panorama de accesos.")
     return redirect(url_for('login'))
@@ -177,7 +175,8 @@ def autorizar_dispositivo(id):
 # --- 5. RUTAS DE LA EXPERIENCIA ---
 @app.route('/intro')
 def intro():
-    if 'user_email' not in session: return redirect(url_for('login'))
+    if 'user_email' not in session: 
+        return redirect(url_for('login'))
     return render_template('intro.html')
 
 @app.route('/')
@@ -198,7 +197,8 @@ def verificar():
 
 @app.route('/boveda')
 def boveda():
-    if 'user_email' not in session: return redirect(url_for('login'))
+    if 'user_email' not in session: 
+        return redirect(url_for('login'))
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute('SELECT archivo, mensaje, id FROM galeria ORDER BY id DESC')
@@ -212,7 +212,8 @@ def boveda():
 # --- 6. GESTIÓN DE CONTENIDO ---
 @app.route('/nueva_nota', methods=['POST'])
 def nueva_nota():
-    autor, contenido = request.form.get('autor_nombre'), request.form.get('contenido_nota')
+    autor = request.form.get('autor_nombre')
+    contenido = request.form.get('contenido_nota')
     modo = request.form.get('modo_nota', 'General')
     if contenido and autor:
         conn = get_db_connection()
