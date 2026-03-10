@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Restringido | Bóveda</title>
+    <style>
+        body { background: #050505; color: white; font-family: sans-serif; text-align: center; padding-top: 100px; }
+        .escudo { font-size: 80px; margin-bottom: 20px; }
+        .mensaje { color: #ff007f; font-weight: bold; font-size: 1.2rem; }
+        .id-dispositivo { color: #555; font-size: 0.8rem; margin-top: 50px; }
+        .cargando { border: 4px solid #333; border-top: 4px solid #ff007f; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="escudo">🛡️</div>
+    <h1>ACCESO PENDIENTE</h1>
+    <p class="mensaje">El "Norte" debe autorizar este dispositivo.</p>
+    
+    <div class="cargando"></div>
+    <p style="color: #888;">Esperando señal del mando principal...</p>
+
+    <script>
+        setInterval(function() {
+            // Esta función llama al 'check_autorizacion' de tu Python cada 3 segundos
+            fetch('/check_autorizacion').then(response => {
+                if (response.status === 200) {
+                    // Si el estado es 200 (OK), significa que Abel ya dio permiso
+                    // Recargamos la página para que el Portero lo deje pasar a la Intro
+                    window.location.reload();
+                }
+            }).catch(err => console.log("Buscando señal..."));
+        }, 3000);
+    </script>
+
+    <div class="id-dispositivo">
+        Estado: En espera de validación de identidad.
+    </div>
+
+</body>
+</html>
