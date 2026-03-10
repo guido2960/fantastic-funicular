@@ -2,108 +2,205 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Para Mi Norte - Mayda</title>
+    <title>Para mi Administradora</title>
     <style>
-        body { margin: 0; background: #050505; color: white; font-family: sans-serif; overflow: hidden; }
-        
-        /* Capas de fondo (Invisibles al clic) */
-        canvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 1; }
-        
-        /* Contenedor de mensajes */
-        .contenedor-texto {
-            position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
-            text-align: center; width: 85%; z-index: 10; pointer-events: none;
-        }
-
-        #mensaje-dinamico {
-            font-size: 1.6rem; text-shadow: 0 0 15px #bc13fe;
-            opacity: 0; transition: opacity 1s; font-style: italic;
-        }
-
-        /* EL BOTÓN: Ahora es un elemento flotante independiente */
-        #btn-final {
-            display: none; position: fixed; bottom: 15%; left: 50%;
-            transform: translateX(-50%); z-index: 99999; /* Máxima prioridad */
-            padding: 20px 50px; background: #bc13fe; color: white;
-            border: 2px solid white; border-radius: 50px; font-weight: bold;
-            font-size: 1.4rem; cursor: pointer; text-decoration: none;
-            box-shadow: 0 0 30px #bc13fe; pointer-events: auto !important;
-        }
-
-        /* Pantalla de inicio */
-        .cortina {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: black; z-index: 100000; display: flex;
-            justify-content: center; align-items: center; cursor: pointer;
-        }
+        body { margin: 0; background: #000; color: white; font-family: 'Courier New', monospace; overflow: hidden; }
+        #canvasUniverso { position: absolute; top: 0; left: 0; }
+        #interfaz { position: relative; z-index: 10; width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; pointer-events: none; }
+        #texto-emocional { font-size: 26px; text-align: center; text-shadow: 0 0 20px #ff4d94; padding: 20px; font-weight: bold; max-width: 80%; line-height: 1.5; }
+        #pantalla-inicio { position: fixed; width: 100%; height: 100%; background: black; z-index: 100; display: flex; justify-content: center; align-items: center; pointer-events: all; }
+        #btn-entrar { padding: 20px 40px; font-size: 22px; cursor: pointer; background: #ff4d94; border: none; color: white; border-radius: 50px; box-shadow: 0 0 30px #ff4d94; transition: 0.3s; font-family: 'Courier New', monospace; }
+        #btn-entrar:hover { transform: scale(1.1); background: #ff3385; }
     </style>
 </head>
 <body>
 
-    <div class="cortina" id="cortina" onclick="iniciar()"> [ CLIC PARA TU SORPRESA ] </div>
+<div id="pantalla-inicio">
+    <button id="btn-entrar" onclick="iniciarHistoria()">Entrar a nuestra historia</button>
+</div>
 
-    <div class="contenedor-texto">
-        <h1 style="color: #bc13fe; letter-spacing: 5px;">MAYDA</h1>
-        <p id="mensaje-dinamico"></p>
-    </div>
+<div id="interfaz">
+    <div id="texto-emocional"></div>
+</div>
 
-    <button id="btn-final" onclick="irABoveda()">ENTRAR A NUESTRA BÓVEDA</button>
+<canvas id="canvasUniverso"></canvas>
 
-    <canvas id="universo"></canvas>
-    <audio id="musica" loop src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772983408/para_ti_Mayda_xkgwz4.mp3"></audio>
+<audio id="musicaFondo" loop preload="auto">
+    <source src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772691824/musica_de_fondo_fuo3r2.m4a" type="audio/mp4">
+</audio>
+<audio id="audioVoz" preload="auto">
+    <source src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772691824/mi_audio_e07s2p.mp4" type="audio/mp4">
+</audio>
 
-    <script>
-        // Redirección directa a tu ruta de Python
-        function irABoveda() {
-            window.location.href = "/boveda";
+<script>
+    const canvas = document.getElementById('canvasUniverso');
+    const ctx = canvas.getContext('2d');
+    const textoDiv = document.getElementById('texto-emocional');
+    const musica = document.getElementById('musicaFondo');
+    const voz = document.getElementById('audioVoz');
+    
+    let particulas = [];
+    let estrellasFijas = []; 
+    let fase = "paz"; 
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // FONDO ESTÁTICO (Las 300 que te gustaron)
+    for(let i=0; i<300; i++) {
+        estrellasFijas.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            opacidad: Math.random() * 0.5 + 0.1
+        });
+    }
+
+    class Particula {
+        constructor() { this.reset(); }
+        reset() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.vx = (Math.random() - 0.5) * 2;
+            this.vy = -Math.random() * 1.5;
+            this.color = "white";
+            this.tamaño = Math.random() * 2 + 0.5;
+            this.opacidad = 1;
+            this.objetivoX = null;
+            this.objetivoY = null;
         }
-
-        const canvas = document.getElementById('universo');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-
-        let stars = [];
-        for(let i=0; i<100; i++) stars.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*3});
-
-        function animar() {
-            ctx.clearRect(0,0,canvas.width, canvas.height);
-            ctx.fillStyle = "#bc13fe";
-            stars.forEach(s => {
-                ctx.beginPath(); ctx.arc(s.x, s.y, s.s, 0, Math.PI*2); ctx.fill();
-                s.y += 0.5; if(s.y > canvas.height) s.y = 0;
-            });
-            requestAnimationFrame(animar);
-        }
-
-        const poesia = [
-            "A veces tengo ganas de ser cursi para decirle: La amo con locura.",
-            "Mayda, admiro tu sacrificio en la cevichería para pagar tu carrera.",
-            "Estamos unidos en esto. No te voy a abandonar nunca.",
-            "Somos un equipo. Te amo profundamente. Tu Abel."
-        ];
-
-        function secuencia(i) {
-            const p = document.getElementById('mensaje-dinamico');
-            if(i < poesia.length) {
-                p.innerText = poesia[i];
-                p.style.opacity = 1;
-                setTimeout(() => {
-                    p.style.opacity = 0;
-                    setTimeout(() => secuencia(i+1), 1000);
-                }, 5000);
-            } else {
-                // Aparece el botón al final
-                document.getElementById('btn-final').style.display = "block";
+        actualizar() {
+            if (fase === "paz") {
+                this.y += this.vy;
+                if (this.y < 0) this.y = canvas.height;
+            } else if (fase === "avion" || fase === "corazon") {
+                this.x += (this.objetivoX - this.x) * 0.05;
+                this.y += (this.objetivoY - this.y) * 0.05;
+            } else if (fase === "fuegos") {
+                this.x += this.vx * 7;
+                this.y += this.vy * 7;
+                this.opacidad -= 0.01;
+            } else if (fase === "petalos") {
+                this.y += 1.5;
+                this.x += Math.sin(this.y * 0.03) * 2;
+                this.color = "rgba(255, 182, 193, " + this.opacidad + ")";
+                if (this.y > canvas.height) { this.y = -10; this.opacidad = Math.random(); }
             }
         }
-
-        function iniciar() {
-            document.getElementById('cortina').style.display = "none";
-            document.getElementById('musica').play();
-            animar();
-            secuencia(0);
+        dibujar() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.tamaño, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.globalAlpha = Math.max(0, this.opacidad);
+            ctx.fill();
         }
-    </script>
+    }
+
+    for (let i = 0; i < 700; i++) particulas.push(new Particula());
+
+    // MÁQUINA DE ESCRIBIR (75ms)
+    function escribir(txt) {
+        let i = 0; 
+        textoDiv.innerHTML = "";
+        const intervalId = setInterval(() => {
+            if(i < txt.length) { 
+                textoDiv.innerHTML += txt.charAt(i); 
+                i++; 
+            } else { 
+                clearInterval(intervalId); 
+            }
+        }, 75);
+    }
+
+    function formarFigura(tipo) {
+        fase = tipo;
+        particulas.forEach((p, i) => {
+            const t = i / particulas.length * Math.PI * 2;
+            if (tipo === "corazon") {
+                p.color = "#ff4d94";
+                p.objetivoX = canvas.width/2 + 180 * Math.pow(Math.sin(t), 3);
+                p.objetivoY = canvas.height/2 - (150 * Math.cos(t) - 60 * Math.cos(2*t) - 30 * Math.cos(3*t) - 15 * Math.cos(4*t));
+            } else if (tipo === "avion") {
+                p.color = "#87CEEB";
+                p.objetivoX = canvas.width/2 + (i%50 * 12) - 300;
+                p.objetivoY = canvas.height/2 + (Math.sin(i*0.5)*25);
+            }
+        });
+    }
+
+    // --- CRONOLOGÍA DE 180 SEGUNDOS (3 MINUTOS) ---
+    function iniciarHistoria() {
+        document.getElementById('pantalla-inicio').style.display = 'none';
+        musica.volume = 0.3;
+        musica.play().catch(e => console.log(e));
+
+        // MINUTO 1: CALMA Y CAPAS
+        escribir("Todo comenzó con esta paz que me diste, mi Administradora."); 
+        
+        setTimeout(() => {
+            escribir("Me tomó tiempo entender cada capa de tu alma, pero cada una vale la pena."); 
+        }, 25000);
+
+        setTimeout(() => {
+            escribir("Valoré cada silencio y cada palabra en tus momentos de calma."); 
+        }, 50000);
+
+        // MINUTO 2: ACCIÓN Y VUELO
+        setTimeout(() => {
+            formarFigura("avion");
+            escribir("Y de pronto, empezamos a volar hacia un mismo norte."); 
+        }, 75000);
+
+        setTimeout(() => {
+            escribir("Admiro tu fuerza en Modo Acción... eres mi mayor inspiración."); 
+        }, 105000);
+
+        // MINUTO 3: CORAZÓN Y TU VOZ
+        setTimeout(() => {
+            formarFigura("corazon");
+            musica.volume = 0.1; 
+            voz.play().catch(e => console.log(e));
+            escribir("Escucha esto que tengo guardado solo para ti..."); 
+        }, 135000);
+
+        setTimeout(() => {
+            escribir("Eres y serás siempre el amor de mi vida, Mayda."); 
+        }, 160000);
+
+        // FINAL (3:00)
+        setTimeout(() => {
+            fase = "fuegos";
+            escribir("👩‍❤️‍💋‍👨 TE AMO PARA SIEMPRE, MI ADMINISTRADORA 👩‍❤️‍💋‍👨"); 
+            
+            setTimeout(() => {
+                fase = "petalos";
+                particulas.forEach(p => { p.opacidad = 1; p.tamaño = 3.5; });
+            }, 3000);
+
+            setTimeout(() => {
+                document.body.style.transition = "opacity 4s";
+                document.body.style.opacity = "0";
+                setTimeout(() => { window.location.href = "/boveda"; }, 4000);
+            }, 12000); 
+        }, 180000);
+    }
+
+    // EL FONDO CHÉVERE (EL GRADIENTE QUE TE GUSTÓ)
+    function animar() {
+        let gradient = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, canvas.width);
+        gradient.addColorStop(0, "#0c001a"); 
+        gradient.addColorStop(1, "#000000"); 
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = "white";
+        estrellasFijas.forEach(ef => {
+            ctx.globalAlpha = ef.opacidad;
+            ctx.fillRect(ef.x, ef.y, 1, 1);
+        });
+
+        particulas.forEach(p => { p.actualizar(); p.dibujar(); });
+        requestAnimationFrame(animar);
+    }
+    animar();
+</script>
 </body>
 </html>
