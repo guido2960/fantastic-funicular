@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard | Bóveda Norte</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body { background-color: #0d0d0d; color: #e0e0e0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .dashboard-wrapper { padding: 40px; max-width: 1000px; margin: auto; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 30px; }
+        .card { 
+            background: rgba(255, 255, 255, 0.05); 
+            border: 1px solid #bc13fe; 
+            padding: 20px; 
+            border-radius: 12px; 
+            text-align: center;
+            transition: 0.3s;
+        }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(188, 19, 254, 0.3); }
+        .number { font-size: 2.5em; font-weight: bold; color: #bc13fe; }
+        .status-online { color: #00ff88; font-weight: bold; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <h1>📊 Panel de Control: Bóveda Digital</h1>
+        <p>Bienvenido, Abel. Aquí tienes el pulso de tu proyecto.</p>
+
+        <div class="stats-grid">
+            <div class="card">
+                <h3>Recuerdos</h3>
+                <p class="number">{{ total_multimedia }}</p>
+                <p>Fotos y Videos</p>
+            </div>
+
+            <div class="card">
+                <h3>Notas en Muro</h3>
+                <p class="number">{{ total_notas }}</p>
+                <p>Mensajes Privados</p>
+            </div>
+
+            <div class="card">
+                <h3>Servidor Render</h3>
+                <p class="status-online">Activo</p>
+                <p>Conectado vía Python</p>
+            </div>
+        </div>
+
+        <div style="margin-top: 50px; opacity: 0.6; font-family: monospace;">
+            <p>// Log: El Norte está seguro. Disfrutando el proceso.</p>
+        </div>
+    </div>
+</body>
+</html>
