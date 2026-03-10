@@ -25,8 +25,8 @@ PIN_ADMIN = "2601"
 
 def avisar_boveda(evento, detalle=""):
     """Función para que el Norte reciba alertas en Telegram"""
-    token = "8666843380:AAHg4pZhiaz62orVcQUw1cdLSaZX5-Ijqt0"
-    chat_id = "6438096356"  # ID de Telegram de Abel
+     TOKEN = "8666843380:AAHg4pZhiaz62orVcQUw1cdLSaZX5-Ijqt0"
+     CHAT_ID = "7595418604" # ID de Telegram de Abel
     url = f"https://api.telegram.org/bot{token}/sendMessage"
     ahora = datetime.now().strftime('%H:%M')
     mensaje = (
