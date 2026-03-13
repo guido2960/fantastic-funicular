@@ -2,6 +2,17 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <title>Para mi Administradora</title>
+    <style>
+        body { margin: 0; background: #000; color: white; font-family: 'Courier New', monospace; overflow: hidden; }
+        #canvasUniverso { position: absolute; top: 0; left: 0; }
+        #interfaz { position: relative; z-index: 10; width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; pointer-events: none; }
+        #texto-emocional { font-size: 26px; text-align: center; text-shadow: 0 0 20px #ff4d94; padding: 20px; font-weight: bold; max-width: 80%; line-height: 1.5; }
+        #pantalla-inicio { position: fixed; width: 100%; height: 100%; background: black; z-index: 100; displ…
+[9:54 a.m., 13/3/2026] A B E L: <!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mayda // Indispensable System</title>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
@@ -9,74 +20,45 @@
         :root { --pink: #ff1493; --glow: #ff69b4; --cyan: #00f2ff; --bg: #050505; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: var(--bg); font-family: 'Poppins', sans-serif; color: white; }
 
-        /* Estrellas de fondo */
-        #starfield { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+        #starfield { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
         
-        /* Galaxia Triple Capa */
-        .ring-container { position: absolute; left: 50%; top: 50%; transform-style: preserve-3d; animation: galaxyRotate 35s linear infinite; }
+        .ring-container { position: absolute; left: 50%; top: 50%; transform-style: preserve-3d; animation: galaxyRotate 35s linear infinite; z-index: 5; }
         @keyframes galaxyRotate {
             0% { transform: translate(-50%, -50%) rotateX(75deg) rotateZ(0deg); }
             100% { transform: translate(-50%, -50%) rotateX(75deg) rotateZ(360deg); }
         }
-        .ring-text { position: absolute; white-space: nowrap; color: var(--pink); opacity: 0.5; font-size: 14px; font-family: 'Fira Code', monospace; text-shadow: 0 0 10px var(--pink); animation: pulseGlow 3s infinite alternate; }
-        @keyframes pulseGlow { from { opacity: 0.3; } to { opacity: 0.7; } }
+        .ring-text { position: absolute; white-space: nowrap; color: var(--pink); opacity: 0.5; font-size: 14px; font-family: 'Fira Code', monospace; text-shadow: 0 0 10px var(--pink); }
 
-        /* Frases Flotantes */
-        .mayda-phrase {
-            position: absolute; color: var(--cyan); opacity: 0; font-family: 'Fira Code', monospace;
-            font-size: 16px; pointer-events: none; z-index: 60; white-space: nowrap;
-            text-shadow: 0 0 12px var(--cyan); animation: phraseFloat 6s ease-in-out forwards;
-        }
-        @keyframes phraseFloat {
-            0% { transform: scale(0.5); opacity: 0; }
-            20% { opacity: 1; transform: scale(1.1); }
-            80% { opacity: 1; }
-            100% { transform: translate(0, -150px) scale(1); opacity: 0; }
-        }
-
-        /* Corazones de Luz */
-        .heart-particle {
-            position: absolute; color: var(--pink); pointer-events: none; z-index: 10;
-            filter: blur(1px); animation: heartPulse 4s ease-out forwards;
-        }
-        @keyframes heartPulse {
-            0% { transform: scale(0) rotate(0); opacity: 0; }
-            50% { opacity: 0.8; }
-            100% { transform: scale(2) rotate(45deg); opacity: 0; }
-        }
-
-        /* Fotos Cinematográficas */
-        .photo { 
-            position: absolute; width: 200px; height: 200px; border: 2px solid white; 
-            border-radius: 15px; object-fit: cover; box-shadow: 0 0 40px var(--glow); 
-            z-index: 50; pointer-events: none; 
-        }
-
-        /* Terminal y Pantalla Final */
-        #final-screen { 
-            position: fixed; inset: 0; z-index: 1000; display: none; 
-            background: rgba(0,0,0,0.97); flex-direction: column; 
+        #intro { 
+            position: fixed; inset: 0; z-index: 999999; 
+            background: var(--bg); display: flex; flex-direction: column; 
             align-items: center; justify-content: center; 
         }
-        .terminal { 
-            font-family: 'Fira Code', monospace; color: var(--cyan); 
-            background: #0d1117; padding: 35px; border-radius: 15px; 
-            border: 1px solid var(--pink); width: 85%; max-width: 600px;
-            box-shadow: 0 0 60px rgba(255, 20, 147, 0.4); overflow: hidden;
-        }
-
-        /* Intro */
-        #intro { position: fixed; inset: 0; z-index: 9999; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        
         #start-btn { 
-            margin-top: 30px; padding: 15px 45px; border: 2px solid var(--pink); 
-            background: transparent; color: var(--pink); cursor: pointer; 
-            font-family: 'Fira Code'; font-weight: bold; font-size: 18px; 
-            transition: 0.3s; position: relative; z-index: 10000;
+            margin-top: 30px; padding: 20px 60px; 
+            border: 3px solid var(--pink); background: #050505; 
+            color: var(--pink); cursor: pointer !important; 
+            font-family: 'Fira Code'; font-weight: bold; font-size: 22px; 
+            transition: 0.3s; position: relative; pointer-events: auto;
         }
-        #start-btn:hover { background: var(--pink); color: white; box-shadow: 0 0 30px var(--pink); }
+        #start-btn:hover { background: var(--pink); color: white; box-shadow: 0 0 50px var(--pink); }
 
-        .fade-in-text { animation: fadeIn 1s forwards; opacity: 0; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .mayda-phrase { position: absolute; color: var(--cyan); opacity: 0; font-family: 'Fira Code', monospace; font-size: 16px; pointer-events: none; z-index: 100; text-shadow: 0 0 12px var(--cyan); animation: phraseFloat 6s ease-in-out forwards; }
+        @keyframes phraseFloat { 0% { transform: scale(0.5); opacity: 0; } 20% { opacity: 1; transform: scale(1.1); } 80% { opacity: 1; } 100% { transform: translate(0, -150px) scale(1); opacity: 0; } }
+        
+        .heart-particle { position: absolute; color: var(--pink); pointer-events: none; z-index: 10; animation: heartPulse 4s ease-out forwards; }
+        @keyframes heartPulse { 0% { transform: scale(0); opacity: 0; } 50% { opacity: 0.8; } 100% { transform: scale(2); opacity: 0; } }
+
+        .photo { position: absolute; width: 220px; height: 220px; border: 2px solid white; border-radius: 15px; object-fit: cover; box-shadow: 0 0 40px var(--glow); z-index: 80; pointer-events: none; }
+
+        #final-screen { position: fixed; inset: 0; z-index: 2000000; display: none; background: rgba(0,0,0,0.98); flex-direction: column; align-items: center; justify-content: center; }
+        .terminal { font-family: 'Fira Code', monospace; color: var(--cyan); background: #0d1117; padding: 35px; border-radius: 15px; border: 1px solid var(--pink); width: 85%; max-width: 600px; box-shadow: 0 0 60px rgba(255, 20, 147, 0.4); height: 400px; overflow-y: auto; }
+        
+        /* Ocultar scrollbar */
+        .terminal::-webkit-scrollbar { display: none; }
+
+        @keyframes fadeInBtn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -91,7 +73,7 @@
     <div id="galaxy"><div class="ring-container" id="ring"></div></div>
     
     <div id="final-screen">
-        <div style="font-size: 70px; margin-bottom: 25px; filter: drop-shadow(0 0 20px var(--pink));">🛹 ❤️ 🌹</div>
+        <div style="font-size: 70px; margin-bottom: 25px;">🛹 ❤️ 🌹</div>
         <div class="terminal" id="term"></div>
     </div>
 
@@ -106,38 +88,18 @@
         const canvas = document.getElementById('starfield');
         const ctx = canvas.getContext('2d');
 
-        const realPhrases = [
-            "No sé cómo te has vuelto indispensable",
-            "Amo cómo eres conmigo",
-            "Mi Administradora favorita ❤️",
-            "Me siento apoyada contigo",
-            "Me haces reír mucho",
-            "Te amo",
-            "Todo con calma amor",
-            "Me haces el hombre más feliz"
-        ];
-
-        const photos = [
-            "https://res.cloudinary.com/dvm2v0zvr/image/upload/v1771000212/lu0vh9dirievwosl19sx.jpg",
-            "https://res.cloudinary.com/dvm2v0zvr/image/upload/v1771012574/htmdh7u7xxvvl43dlxfc.jpg",
-            "https://res.cloudinary.com/dvm2v0zvr/image/upload/v1771012672/zohlnjlunxeafhnzdinx.jpg",
-            "https://res.cloudinary.com/dvm2v0zvr/image/upload/v1772508574/vksygd7avg8adotj5jfs.jpg",
-            "https://res.cloudinary.com/dvm2v0zvr/image/upload/v1772532240/bnxotwbredookmb58sbq.jpg",
-            "https://res.cloudinary.com/dvm2v0zvr/image/upload/v1771173751/o9pc4smsntgueavxurnz.jpg"
-        ];
-
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        const stars = Array(200).fill().map(() => ({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*2, v: Math.random()*0.3 }));
+        const stars = Array(150).fill().map(() => ({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*2, v: Math.random()*0.3 }));
         function draw() { ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle="white"; stars.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, s.s, 0, Math.PI*2); ctx.fill(); s.y+=s.v; if(s.y>canvas.height) s.y=0; }); requestAnimationFrame(draw); }
         draw();
 
         document.getElementById('start-btn').addEventListener('click', function() {
             intro.style.display = 'none'; 
-            audio.play().catch(() => console.log("Audio esperando..."));
+            audio.play().catch(err => console.log("Audio en espera"));
             buildGalaxy();
             setInterval(spawnHeartParticle, 500);
             setInterval(spawnPhoto, 4500);   
-            setInterval(spawnPhrase, 1800);  
+            setInterval(spawnPhrase, 2000);  
         });
 
         function buildGalaxy() {
@@ -160,12 +122,14 @@
 
         function spawnPhrase() {
             const p = document.createElement('div'); p.className = 'mayda-phrase';
-            p.innerText = realPhrases[Math.floor(Math.random()*realPhrases.length)];
+            const phrases = ["No sé cómo te has vuelto indispensable", "Amo cómo eres conmigo", "Mi Administradora favorita ❤️", "Te amo", "Me haces el hombre más feliz"];
+            p.innerText = phrases[Math.floor(Math.random()*phrases.length)];
             p.style.left = (15+Math.random()*70)+"vw"; p.style.top = (20+Math.random()*60)+"vh";
             document.body.appendChild(p); setTimeout(() => p.remove(), 6000);
         }
 
         function spawnPhoto() {
+            const photos = ["https://res.cloudinary.com/dvm2v0zvr/image/upload/v1771000212/lu0vh9dirievwosl19sx.jpg", "https://res.cloudinary.com/dvm2v0zvr/image/upload/v1771012574/htmdh7u7xxvvl43dlxfc.jpg", "https://res.cloudinary.com/dvm2v0zvr/image/upload/v1771012672/zohlnjlunxeafhnzdinx.jpg", "https://res.cloudinary.com/dvm2v0zvr/image/upload/v1772508574/vksygd7avg8adotj5jfs.jpg", "https://res.cloudinary.com/dvm2v0zvr/image/upload/v1772532240/bnxotwbredookmb58sbq.jpg", "https://res.cloudinary.com/dvm2v0zvr/image/upload/v1771173751/o9pc4smsntgueavxurnz.jpg"];
             const img = document.createElement('img'); img.src = photos[Math.floor(Math.random()*photos.length)];
             img.className = 'photo'; img.style.left = (20+Math.random()*60)+"%"; img.style.top = (20+Math.random()*60)+"%";
             document.body.appendChild(img);
@@ -177,30 +141,43 @@
             const lines = [
                 "> [SYSTEM] Identidad verificada: MAYDA.",
                 "> [STATUS] Administradora de este sistema.",
-                "> Me encanta leerte; me haces el hombre más feliz.",
+                "> Me encanta leer cómo te expresas.",
+                "> Me haces sentir el hombre más feliz del mundo.",
                 "> Gracias por ser mi apoyo y mi norte.",
-                "> Tu programador y skater siempre estará para ti.",
                 "> MORALEJA: Eres indispensable en este código y en mi vida.",
                 "> [ACCESS] Permiso concedido.",
                 "> while(true) { amarte_siempre(); }"
             ];
-            let i = 0;
-            const t = setInterval(() => {
-                if(i < lines.length) {
-                    term.innerHTML += <div class="fade-in-text" style="margin-bottom:12px;">${lines[i]}</div>;
-                    i++;
-                } else {
-                    clearInterval(t);
-                    setTimeout(() => {
-                        term.innerHTML += <br><button onclick="entrarABoveda()" style="padding:12px 25px; border:1px solid var(--cyan); background:rgba(0,242,255,0.1); color:var(--cyan); cursor:pointer; font-family:'Fira Code'; box-shadow: 0 0 15px var(--cyan); animation: fadeIn 1s forwards;"> [ ACCEDER A BÓVEDA DIGITAL ] </button>;
-                    }, 1500);
-                }
-            }, 1900);
-        };
+            
+            let lineIdx = 0;
+            function typeLine() {
+                if (lineIdx < lines.length) {
+                    let charIdx = 0;
+                    let currentLine = lines[lineIdx];
+                    let lineDiv = document.createElement('div');
+                    lineDiv.style.marginBottom = "12px";
+                    term.appendChild(lineDiv);
 
-        function entrarABoveda() {
-            window.location.href = "/boveda"; 
-        }
+                    function typeChar() {
+                        if (charIdx < currentLine.length) {
+                            lineDiv.innerHTML += currentLine.charAt(charIdx);
+                            charIdx++;
+                            setTimeout(typeChar, 40);
+                        } else {
+                            lineIdx++;
+                            setTimeout(typeLine, 800);
+                        }
+                        term.scrollTop = term.scrollHeight;
+                    }
+                    typeChar();
+                } else {
+                    setTimeout(() => {
+                        term.innerHTML += <br><button onclick="window.location.href='/boveda'" style="padding:12px 25px; border:1px solid var(--cyan); background:rgba(0,242,255,0.1); color:var(--cyan); cursor:pointer; font-family:'Fira Code'; box-shadow: 0 0 15px var(--cyan); animation: fadeInBtn 1s forwards;"> [ ACCEDER A BÓVEDA DIGITAL ] </button>;
+                    }, 1000);
+                }
+            }
+            typeLine();
+        };
     </script>
 </body>
 </html>
