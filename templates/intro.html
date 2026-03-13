@@ -2,205 +2,205 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Para mi Administradora</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mayda // Indispensable System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; background: #000; color: white; font-family: 'Courier New', monospace; overflow: hidden; }
-        #canvasUniverso { position: absolute; top: 0; left: 0; }
-        #interfaz { position: relative; z-index: 10; width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; pointer-events: none; }
-        #texto-emocional { font-size: 26px; text-align: center; text-shadow: 0 0 20px #ff4d94; padding: 20px; font-weight: bold; max-width: 80%; line-height: 1.5; }
-        #pantalla-inicio { position: fixed; width: 100%; height: 100%; background: black; z-index: 100; display: flex; justify-content: center; align-items: center; pointer-events: all; }
-        #btn-entrar { padding: 20px 40px; font-size: 22px; cursor: pointer; background: #ff4d94; border: none; color: white; border-radius: 50px; box-shadow: 0 0 30px #ff4d94; transition: 0.3s; font-family: 'Courier New', monospace; }
-        #btn-entrar:hover { transform: scale(1.1); background: #ff3385; }
+        :root { --pink: #ff1493; --glow: #ff69b4; --cyan: #00f2ff; --bg: #050505; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: var(--bg); font-family: 'Poppins', sans-serif; color: white; }
+
+        /* Estrellas de fondo */
+        #starfield { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+        
+        /* Galaxia Triple Capa */
+        .ring-container { position: absolute; left: 50%; top: 50%; transform-style: preserve-3d; animation: galaxyRotate 35s linear infinite; }
+        @keyframes galaxyRotate {
+            0% { transform: translate(-50%, -50%) rotateX(75deg) rotateZ(0deg); }
+            100% { transform: translate(-50%, -50%) rotateX(75deg) rotateZ(360deg); }
+        }
+        .ring-text { position: absolute; white-space: nowrap; color: var(--pink); opacity: 0.5; font-size: 14px; font-family: 'Fira Code', monospace; text-shadow: 0 0 10px var(--pink); animation: pulseGlow 3s infinite alternate; }
+        @keyframes pulseGlow { from { opacity: 0.3; } to { opacity: 0.7; } }
+
+        /* Frases Flotantes */
+        .mayda-phrase {
+            position: absolute; color: var(--cyan); opacity: 0; font-family: 'Fira Code', monospace;
+            font-size: 16px; pointer-events: none; z-index: 60; white-space: nowrap;
+            text-shadow: 0 0 12px var(--cyan); animation: phraseFloat 6s ease-in-out forwards;
+        }
+        @keyframes phraseFloat {
+            0% { transform: scale(0.5); opacity: 0; }
+            20% { opacity: 1; transform: scale(1.1); }
+            80% { opacity: 1; }
+            100% { transform: translate(0, -150px) scale(1); opacity: 0; }
+        }
+
+        /* Corazones de Luz */
+        .heart-particle {
+            position: absolute; color: var(--pink); pointer-events: none; z-index: 10;
+            filter: blur(1px); animation: heartPulse 4s ease-out forwards;
+        }
+        @keyframes heartPulse {
+            0% { transform: scale(0) rotate(0); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: scale(2) rotate(45deg); opacity: 0; }
+        }
+
+        /* Fotos Cinematográficas */
+        .photo { 
+            position: absolute; width: 200px; height: 200px; border: 2px solid white; 
+            border-radius: 15px; object-fit: cover; box-shadow: 0 0 40px var(--glow); 
+            z-index: 50; pointer-events: none; 
+        }
+
+        /* Terminal y Pantalla Final */
+        #final-screen { 
+            position: fixed; inset: 0; z-index: 1000; display: none; 
+            background: rgba(0,0,0,0.97); flex-direction: column; 
+            align-items: center; justify-content: center; 
+        }
+        .terminal { 
+            font-family: 'Fira Code', monospace; color: var(--cyan); 
+            background: #0d1117; padding: 35px; border-radius: 15px; 
+            border: 1px solid var(--pink); width: 85%; max-width: 600px;
+            box-shadow: 0 0 60px rgba(255, 20, 147, 0.4); overflow: hidden;
+        }
+
+        /* Intro */
+        #intro { position: fixed; inset: 0; z-index: 9999; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        #start-btn { 
+            margin-top: 30px; padding: 15px 45px; border: 2px solid var(--pink); 
+            background: transparent; color: var(--pink); cursor: pointer; 
+            font-family: 'Fira Code'; font-weight: bold; font-size: 18px; 
+            transition: 0.3s; position: relative; z-index: 10000;
+        }
+        #start-btn:hover { background: var(--pink); color: white; box-shadow: 0 0 30px var(--pink); }
+
+        .fade-in-text { animation: fadeIn 1s forwards; opacity: 0; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-<div id="pantalla-inicio">
-    <button id="btn-entrar" onclick="iniciarHistoria()">Entrar a nuestra historia</button>
-</div>
+    <div id="intro">
+        <h1 style="font-family:'Fira Code'; text-shadow: 0 0 15px var(--pink);">&lt;SYSTEM_OVERRIDE: MAYDA /&gt;</h1>
+        <p style="color: #666; font-size: 13px; letter-spacing: 2px;">MI ADMINISTRADORA • MI NORTE</p>
+        <button id="start-btn">CONECTAR SISTEMA</button>
+    </div>
 
-<div id="interfaz">
-    <div id="texto-emocional"></div>
-</div>
-
-<canvas id="canvasUniverso"></canvas>
-
-<audio id="musicaFondo" loop preload="auto">
-    <source src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772691824/musica_de_fondo_fuo3r2.m4a" type="audio/mp4">
-</audio>
-<audio id="audioVoz" preload="auto">
-    <source src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772691824/mi_audio_e07s2p.mp4" type="audio/mp4">
-</audio>
-
-<script>
-    const canvas = document.getElementById('canvasUniverso');
-    const ctx = canvas.getContext('2d');
-    const textoDiv = document.getElementById('texto-emocional');
-    const musica = document.getElementById('musicaFondo');
-    const voz = document.getElementById('audioVoz');
+    <canvas id="starfield"></canvas>
+    <div id="galaxy"><div class="ring-container" id="ring"></div></div>
     
-    let particulas = [];
-    let estrellasFijas = []; 
-    let fase = "paz"; 
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    <div id="final-screen">
+        <div style="font-size: 70px; margin-bottom: 25px; filter: drop-shadow(0 0 20px var(--pink));">🛹 ❤️ 🌹</div>
+        <div class="terminal" id="term"></div>
+    </div>
 
-    // FONDO ESTÁTICO (Las 300 que te gustaron)
-    for(let i=0; i<300; i++) {
-        estrellasFijas.push({
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
-            opacidad: Math.random() * 0.5 + 0.1
-        });
-    }
+    <audio id="audio" preload="auto">
+        <source src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1773381592/MAYDA_AMORE_nsel5u.mp4" type="audio/mpeg">
+    </audio>
 
-    class Particula {
-        constructor() { this.reset(); }
-        reset() {
-            this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height;
-            this.vx = (Math.random() - 0.5) * 2;
-            this.vy = -Math.random() * 1.5;
-            this.color = "white";
-            this.tamaño = Math.random() * 2 + 0.5;
-            this.opacidad = 1;
-            this.objetivoX = null;
-            this.objetivoY = null;
-        }
-        actualizar() {
-            if (fase === "paz") {
-                this.y += this.vy;
-                if (this.y < 0) this.y = canvas.height;
-            } else if (fase === "avion" || fase === "corazon") {
-                this.x += (this.objetivoX - this.x) * 0.05;
-                this.y += (this.objetivoY - this.y) * 0.05;
-            } else if (fase === "fuegos") {
-                this.x += this.vx * 7;
-                this.y += this.vy * 7;
-                this.opacidad -= 0.01;
-            } else if (fase === "petalos") {
-                this.y += 1.5;
-                this.x += Math.sin(this.y * 0.03) * 2;
-                this.color = "rgba(255, 182, 193, " + this.opacidad + ")";
-                if (this.y > canvas.height) { this.y = -10; this.opacidad = Math.random(); }
-            }
-        }
-        dibujar() {
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.tamaño, 0, Math.PI * 2);
-            ctx.fillStyle = this.color;
-            ctx.globalAlpha = Math.max(0, this.opacidad);
-            ctx.fill();
-        }
-    }
+    <script>
+        const audio = document.getElementById('audio');
+        const intro = document.getElementById('intro');
+        const term = document.getElementById('term');
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
 
-    for (let i = 0; i < 700; i++) particulas.push(new Particula());
+        const realPhrases = [
+            "No sé cómo te has vuelto indispensable",
+            "Amo cómo eres conmigo",
+            "Mi Administradora favorita ❤️",
+            "Me siento apoyada contigo",
+            "Me haces reír mucho",
+            "Te amo",
+            "Todo con calma amor",
+            "Me haces el hombre más feliz"
+        ];
 
-    // MÁQUINA DE ESCRIBIR (75ms)
-    function escribir(txt) {
-        let i = 0; 
-        textoDiv.innerHTML = "";
-        const intervalId = setInterval(() => {
-            if(i < txt.length) { 
-                textoDiv.innerHTML += txt.charAt(i); 
-                i++; 
-            } else { 
-                clearInterval(intervalId); 
-            }
-        }, 75);
-    }
+        const photos = [
+            "https://res.cloudinary.com/dvm2v0zvr/image/upload/v1771000212/lu0vh9dirievwosl19sx.jpg",
+            "https://res.cloudinary.com/dvm2v0zvr/image/upload/v1771012574/htmdh7u7xxvvl43dlxfc.jpg",
+            "https://res.cloudinary.com/dvm2v0zvr/image/upload/v1771012672/zohlnjlunxeafhnzdinx.jpg",
+            "https://res.cloudinary.com/dvm2v0zvr/image/upload/v1772508574/vksygd7avg8adotj5jfs.jpg",
+            "https://res.cloudinary.com/dvm2v0zvr/image/upload/v1772532240/bnxotwbredookmb58sbq.jpg",
+            "https://res.cloudinary.com/dvm2v0zvr/image/upload/v1771173751/o9pc4smsntgueavxurnz.jpg"
+        ];
 
-    function formarFigura(tipo) {
-        fase = tipo;
-        particulas.forEach((p, i) => {
-            const t = i / particulas.length * Math.PI * 2;
-            if (tipo === "corazon") {
-                p.color = "#ff4d94";
-                p.objetivoX = canvas.width/2 + 180 * Math.pow(Math.sin(t), 3);
-                p.objetivoY = canvas.height/2 - (150 * Math.cos(t) - 60 * Math.cos(2*t) - 30 * Math.cos(3*t) - 15 * Math.cos(4*t));
-            } else if (tipo === "avion") {
-                p.color = "#87CEEB";
-                p.objetivoX = canvas.width/2 + (i%50 * 12) - 300;
-                p.objetivoY = canvas.height/2 + (Math.sin(i*0.5)*25);
-            }
-        });
-    }
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        const stars = Array(200).fill().map(() => ({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*2, v: Math.random()*0.3 }));
+        function draw() { ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle="white"; stars.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, s.s, 0, Math.PI*2); ctx.fill(); s.y+=s.v; if(s.y>canvas.height) s.y=0; }); requestAnimationFrame(draw); }
+        draw();
 
-    // --- CRONOLOGÍA DE 180 SEGUNDOS (3 MINUTOS) ---
-    function iniciarHistoria() {
-        document.getElementById('pantalla-inicio').style.display = 'none';
-        musica.volume = 0.3;
-        musica.play().catch(e => console.log(e));
-
-        // MINUTO 1: CALMA Y CAPAS
-        escribir("Todo comenzó con esta paz que me diste, mi Administradora."); 
-        
-        setTimeout(() => {
-            escribir("Me tomó tiempo entender cada capa de tu alma, pero cada una vale la pena."); 
-        }, 25000);
-
-        setTimeout(() => {
-            escribir("Valoré cada silencio y cada palabra en tus momentos de calma."); 
-        }, 50000);
-
-        // MINUTO 2: ACCIÓN Y VUELO
-        setTimeout(() => {
-            formarFigura("avion");
-            escribir("Y de pronto, empezamos a volar hacia un mismo norte."); 
-        }, 75000);
-
-        setTimeout(() => {
-            escribir("Admiro tu fuerza en Modo Acción... eres mi mayor inspiración."); 
-        }, 105000);
-
-        // MINUTO 3: CORAZÓN Y TU VOZ
-        setTimeout(() => {
-            formarFigura("corazon");
-            musica.volume = 0.1; 
-            voz.play().catch(e => console.log(e));
-            escribir("Escucha esto que tengo guardado solo para ti..."); 
-        }, 135000);
-
-        setTimeout(() => {
-            escribir("Eres y serás siempre el amor de mi vida, Mayda."); 
-        }, 160000);
-
-        // FINAL (3:00)
-        setTimeout(() => {
-            fase = "fuegos";
-            escribir("👩‍❤️‍💋‍👨 TE AMO PARA SIEMPRE, MI ADMINISTRADORA 👩‍❤️‍💋‍👨"); 
-            
-            setTimeout(() => {
-                fase = "petalos";
-                particulas.forEach(p => { p.opacidad = 1; p.tamaño = 3.5; });
-            }, 3000);
-
-            setTimeout(() => {
-                document.body.style.transition = "opacity 4s";
-                document.body.style.opacity = "0";
-                setTimeout(() => { window.location.href = "/boveda"; }, 4000);
-            }, 12000); 
-        }, 180000);
-    }
-
-    // EL FONDO CHÉVERE (EL GRADIENTE QUE TE GUSTÓ)
-    function animar() {
-        let gradient = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, canvas.width);
-        gradient.addColorStop(0, "#0c001a"); 
-        gradient.addColorStop(1, "#000000"); 
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        ctx.fillStyle = "white";
-        estrellasFijas.forEach(ef => {
-            ctx.globalAlpha = ef.opacidad;
-            ctx.fillRect(ef.x, ef.y, 1, 1);
+        document.getElementById('start-btn').addEventListener('click', function() {
+            intro.style.display = 'none'; 
+            audio.play().catch(() => console.log("Audio esperando..."));
+            buildGalaxy();
+            setInterval(spawnHeartParticle, 500);
+            setInterval(spawnPhoto, 4500);   
+            setInterval(spawnPhrase, 1800);  
         });
 
-        particulas.forEach(p => { p.actualizar(); p.dibujar(); });
-        requestAnimationFrame(animar);
-    }
-    animar();
-</script>
+        function buildGalaxy() {
+            const container = document.getElementById('ring');
+            const texts = ["INDISPENSABLE", "MI ADMINISTRADORA", "MI NORTE", "MAYDA ❤️"];
+            for(let i=0; i<20; i++) {
+                const el = document.createElement('span'); el.className = 'ring-text';
+                el.innerText = texts[i % texts.length] + " • ";
+                el.style.transform = rotateZ(${i*18}deg) translateY(350px) rotateX(-90deg);
+                container.appendChild(el);
+            }
+        }
+
+        function spawnHeartParticle() {
+            const h = document.createElement('div'); h.className = 'heart-particle';
+            h.innerHTML = '❤️'; h.style.left = Math.random()*100+"vw"; h.style.top = Math.random()*100+"vh";
+            h.style.fontSize = (Math.random()*15+15)+"px"; document.body.appendChild(h);
+            setTimeout(() => h.remove(), 4000);
+        }
+
+        function spawnPhrase() {
+            const p = document.createElement('div'); p.className = 'mayda-phrase';
+            p.innerText = realPhrases[Math.floor(Math.random()*realPhrases.length)];
+            p.style.left = (15+Math.random()*70)+"vw"; p.style.top = (20+Math.random()*60)+"vh";
+            document.body.appendChild(p); setTimeout(() => p.remove(), 6000);
+        }
+
+        function spawnPhoto() {
+            const img = document.createElement('img'); img.src = photos[Math.floor(Math.random()*photos.length)];
+            img.className = 'photo'; img.style.left = (20+Math.random()*60)+"%"; img.style.top = (20+Math.random()*60)+"%";
+            document.body.appendChild(img);
+            img.animate([{transform:'scale(0) rotate(-10deg)', opacity:0}, {transform:'scale(1) rotate(0)', opacity:1, offset:0.1}, {transform:'scale(1.4) rotate(10deg)', opacity:0}], 9000).onfinish = () => img.remove();
+        }
+
+        audio.onended = () => {
+            document.getElementById('final-screen').style.display = 'flex';
+            const lines = [
+                "> [SYSTEM] Identidad verificada: MAYDA.",
+                "> [STATUS] Administradora de este sistema.",
+                "> Me encanta leerte; me haces el hombre más feliz.",
+                "> Gracias por ser mi apoyo y mi norte.",
+                "> Tu programador y skater siempre estará para ti.",
+                "> MORALEJA: Eres indispensable en este código y en mi vida.",
+                "> [ACCESS] Permiso concedido.",
+                "> while(true) { amarte_siempre(); }"
+            ];
+            let i = 0;
+            const t = setInterval(() => {
+                if(i < lines.length) {
+                    term.innerHTML += <div class="fade-in-text" style="margin-bottom:12px;">${lines[i]}</div>;
+                    i++;
+                } else {
+                    clearInterval(t);
+                    setTimeout(() => {
+                        term.innerHTML += <br><button onclick="entrarABoveda()" style="padding:12px 25px; border:1px solid var(--cyan); background:rgba(0,242,255,0.1); color:var(--cyan); cursor:pointer; font-family:'Fira Code'; box-shadow: 0 0 15px var(--cyan); animation: fadeIn 1s forwards;"> [ ACCEDER A BÓVEDA DIGITAL ] </button>;
+                    }, 1500);
+                }
+            }, 1900);
+        };
+
+        function entrarABoveda() {
+            window.location.href = "/boveda"; 
+        }
+    </script>
 </body>
 </html>
