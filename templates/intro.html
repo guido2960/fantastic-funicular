@@ -2,84 +2,90 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mayda // System</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
     <style>
         :root { --pink: #ff1493; --cyan: #00f2ff; --bg: #050505; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: var(--bg); font-family: 'Poppins', sans-serif; color: white; }
-
-        /* Capas de fondo */
-        #starfield { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
-        #galaxy { position: fixed; inset: 0; z-index: 5; pointer-events: none; }
         
-        /* Contenedor de Intro - PRIORIDAD MÁXIMA */
-        #intro-layer { 
-            position: fixed; inset: 0; z-index: 1000000; 
-            background: var(--bg); display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; text-align: center;
+        /* RESET TOTAL PARA EVITAR INTERFERENCIAS */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body, html { width: 100%; height: 100%; background: var(--bg); overflow: hidden; font-family: 'Courier New', Courier, monospace; }
+
+        /* CAPA 1: ESTRELLAS Y GALAXIA (DESACTIVADAS PARA EL CLIC) */
+        #starfield, #galaxy-layer {
+            position: fixed; inset: 0;
+            pointer-events: none !important; /* GARANTÍA: El mouse las atraviesa */
+            z-index: 1;
         }
 
-        #start-btn { 
-            margin-top: 30px; padding: 22px 65px; 
-            border: 4px solid var(--pink); background: transparent; 
-            color: var(--pink); cursor: pointer !important; 
-            font-family: 'Fira Code'; font-weight: bold; font-size: 24px; 
-            text-transform: uppercase; letter-spacing: 3px;
-            transition: 0.3s; position: relative; pointer-events: all;
-            box-shadow: 0 0 20px rgba(255, 20, 147, 0.3);
+        /* CAPA 2: EL BOTÓN DE INICIO (ESTÁ ENCIMA DE TODO) */
+        #ui-trigger-layer {
+            position: fixed; inset: 0;
+            z-index: 999999; /* PRIORIDAD MÁXIMA */
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            background: var(--bg); /* Fondo sólido inicial */
+            pointer-events: all;
         }
-        #start-btn:hover { background: var(--pink); color: white; box-shadow: 0 0 60px var(--pink); }
 
-        /* Elementos de animación */
-        .ring-container { position: absolute; left: 50%; top: 50%; transform-style: preserve-3d; animation: galaxyRotate 35s linear infinite; }
-        @keyframes galaxyRotate {
-            0% { transform: translate(-50%, -50%) rotateX(75deg) rotateZ(0deg); }
-            100% { transform: translate(-50%, -50%) rotateX(75deg) rotateZ(360deg); }
+        #start-btn {
+            padding: 25px 60px;
+            background: transparent;
+            color: var(--pink);
+            border: 4px solid var(--pink);
+            font-size: 24px; font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 20, 147, 0.4);
+            text-transform: uppercase;
+            z-index: 1000000;
         }
-        .ring-text { position: absolute; white-space: nowrap; color: var(--pink); opacity: 0.4; font-size: 14px; font-family: 'Fira Code'; }
 
-        /* Pantalla Final */
-        #final-screen { 
-            position: fixed; inset: 0; z-index: 2000000; display: none; 
-            background: rgba(0,0,0,0.98); flex-direction: column; 
-            align-items: center; justify-content: center; 
+        /* CAPA 3: PANTALLA FINAL */
+        #final-screen {
+            position: fixed; inset: 0; z-index: 2000000;
+            display: none; background: rgba(0,0,0,0.95);
+            flex-direction: column; align-items: center; justify-content: center;
+            pointer-events: all;
         }
-        .terminal { 
-            font-family: 'Fira Code', monospace; color: var(--cyan); 
-            background: #0d1117; padding: 30px; border-radius: 12px; 
-            border: 1px solid var(--pink); width: 85%; max-width: 550px; 
-            height: 350px; overflow-y: auto; margin-bottom: 20px;
-        }
-        .terminal::-webkit-scrollbar { display: none; }
 
-        #btn-boveda {
-            padding: 15px 30px; border: 2px solid var(--cyan); 
-            background: rgba(0,242,255,0.1); color: var(--cyan); 
-            font-family: 'Fira Code'; font-weight: bold; cursor: pointer !important;
-            display: none; animation: fadeIn 1s forwards; text-decoration: none;
+        .terminal {
+            width: 90%; max-width: 600px; height: 300px;
+            background: #0d1117; border: 1px solid var(--pink);
+            color: var(--cyan); padding: 20px; overflow-y: auto;
+            font-size: 14px; line-height: 1.5; margin-bottom: 20px;
         }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Fotos y partículas */
-        .photo { position: absolute; width: 220px; height: 220px; border-radius: 15px; border: 2px solid white; object-fit: cover; z-index: 50; pointer-events: none; }
+        #btn-access {
+            display: none; padding: 15px 30px;
+            border: 2px solid var(--cyan); color: var(--cyan);
+            background: transparent; text-decoration: none;
+            font-weight: bold; cursor: pointer;
+        }
+
+        /* ANIMACIONES DE LA GALAXIA */
+        .ring-container { position: absolute; left: 50%; top: 50%; transform-style: preserve-3d; animation: rot 30s linear infinite; }
+        @keyframes rot { from { transform: translate(-50%, -50%) rotateX(75deg) rotateZ(0deg); } to { transform: translate(-50%, -50%) rotateX(75deg) rotateZ(360deg); } }
+        .ring-text { position: absolute; color: var(--pink); font-size: 12px; opacity: 0.4; white-space: nowrap; }
+
+        .photo { position: absolute; width: 180px; height: 180px; border: 2px solid white; object-fit: cover; z-index: 50; pointer-events: none; }
     </style>
 </head>
 <body>
 
-    <div id="intro-layer">
-        <h1 style="font-family:'Fira Code'; text-shadow: 0 0 20px var(--pink); font-size: 2.5em;">&lt;MAYDA_SYSTEM/&gt;</h1>
-        <p style="color: #555; letter-spacing: 5px; font-size: 12px;">AUTENTICACIÓN REQUERIDA</p>
+    <div id="ui-trigger-layer">
+        <h1 style="color:white; margin-bottom:20px; text-shadow: 0 0 10px var(--pink);">&lt;SYSTEM_OVERRIDE/&gt;</h1>
         <button id="start-btn">CONECTAR</button>
+        <p style="color:#444; margin-top:15px; font-size:10px;">AUTH_REQUIRED // MAYDA_ADMIN</p>
     </div>
 
     <canvas id="starfield"></canvas>
-    <div id="galaxy"><div class="ring-container" id="ring"></div></div>
+    <div id="galaxy-layer"><div class="ring-container" id="ring"></div></div>
     
     <div id="final-screen">
-        <div style="font-size: 50px; margin-bottom: 20px;">🛹 ❤️ 🌹</div>
+        <div style="font-size: 40px; margin-bottom: 15px;">🛹 ❤️ 🌹</div>
         <div class="terminal" id="term"></div>
-        <a href="/boveda" id="btn-boveda">[ ACCEDER A BÓVEDA DIGITAL ]</a>
+        <a href="/boveda" id="btn-access">[ ENTRAR A LA BÓVEDA ]</a>
     </div>
 
     <audio id="audio" preload="auto">
@@ -88,109 +94,94 @@
 
     <script>
         const audio = document.getElementById('audio');
-        const introLayer = document.getElementById('intro-layer');
+        const triggerLayer = document.getElementById('ui-trigger-layer');
         const term = document.getElementById('term');
-        const btnStart = document.getElementById('start-btn');
+        const btnAccess = document.getElementById('btn-access');
 
-        // Función de inicio (Blindada)
-        function iniciarSistema() {
-            introLayer.style.pointerEvents = 'none';
-            introLayer.style.display = 'none';
+        // FUNCIÓN ÚNICA DE ARRANQUE
+        function start() {
+            triggerLayer.style.display = 'none'; // Desaparece la capa de bloqueo
+            audio.play();
             
-            audio.play().catch(e => console.log("Audio en espera de carga"));
-
+            // Iniciar visuales
             buildGalaxy();
-            setInterval(spawnHeart, 600);
-            setInterval(spawnPhoto, 4500);
-            setInterval(spawnPhrase, 2200);
+            setInterval(spawnPhoto, 5000);
+            setInterval(spawnHeart, 700);
         }
 
-        // Escuchar tanto click como touch para evitar fallos en móviles
-        btnStart.addEventListener('click', iniciarSistema);
-        btnStart.addEventListener('touchstart', iniciarSistema);
+        // DOBLE ESCUCHA (PARA MÓVIL Y PC)
+        document.getElementById('start-btn').addEventListener('click', start);
+        document.getElementById('start-btn').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            start();
+        });
 
-        // --- Lógica de la Galaxia y Efectos ---
         function buildGalaxy() {
-            const container = document.getElementById('ring');
-            const texts = ["INDISPENSABLE", "MAYDA", "MI NORTE", "ADMINISTRADORA"];
-            for(let i=0; i<20; i++){
-                const span = document.createElement('span'); span.className = 'ring-text';
-                span.innerText = texts[i%4] + " • ";
-                span.style.transform = rotateZ(${i*18}deg) translateY(300px) rotateX(-90deg);
-                container.appendChild(span);
+            const r = document.getElementById('ring');
+            for(let i=0; i<20; i++) {
+                const s = document.createElement('span'); s.className = 'ring-text';
+                s.innerText = "MAYDA • INDISPENSABLE • MI NORTE • ";
+                s.style.transform = rotateZ(${i*18}deg) translateY(280px) rotateX(-90deg);
+                r.appendChild(s);
             }
         }
 
         function spawnHeart() {
-            const h = document.createElement('div'); h.style.position = 'fixed';
-            h.style.left = Math.random()*100+"vw"; h.style.top = Math.random()*100+"vh";
-            h.style.color = 'var(--pink)'; h.innerHTML = '❤️'; h.style.zIndex = '10';
+            const h = document.createElement('div');
+            h.innerHTML = '❤️'; h.style.position = 'fixed';
+            h.style.left = Math.random()*100+'vw'; h.style.top = Math.random()*100+'vh';
+            h.style.color = 'var(--pink)'; h.style.zIndex = '5'; h.style.pointerEvents = 'none';
             document.body.appendChild(h);
-            h.animate([{transform:'scale(0)', opacity:0}, {transform:'scale(1.5)', opacity:1}, {transform:'scale(2)', opacity:0}], 4000).onfinish = () => h.remove();
+            h.animate([{transform:'scale(0)', opacity:0}, {transform:'scale(2)', opacity:1}, {transform:'opacity:0'}], 3000).onfinish = () => h.remove();
         }
 
         function spawnPhoto() {
             const urls = ["https://res.cloudinary.com/dvm2v0zvr/image/upload/v1771000212/lu0vh9dirievwosl19sx.jpg", "https://res.cloudinary.com/dvm2v0zvr/image/upload/v1771012574/htmdh7u7xxvvl43dlxfc.jpg", "https://res.cloudinary.com/dvm2v0zvr/image/upload/v1771012672/zohlnjlunxeafhnzdinx.jpg", "https://res.cloudinary.com/dvm2v0zvr/image/upload/v1772508574/vksygd7avg8adotj5jfs.jpg", "https://res.cloudinary.com/dvm2v0zvr/image/upload/v1772532240/bnxotwbredookmb58sbq.jpg", "https://res.cloudinary.com/dvm2v0zvr/image/upload/v1771173751/o9pc4smsntgueavxurnz.jpg"];
             const img = document.createElement('img'); img.src = urls[Math.floor(Math.random()*urls.length)];
-            img.className = 'photo'; img.style.left = (15+Math.random()*70)+"%"; img.style.top = (15+Math.random()*70)+"%";
+            img.className = 'photo'; img.style.left = Math.random()*70+'%'; img.style.top = Math.random()*70+'%';
             document.body.appendChild(img);
-            img.animate([{opacity:0, transform:'scale(0.8)'}, {opacity:1, transform:'scale(1)'}, {opacity:0, transform:'scale(1.2)'}], 8000).onfinish = () => img.remove();
+            img.animate([{opacity:0}, {opacity:1}, {opacity:0}], 8000).onfinish = () => img.remove();
         }
 
-        function spawnPhrase() {
-            const phrases = ["Indispensable ❤️", "Mi Administradora", "Mi Norte", "Te amo", "El hombre más feliz"];
-            const p = document.createElement('div'); p.innerText = phrases[Math.floor(Math.random()*phrases.length)];
-            p.style.position = 'fixed'; p.style.color = 'var(--cyan)'; p.style.zIndex = '100';
-            p.style.left = Math.random()*80+"vw"; p.style.top = Math.random()*80+"vh";
-            p.style.fontFamily = 'Fira Code';
-            document.body.appendChild(p);
-            p.animate([{opacity:0}, {opacity:1}, {opacity:0}], 5000).onfinish = () => p.remove();
-        }
-
-        // --- Final: Máquina de Escribir ---
         audio.onended = () => {
             document.getElementById('final-screen').style.display = 'flex';
             const lines = [
-                "> [SYSTEM] Identidad verificada: MAYDA.",
-                "> [STATUS] Administradora detectada.",
-                "> Me encanta leer cómo te expresas.",
-                "> Me haces sentir el hombre más feliz del mundo.",
+                "> [LOGIN] Identidad: MAYDA",
+                "> Analizando archivos de voz...",
+                "> Eres indispensable en este sistema.",
+                "> Me haces el hombre más feliz del mundo.",
                 "> Gracias por ser mi apoyo y mi norte.",
-                "> MORALEJA: Eres indispensable en mi vida.",
-                "> while(true) { amarte_siempre(); }",
-                "> Acceso total concedido."
+                "> MORALEJA: Todo es por ti y para ti.",
+                "> Acceso total concedido.",
+                "> while(true) { amarte(); }"
             ];
-            
-            let lIdx = 0;
-            function typeLine() {
-                if(lIdx < lines.length) {
-                    let cIdx = 0;
-                    let div = document.createElement('div');
-                    div.style.marginBottom = "10px";
-                    term.appendChild(div);
-                    function typeChar() {
-                        if(cIdx < lines[lIdx].length) {
-                            div.innerHTML += lines[lIdx].charAt(cIdx);
-                            cIdx++; setTimeout(typeChar, 40);
-                        } else {
-                            lIdx++; setTimeout(typeLine, 700);
-                        }
+            let l = 0;
+            function type() {
+                if(l < lines.length) {
+                    let c = 0; let d = document.createElement('div'); d.style.marginBottom = "8px";
+                    term.appendChild(d);
+                    function char() {
+                        if(c < lines[l].length) {
+                            d.innerHTML += lines[l].charAt(c); c++; setTimeout(char, 30);
+                        } else { l++; setTimeout(type, 600); }
                         term.scrollTop = term.scrollHeight;
                     }
-                    typeChar();
-                } else {
-                    document.getElementById('btn-boveda').style.display = 'inline-block';
-                }
+                    char();
+                } else { btnAccess.style.display = 'inline-block'; }
             }
-            typeLine();
+            type();
         };
 
-        // Estrellas
-        const sCtx = canvas.getContext('2d');
-        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        const stars = Array(150).fill().map(() => ({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*2, v: Math.random()*0.3 }));
-        function anim() { sCtx.clearRect(0,0,canvas.width,canvas.height); sCtx.fillStyle="white"; stars.forEach(s => { sCtx.beginPath(); sCtx.arc(s.x, s.y, s.s, 0, Math.PI*2); sCtx.fill(); s.y+=s.v; if(s.y>canvas.height) s.y=0; }); requestAnimationFrame(anim); }
-        anim();
+        // ESTRELLAS
+        const c = document.getElementById('starfield'); const x = c.getContext('2d');
+        c.width = window.innerWidth; c.height = window.innerHeight;
+        const st = Array(100).fill().map(() => ({x:Math.random()*c.width, y:Math.random()*c.height, v:Math.random()*0.5}));
+        function draw() {
+            x.clearRect(0,0,c.width,c.height); x.fillStyle="white";
+            st.forEach(s => { x.fillRect(s.x, s.y, 1, 1); s.y += s.v; if(s.y > c.width) s.y = 0; });
+            requestAnimationFrame(draw);
+        }
+        draw();
     </script>
 </body>
 </html>
