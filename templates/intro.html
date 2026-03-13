@@ -2,186 +2,205 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mayda // System</title>
+    <title>Para mi Administradora</title>
     <style>
-        :root { --pink: #ff1493; --cyan: #00f2ff; --bg: #050505; }
-        
-        /* RESET TOTAL PARA EVITAR INTERFERENCIAS */
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        body, html { width: 100%; height: 100%; background: var(--bg); overflow: hidden; font-family: 'Courier New', Courier, monospace; }
-
-        /* CAPA 1: ESTRELLAS Y GALAXIA (DESACTIVADAS PARA EL CLIC) */
-        #starfield, #galaxy-layer {
-            position: fixed; inset: 0;
-            pointer-events: none !important; /* GARANTÍA: El mouse las atraviesa */
-            z-index: 1;
-        }
-
-        /* CAPA 2: EL BOTÓN DE INICIO (ESTÁ ENCIMA DE TODO) */
-        #ui-trigger-layer {
-            position: fixed; inset: 0;
-            z-index: 999999; /* PRIORIDAD MÁXIMA */
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            background: var(--bg); /* Fondo sólido inicial */
-            pointer-events: all;
-        }
-
-        #start-btn {
-            padding: 25px 60px;
-            background: transparent;
-            color: var(--pink);
-            border: 4px solid var(--pink);
-            font-size: 24px; font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 0 20px rgba(255, 20, 147, 0.4);
-            text-transform: uppercase;
-            z-index: 1000000;
-        }
-
-        /* CAPA 3: PANTALLA FINAL */
-        #final-screen {
-            position: fixed; inset: 0; z-index: 2000000;
-            display: none; background: rgba(0,0,0,0.95);
-            flex-direction: column; align-items: center; justify-content: center;
-            pointer-events: all;
-        }
-
-        .terminal {
-            width: 90%; max-width: 600px; height: 300px;
-            background: #0d1117; border: 1px solid var(--pink);
-            color: var(--cyan); padding: 20px; overflow-y: auto;
-            font-size: 14px; line-height: 1.5; margin-bottom: 20px;
-        }
-
-        #btn-access {
-            display: none; padding: 15px 30px;
-            border: 2px solid var(--cyan); color: var(--cyan);
-            background: transparent; text-decoration: none;
-            font-weight: bold; cursor: pointer;
-        }
-
-        /* ANIMACIONES DE LA GALAXIA */
-        .ring-container { position: absolute; left: 50%; top: 50%; transform-style: preserve-3d; animation: rot 30s linear infinite; }
-        @keyframes rot { from { transform: translate(-50%, -50%) rotateX(75deg) rotateZ(0deg); } to { transform: translate(-50%, -50%) rotateX(75deg) rotateZ(360deg); } }
-        .ring-text { position: absolute; color: var(--pink); font-size: 12px; opacity: 0.4; white-space: nowrap; }
-
-        .photo { position: absolute; width: 180px; height: 180px; border: 2px solid white; object-fit: cover; z-index: 50; pointer-events: none; }
+        body { margin: 0; background: #000; color: white; font-family: 'Courier New', monospace; overflow: hidden; }
+        #canvasUniverso { position: absolute; top: 0; left: 0; }
+        #interfaz { position: relative; z-index: 10; width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; pointer-events: none; }
+        #texto-emocional { font-size: 26px; text-align: center; text-shadow: 0 0 20px #ff4d94; padding: 20px; font-weight: bold; max-width: 80%; line-height: 1.5; }
+        #pantalla-inicio { position: fixed; width: 100%; height: 100%; background: black; z-index: 100; display: flex; justify-content: center; align-items: center; pointer-events: all; }
+        #btn-entrar { padding: 20px 40px; font-size: 22px; cursor: pointer; background: #ff4d94; border: none; color: white; border-radius: 50px; box-shadow: 0 0 30px #ff4d94; transition: 0.3s; font-family: 'Courier New', monospace; }
+        #btn-entrar:hover { transform: scale(1.1); background: #ff3385; }
     </style>
 </head>
 <body>
 
-    <div id="ui-trigger-layer">
-        <h1 style="color:white; margin-bottom:20px; text-shadow: 0 0 10px var(--pink);">&lt;SYSTEM_OVERRIDE/&gt;</h1>
-        <button id="start-btn">CONECTAR</button>
-        <p style="color:#444; margin-top:15px; font-size:10px;">AUTH_REQUIRED // MAYDA_ADMIN</p>
-    </div>
+<div id="pantalla-inicio">
+    <button id="btn-entrar" onclick="iniciarHistoria()">Entrar a nuestra historia</button>
+</div>
 
-    <canvas id="starfield"></canvas>
-    <div id="galaxy-layer"><div class="ring-container" id="ring"></div></div>
+<div id="interfaz">
+    <div id="texto-emocional"></div>
+</div>
+
+<canvas id="canvasUniverso"></canvas>
+
+<audio id="musicaFondo" loop preload="auto">
+    <source src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772691824/musica_de_fondo_fuo3r2.m4a" type="audio/mp4">
+</audio>
+<audio id="audioVoz" preload="auto">
+    <source src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1772691824/mi_audio_e07s2p.mp4" type="audio/mp4">
+</audio>
+
+<script>
+    const canvas = document.getElementById('canvasUniverso');
+    const ctx = canvas.getContext('2d');
+    const textoDiv = document.getElementById('texto-emocional');
+    const musica = document.getElementById('musicaFondo');
+    const voz = document.getElementById('audioVoz');
     
-    <div id="final-screen">
-        <div style="font-size: 40px; margin-bottom: 15px;">🛹 ❤️ 🌹</div>
-        <div class="terminal" id="term"></div>
-        <a href="/boveda" id="btn-access">[ ENTRAR A LA BÓVEDA ]</a>
-    </div>
+    let particulas = [];
+    let estrellasFijas = []; 
+    let fase = "paz"; 
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-    <audio id="audio" preload="auto">
-        <source src="https://res.cloudinary.com/dvm2v0zvr/video/upload/v1773381592/MAYDA_AMORE_nsel5u.mp4" type="audio/mpeg">
-    </audio>
+    // FONDO ESTÁTICO (Las 300 que te gustaron)
+    for(let i=0; i<300; i++) {
+        estrellasFijas.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            opacidad: Math.random() * 0.5 + 0.1
+        });
+    }
 
-    <script>
-        const audio = document.getElementById('audio');
-        const triggerLayer = document.getElementById('ui-trigger-layer');
-        const term = document.getElementById('term');
-        const btnAccess = document.getElementById('btn-access');
-
-        // FUNCIÓN ÚNICA DE ARRANQUE
-        function start() {
-            triggerLayer.style.display = 'none'; // Desaparece la capa de bloqueo
-            audio.play();
-            
-            // Iniciar visuales
-            buildGalaxy();
-            setInterval(spawnPhoto, 5000);
-            setInterval(spawnHeart, 700);
+    class Particula {
+        constructor() { this.reset(); }
+        reset() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.vx = (Math.random() - 0.5) * 2;
+            this.vy = -Math.random() * 1.5;
+            this.color = "white";
+            this.tamaño = Math.random() * 2 + 0.5;
+            this.opacidad = 1;
+            this.objetivoX = null;
+            this.objetivoY = null;
         }
+        actualizar() {
+            if (fase === "paz") {
+                this.y += this.vy;
+                if (this.y < 0) this.y = canvas.height;
+            } else if (fase === "avion" || fase === "corazon") {
+                this.x += (this.objetivoX - this.x) * 0.05;
+                this.y += (this.objetivoY - this.y) * 0.05;
+            } else if (fase === "fuegos") {
+                this.x += this.vx * 7;
+                this.y += this.vy * 7;
+                this.opacidad -= 0.01;
+            } else if (fase === "petalos") {
+                this.y += 1.5;
+                this.x += Math.sin(this.y * 0.03) * 2;
+                this.color = "rgba(255, 182, 193, " + this.opacidad + ")";
+                if (this.y > canvas.height) { this.y = -10; this.opacidad = Math.random(); }
+            }
+        }
+        dibujar() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.tamaño, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.globalAlpha = Math.max(0, this.opacidad);
+            ctx.fill();
+        }
+    }
 
-        // DOBLE ESCUCHA (PARA MÓVIL Y PC)
-        document.getElementById('start-btn').addEventListener('click', start);
-        document.getElementById('start-btn').addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            start();
+    for (let i = 0; i < 700; i++) particulas.push(new Particula());
+
+    // MÁQUINA DE ESCRIBIR (75ms)
+    function escribir(txt) {
+        let i = 0; 
+        textoDiv.innerHTML = "";
+        const intervalId = setInterval(() => {
+            if(i < txt.length) { 
+                textoDiv.innerHTML += txt.charAt(i); 
+                i++; 
+            } else { 
+                clearInterval(intervalId); 
+            }
+        }, 75);
+    }
+
+    function formarFigura(tipo) {
+        fase = tipo;
+        particulas.forEach((p, i) => {
+            const t = i / particulas.length * Math.PI * 2;
+            if (tipo === "corazon") {
+                p.color = "#ff4d94";
+                p.objetivoX = canvas.width/2 + 180 * Math.pow(Math.sin(t), 3);
+                p.objetivoY = canvas.height/2 - (150 * Math.cos(t) - 60 * Math.cos(2*t) - 30 * Math.cos(3*t) - 15 * Math.cos(4*t));
+            } else if (tipo === "avion") {
+                p.color = "#87CEEB";
+                p.objetivoX = canvas.width/2 + (i%50 * 12) - 300;
+                p.objetivoY = canvas.height/2 + (Math.sin(i*0.5)*25);
+            }
+        });
+    }
+
+    // --- CRONOLOGÍA DE 180 SEGUNDOS (3 MINUTOS) ---
+    function iniciarHistoria() {
+        document.getElementById('pantalla-inicio').style.display = 'none';
+        musica.volume = 0.3;
+        musica.play().catch(e => console.log(e));
+
+        // MINUTO 1: CALMA Y CAPAS
+        escribir("Todo comenzó con esta paz que me diste, mi Administradora."); 
+        
+        setTimeout(() => {
+            escribir("Me tomó tiempo entender cada capa de tu alma, pero cada una vale la pena."); 
+        }, 25000);
+
+        setTimeout(() => {
+            escribir("Valoré cada silencio y cada palabra en tus momentos de calma."); 
+        }, 50000);
+
+        // MINUTO 2: ACCIÓN Y VUELO
+        setTimeout(() => {
+            formarFigura("avion");
+            escribir("Y de pronto, empezamos a volar hacia un mismo norte."); 
+        }, 75000);
+
+        setTimeout(() => {
+            escribir("Admiro tu fuerza en Modo Acción... eres mi mayor inspiración."); 
+        }, 105000);
+
+        // MINUTO 3: CORAZÓN Y TU VOZ
+        setTimeout(() => {
+            formarFigura("corazon");
+            musica.volume = 0.1; 
+            voz.play().catch(e => console.log(e));
+            escribir("Escucha esto que tengo guardado solo para ti..."); 
+        }, 135000);
+
+        setTimeout(() => {
+            escribir("Eres y serás siempre el amor de mi vida, Mayda."); 
+        }, 160000);
+
+        // FINAL (3:00)
+        setTimeout(() => {
+            fase = "fuegos";
+            escribir("👩‍❤️‍💋‍👨 TE AMO PARA SIEMPRE, MI ADMINISTRADORA 👩‍❤️‍💋‍👨"); 
+            
+            setTimeout(() => {
+                fase = "petalos";
+                particulas.forEach(p => { p.opacidad = 1; p.tamaño = 3.5; });
+            }, 3000);
+
+            setTimeout(() => {
+                document.body.style.transition = "opacity 4s";
+                document.body.style.opacity = "0";
+                setTimeout(() => { window.location.href = "/boveda"; }, 4000);
+            }, 12000); 
+        }, 180000);
+    }
+
+    // EL FONDO CHÉVERE (EL GRADIENTE QUE TE GUSTÓ)
+    function animar() {
+        let gradient = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, canvas.width);
+        gradient.addColorStop(0, "#0c001a"); 
+        gradient.addColorStop(1, "#000000"); 
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = "white";
+        estrellasFijas.forEach(ef => {
+            ctx.globalAlpha = ef.opacidad;
+            ctx.fillRect(ef.x, ef.y, 1, 1);
         });
 
-        function buildGalaxy() {
-            const r = document.getElementById('ring');
-            for(let i=0; i<20; i++) {
-                const s = document.createElement('span'); s.className = 'ring-text';
-                s.innerText = "MAYDA • INDISPENSABLE • MI NORTE • ";
-                s.style.transform = rotateZ(${i*18}deg) translateY(280px) rotateX(-90deg);
-                r.appendChild(s);
-            }
-        }
-
-        function spawnHeart() {
-            const h = document.createElement('div');
-            h.innerHTML = '❤️'; h.style.position = 'fixed';
-            h.style.left = Math.random()*100+'vw'; h.style.top = Math.random()*100+'vh';
-            h.style.color = 'var(--pink)'; h.style.zIndex = '5'; h.style.pointerEvents = 'none';
-            document.body.appendChild(h);
-            h.animate([{transform:'scale(0)', opacity:0}, {transform:'scale(2)', opacity:1}, {transform:'opacity:0'}], 3000).onfinish = () => h.remove();
-        }
-
-        function spawnPhoto() {
-            const urls = ["https://res.cloudinary.com/dvm2v0zvr/image/upload/v1771000212/lu0vh9dirievwosl19sx.jpg", "https://res.cloudinary.com/dvm2v0zvr/image/upload/v1771012574/htmdh7u7xxvvl43dlxfc.jpg", "https://res.cloudinary.com/dvm2v0zvr/image/upload/v1771012672/zohlnjlunxeafhnzdinx.jpg", "https://res.cloudinary.com/dvm2v0zvr/image/upload/v1772508574/vksygd7avg8adotj5jfs.jpg", "https://res.cloudinary.com/dvm2v0zvr/image/upload/v1772532240/bnxotwbredookmb58sbq.jpg", "https://res.cloudinary.com/dvm2v0zvr/image/upload/v1771173751/o9pc4smsntgueavxurnz.jpg"];
-            const img = document.createElement('img'); img.src = urls[Math.floor(Math.random()*urls.length)];
-            img.className = 'photo'; img.style.left = Math.random()*70+'%'; img.style.top = Math.random()*70+'%';
-            document.body.appendChild(img);
-            img.animate([{opacity:0}, {opacity:1}, {opacity:0}], 8000).onfinish = () => img.remove();
-        }
-
-        audio.onended = () => {
-            document.getElementById('final-screen').style.display = 'flex';
-            const lines = [
-                "> [LOGIN] Identidad: MAYDA",
-                "> Analizando archivos de voz...",
-                "> Eres indispensable en este sistema.",
-                "> Me haces el hombre más feliz del mundo.",
-                "> Gracias por ser mi apoyo y mi norte.",
-                "> MORALEJA: Todo es por ti y para ti.",
-                "> Acceso total concedido.",
-                "> while(true) { amarte(); }"
-            ];
-            let l = 0;
-            function type() {
-                if(l < lines.length) {
-                    let c = 0; let d = document.createElement('div'); d.style.marginBottom = "8px";
-                    term.appendChild(d);
-                    function char() {
-                        if(c < lines[l].length) {
-                            d.innerHTML += lines[l].charAt(c); c++; setTimeout(char, 30);
-                        } else { l++; setTimeout(type, 600); }
-                        term.scrollTop = term.scrollHeight;
-                    }
-                    char();
-                } else { btnAccess.style.display = 'inline-block'; }
-            }
-            type();
-        };
-
-        // ESTRELLAS
-        const c = document.getElementById('starfield'); const x = c.getContext('2d');
-        c.width = window.innerWidth; c.height = window.innerHeight;
-        const st = Array(100).fill().map(() => ({x:Math.random()*c.width, y:Math.random()*c.height, v:Math.random()*0.5}));
-        function draw() {
-            x.clearRect(0,0,c.width,c.height); x.fillStyle="white";
-            st.forEach(s => { x.fillRect(s.x, s.y, 1, 1); s.y += s.v; if(s.y > c.width) s.y = 0; });
-            requestAnimationFrame(draw);
-        }
-        draw();
-    </script>
+        particulas.forEach(p => { p.actualizar(); p.dibujar(); });
+        requestAnimationFrame(animar);
+    }
+    animar();
+</script>
 </body>
 </html>
