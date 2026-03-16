@@ -38,15 +38,16 @@
     let particulas = [];
     let estrellasFijas = []; 
     let fase = "paz"; 
+    let escribirInterval;
+
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    // Crear universo de fondo (estrellas que se mueven al estilo cine)
     for(let i=0; i<400; i++) {
         estrellasFijas.push({
             x: Math.random() * canvas.width,
             y: Math.random() * canvas.height,
-            z: Math.random() * canvas.width, // Profundidad
+            z: Math.random() * canvas.width, 
             opacidad: Math.random()
         });
     }
@@ -85,12 +86,12 @@
     for (let i = 0; i < 800; i++) particulas.push(new Particula());
 
     function escribir(txt) {
+        clearInterval(escribirInterval);
         let i = 0; textoDiv.innerHTML = "";
-        let speed = 90; 
-        const intervalId = setInterval(() => {
+        escribirInterval = setInterval(() => {
             if(i < txt.length) { textoDiv.innerHTML += txt.charAt(i); i++; }
-            else clearInterval(intervalId);
-        }, speed);
+            else clearInterval(escribirInterval);
+        }, 90);
     }
 
     function formarFigura(tipo) {
@@ -105,10 +106,6 @@
                 p.color = "#87CEEB";
                 if (i < 300) { p.objetivoX = canvas.width/2 + (Math.cos(i)*250); p.objetivoY = canvas.height/2 + (i%2===0?5:-5); }
                 else { p.objetivoX = canvas.width/2 + (i-500)*2; p.objetivoY = canvas.height/2; }
-            } else if (tipo === "edificio") {
-                p.color = "#FFD700";
-                p.objetivoX = canvas.width/2 + (i%25 * 15) - 180;
-                p.objetivoY = canvas.height/2 + (Math.floor(i/25) * -10);
             } else if (tipo === "corazon") {
                 p.color = "#ff4d94";
                 p.objetivoX = canvas.width/2 + 160 * Math.pow(Math.sin(t), 3);
@@ -121,41 +118,33 @@
         document.getElementById('pantalla-inicio').style.display = 'none';
         musica.volume = 0.3; musica.play();
 
-        // 0s - 30s: Intro
-        escribir("Todo comenzó con esta paz que me diste, mi Administradora favorita.");
+        escribir("Todo comenzó con esta paz que me diste...");
         
-        // 30s: Capas (Árbol)
-        setTimeout(() => { formarFigura("arbol"); escribir("Me tomó tiempo entender cada capa de tu alma, pero cada una de ellas vale la pena."); }, 30000);
-
-        // 60s: Norte (Avión)
-        setTimeout(() => { formarFigura("avion"); escribir("Admiro tu fuerza en Modo Acción... por eso mi vida siempre vuela hacia tu Norte."); }, 60000);
-
-        // 90s: Administradora (Edificio)
-        setTimeout(() => { formarFigura("edificio"); escribir("Eres una Administradora brillante. Admiro tu visión y quiero ser tu socio de vida."); }, 90000);
-
-        // 120s: Videos y Mensajes
-        setTimeout(() => { fase = "paz"; escribir("Tomo tan en serio cada video y mensaje que me mandas... me encanta cómo te expresas."); }, 120000);
-        setTimeout(() => { escribir("Quiero conocer a cada una de tus versiones y caminar a tu lado, poco a poco."); }, 135000);
-
-        // 150s: El Beso y Respeto
-        setTimeout(() => { escribir("Me encantaría darte ese primer beso... pero amo aún más respetar tu ritmo y esperarte."); }, 150000);
-
-        // 165s: Corazón y Voz
-        setTimeout(() => { formarFigura("corazon"); musica.volume = 0.08; voz.play(); escribir("Escucha esto que tengo guardado solo para ti..."); }, 165000);
-
-        // 180s: Final
+        setTimeout(() => { formarFigura("arbol"); escribir("Cada capa de tu alma vale la pena."); }, 8000);
+        setTimeout(() => { formarFigura("avion"); escribir("Mi vida vuela hacia tu Norte."); }, 18000);
+        
+        // CONEXIÓN DIRECTA A LA BÓVEDA
         setTimeout(() => { 
-            escribir("👩‍❤️‍💋‍👨 TE AMO PARA SIEMPRE, MAYDA 👩‍❤️‍💋‍👨");
-            setTimeout(() => { document.body.style.transition = "opacity 5s"; document.body.style.opacity = "0"; setTimeout(() => { window.location.href = "/boveda"; }, 5000); }, 10000);
-        }, 175000);
+            formarFigura("corazon"); 
+            musica.volume = 0.1; 
+            voz.play(); 
+            escribir("TE AMO PARA SIEMPRE, MAYDA"); 
+            
+            // Al terminar la voz y el mensaje, redirigir a la ruta de Python
+            setTimeout(() => { 
+                document.body.style.transition = "opacity 3s"; 
+                document.body.style.opacity = "0"; 
+                setTimeout(() => { 
+                    window.location.href = "/boveda"; // Esta es la llave que abre tu Python
+                }, 3000); 
+            }, 10000);
+        }, 28000);
     }
 
     function animar() {
         ctx.fillStyle = "black"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // EFECTO CINE SUTIL: Movimiento hacia el espectador
         estrellasFijas.forEach(ef => {
-            ef.z -= 0.5; // Las estrellas se acercan
+            ef.z -= 0.5;
             if (ef.z <= 0) ef.z = canvas.width;
             let x = (ef.x - canvas.width/2) * (canvas.width/ef.z) + canvas.width/2;
             let y = (ef.y - canvas.height/2) * (canvas.width/ef.z) + canvas.height/2;
@@ -163,7 +152,6 @@
             ctx.fillStyle = "white"; ctx.globalAlpha = ef.opacidad;
             ctx.fillRect(x, y, s, s);
         });
-
         particulas.forEach(p => { p.actualizar(); p.dibujar(); });
         requestAnimationFrame(animar);
     }
