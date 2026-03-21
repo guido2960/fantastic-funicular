@@ -7,7 +7,7 @@ import requests  # Para las notificaciones de Telegram
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 
-app = Flask(__name__, static_folder='static', static_url_path='/static')
+app = Flask(_name_, static_folder='static', static_url_path='/static')
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'llave_secreta_para_sesiones_2601')
 
 # --- 1. CONFIGURACIÓN DE CLOUDINARY ---
@@ -48,10 +48,8 @@ def get_db_connection():
         print("❌ Error: No se detectó DATABASE_URL")
         return None
     try:
-        # Ajuste técnico para compatibilidad con librerías de Python
         if url.startswith("postgres://"):
             url = url.replace("postgres://", "postgresql://", 1)
-        # En Render, la URL externa ya maneja los parámetros necesarios
         return psycopg2.connect(url)
     except Exception as e:
         print(f"❌ Error de conexión: {e}")
@@ -90,11 +88,16 @@ def inicializar_db():
 
 inicializar_db()
 
-# --- 3. EL PORTERO ---
+# --- 3. EL PORTERO (CORREGIDO PARA EVITAR EL ERROR 502) ---
 @app.before_request
 def portero_seguridad():
     rutas_libres = ['login', 'verificar', 'static', 'registro_jefe', 'check_autorizacion', 'sala_espera', 'reinstalar', 'cerrar_todo']
-    if request.endpoint in rutas_libres or request.path.startswith('/static'):
+    if request.endpoint in rutas_libres or (request.path and request.path.startswith('/static')):
+        return
+
+    # CORRECCIÓN CLAVE: Si ya hay sesión iniciada, NO revisamos la base de datos.
+    # Esto evita el lag y el error 502 al saltar del Login al Intro.
+    if 'user_email' in session:
         return
 
     huella = obtener_huella(request)
@@ -102,22 +105,25 @@ def portero_seguridad():
     if not conn: 
         return 
     
-    cur = conn.cursor()
-    cur.execute("SELECT autorizado, es_admin FROM autorizaciones WHERE dispositivo_id = %s", (huella,))
-    usuario = cur.fetchone()
-    cur.close()
-    conn.close()
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT autorizado, es_admin FROM autorizaciones WHERE dispositivo_id = %s", (huella,))
+        usuario = cur.fetchone()
+        cur.close()
+        conn.close()
 
-    if not usuario or (not usuario[0] and not usuario[1]):
-        if not usuario:
-            agente = request.user_agent.platform or "Desconocido"
-            conn = get_db_connection()
-            cur = conn.cursor()
-            cur.execute("INSERT INTO autorizaciones (dispositivo_id, nombre_equipo) VALUES (%s, %s) ON CONFLICT DO NOTHING", (huella, agente))
-            conn.commit()
-            cur.close()
-            conn.close()
-        return render_template('sala_espera.html')
+        if not usuario or (not usuario[0] and not usuario[1]):
+            if not usuario:
+                agente = request.user_agent.platform or "Desconocido"
+                conn = get_db_connection()
+                cur = conn.cursor()
+                cur.execute("INSERT INTO autorizaciones (dispositivo_id, nombre_equipo) VALUES (%s, %s) ON CONFLICT DO NOTHING", (huella, agente))
+                conn.commit()
+                cur.close()
+                conn.close()
+            return render_template('sala_espera.html')
+    except Exception as e:
+        print(f"Error en portero: {e}")
 
 # --- 4. RUTAS DE MANDO (DASHBOARD Y CONTROL) ---
 @app.route('/reinstalar')
@@ -170,7 +176,7 @@ def dashboard_norte():
 @app.route('/cerrar-todo')
 def cerrar_todo():
     session.clear()
-    avisar_boveda("⚠️ BOTÓN DE PÁNICO", "Se ha cerrado la sesión y limpiado el panorama de accesos.")
+    avisar_boveda("⚠️ BOTÓN DE PÁNICO", "Se ha cerrado la sesión.")
     return redirect(url_for('login'))
 
 @app.route('/autorizar_dispositivo/<int:id>')
@@ -201,10 +207,28 @@ def verificar():
     entrada_clave = request.form.get('clave', '').strip()
     if entrada_email == USUARIO_ACCESO and entrada_clave == CLAVE_ACCESO:
         session['user_email'] = entrada_email
-        avisar_boveda("Login", "Mayda o Abel han entrado a la Bóveda.")
+        
+        # AUTO-AUTORIZACIÓN: Para que al poner la clave, no te bloquee después.
+        try:
+            huella = obtener_huella(request)
+            conn = get_db_connection()
+            if conn:
+                cur = conn.cursor()
+                cur.execute("""
+                    INSERT INTO autorizaciones (dispositivo_id, nombre_equipo, autorizado)
+                    VALUES (%s, %s, True)
+                    ON CONFLICT (dispositivo_id) DO UPDATE SET autorizado = True
+                """, (huella, f"Acceso Validado ({request.user_agent.platform})"))
+                conn.commit()
+                cur.close()
+                conn.close()
+        except:
+            pass
+
+        avisar_boveda("Login", "Mayda o Abel han entrado.")
         return redirect(url_for('intro'))
     
-    avisar_boveda("⚠️ Intento Fallido", f"Alguien intentó entrar con el correo: {entrada_email}")
+    avisar_boveda("⚠️ Intento Fallido", f"Correo: {entrada_email}")
     return "🔐 Acceso denegado.", 403
 
 @app.route('/boveda')
@@ -234,7 +258,7 @@ def nueva_nota():
         conn.commit()
         cur.close()
         conn.close()
-        avisar_boveda("Nota Nueva", f"Se ha escrito un nuevo mensaje de amor.")
+        avisar_boveda("Nota Nueva", f"Se ha escrito un mensaje.")
     return redirect(url_for('boveda'))
 
 @app.route('/eliminar_nota/<int:id>', methods=['POST'])
@@ -259,7 +283,7 @@ def subir():
         conn.commit()
         cur.close()
         conn.close()
-        avisar_boveda("Recuerdo Nuevo", "Se ha subido una nueva foto a la galería.")
+        avisar_boveda("Recuerdo Nuevo", "Se ha subido una foto.")
     return redirect(url_for('boveda'))
 
 @app.route('/eliminar/<int:id>', methods=['POST'])
@@ -273,6 +297,6 @@ def eliminar(id):
     return redirect(url_for('boveda'))
 
 # --- 7. EL ARREGLO FINAL ---
-if __name__ == '__main__':
+if _name_ == '_main_':
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
