@@ -42,11 +42,17 @@ def avisar_boveda(evento, detalle=""):
         print(f"Error de red en Telegram: {e}")
 
 def get_db_connection():
-    # Ajuste: Usamos la URL de la base de datos que configuraste en Render
+    """Conexión adaptada para la URL Externa de Render"""
     url = os.environ.get('DATABASE_URL')
+    if not url:
+        print("❌ Error: No se detectó DATABASE_URL")
+        return None
     try:
-        # El sslmode='require' es vital para la seguridad en Render
-        return psycopg2.connect(url, sslmode='require')
+        # Ajuste técnico para compatibilidad con librerías de Python
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql://", 1)
+        # En Render, la URL externa ya maneja los parámetros necesarios
+        return psycopg2.connect(url)
     except Exception as e:
         print(f"❌ Error de conexión: {e}")
         return None
@@ -59,24 +65,28 @@ def inicializar_db():
     conn = get_db_connection()
     if conn:
         print("🛠️ Inicializando tablas...")
-        cur = conn.cursor()
-        cur.execute('''CREATE TABLE IF NOT EXISTS galeria (
-            id SERIAL PRIMARY KEY, archivo TEXT NOT NULL, mensaje TEXT, fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )''')
-        cur.execute('''CREATE TABLE IF NOT EXISTS notas_amor (
-            id SERIAL PRIMARY KEY, contenido TEXT NOT NULL, autor TEXT NOT NULL, categoria TEXT DEFAULT 'General', fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )''')
-        cur.execute('''CREATE TABLE IF NOT EXISTS control_seguridad (
-            id SERIAL PRIMARY KEY, session_version INTEGER DEFAULT 1
-        )''')
-        cur.execute('''CREATE TABLE IF NOT EXISTS autorizaciones (
-            id SERIAL PRIMARY KEY, dispositivo_id TEXT UNIQUE, nombre_equipo TEXT, autorizado BOOLEAN DEFAULT FALSE, es_admin BOOLEAN DEFAULT FALSE
-        )''')
-        cur.execute("INSERT INTO control_seguridad (id, session_version) SELECT 1, 1 WHERE NOT EXISTS (SELECT 1 FROM control_seguridad WHERE id = 1)")
-        conn.commit()
-        cur.close()
-        conn.close()
-        print("✅ Tablas verificadas/creadas.")
+        try:
+            cur = conn.cursor()
+            cur.execute('''CREATE TABLE IF NOT EXISTS galeria (
+                id SERIAL PRIMARY KEY, archivo TEXT NOT NULL, mensaje TEXT, fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )''')
+            cur.execute('''CREATE TABLE IF NOT EXISTS notas_amor (
+                id SERIAL PRIMARY KEY, contenido TEXT NOT NULL, autor TEXT NOT NULL, categoria TEXT DEFAULT 'General', fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )''')
+            cur.execute('''CREATE TABLE IF NOT EXISTS control_seguridad (
+                id SERIAL PRIMARY KEY, session_version INTEGER DEFAULT 1
+            )''')
+            cur.execute('''CREATE TABLE IF NOT EXISTS autorizaciones (
+                id SERIAL PRIMARY KEY, dispositivo_id TEXT UNIQUE, nombre_equipo TEXT, autorizado BOOLEAN DEFAULT FALSE, es_admin BOOLEAN DEFAULT FALSE
+            )''')
+            cur.execute("INSERT INTO control_seguridad (id, session_version) SELECT 1, 1 WHERE NOT EXISTS (SELECT 1 FROM control_seguridad WHERE id = 1)")
+            conn.commit()
+            cur.close()
+            print("✅ Tablas verificadas/creadas.")
+        except Exception as e:
+            print(f"⚠️ Error en inicialización: {e}")
+        finally:
+            conn.close()
 
 inicializar_db()
 
