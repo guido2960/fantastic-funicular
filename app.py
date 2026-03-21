@@ -7,7 +7,7 @@ import requests  # Para las notificaciones de Telegram
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 
-app = Flask(_name_, static_folder='static', static_url_path='/static')
+app = Flask(__name__, static_folder='static', static_url_path='/static')
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'llave_secreta_para_sesiones_2601')
 
 # --- 1. CONFIGURACIÓN DE CLOUDINARY ---
@@ -297,6 +297,6 @@ def eliminar(id):
     return redirect(url_for('boveda'))
 
 # --- 7. EL ARREGLO FINAL ---
-if _name_ == '_main_':
+if __name__ == '__main__':
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
