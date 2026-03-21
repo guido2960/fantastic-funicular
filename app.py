@@ -42,8 +42,10 @@ def avisar_boveda(evento, detalle=""):
         print(f"Error de red en Telegram: {e}")
 
 def get_db_connection():
+    # Ajuste: Usamos la URL de la base de datos que configuraste en Render
     url = os.environ.get('DATABASE_URL')
     try:
+        # El sslmode='require' es vital para la seguridad en Render
         return psycopg2.connect(url, sslmode='require')
     except Exception as e:
         print(f"❌ Error de conexión: {e}")
